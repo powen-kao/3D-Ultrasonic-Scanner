@@ -1,0 +1,592 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A225A3030C00272051 /* AppDelegate.swift */; };
+		FA19B3A525A3030C00272051 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3A425A3030C00272051 /* art.scnassets */; };
+		FA19B3A725A3030C00272051 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A625A3030C00272051 /* ViewController.swift */; };
+		FA19B3AA25A3030C00272051 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3A825A3030C00272051 /* Main.storyboard */; };
+		FA19B3AC25A3031100272051 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3AB25A3031100272051 /* Assets.xcassets */; };
+		FA19B3AF25A3031100272051 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */; };
+		FA19B3BA25A3031100272051 /* _D_Ultrasonic_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */; };
+		FA19B3C525A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FA19B3B625A3031100272051 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA19B39725A3030C00272051 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA19B39E25A3030C00272051;
+			remoteInfo = "3D Ultrasonic Scanner";
+		};
+		FA19B3C125A3031100272051 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA19B39725A3030C00272051 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA19B39E25A3030C00272051;
+			remoteInfo = "3D Ultrasonic Scanner";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3D Ultrasonic Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA19B3A225A3030C00272051 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FA19B3A425A3030C00272051 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
+		FA19B3A625A3030C00272051 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FA19B3A925A3030C00272051 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FA19B3AB25A3031100272051 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FA19B3AE25A3031100272051 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		FA19B3B025A3031100272051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA19B3B525A3031100272051 /* 3D Ultrasonic ScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "3D Ultrasonic ScannerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _D_Ultrasonic_ScannerTests.swift; sourceTree = "<group>"; };
+		FA19B3BB25A3031100272051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "3D Ultrasonic ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _D_Ultrasonic_ScannerUITests.swift; sourceTree = "<group>"; };
+		FA19B3C625A3031100272051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FA19B39C25A3030C00272051 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3B225A3031100272051 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3BD25A3031100272051 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FA19B39625A3030C00272051 = {
+			isa = PBXGroup;
+			children = (
+				FA19B3A125A3030C00272051 /* 3D Ultrasonic Scanner */,
+				FA19B3B825A3031100272051 /* 3D Ultrasonic ScannerTests */,
+				FA19B3C325A3031100272051 /* 3D Ultrasonic ScannerUITests */,
+				FA19B3A025A3030C00272051 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FA19B3A025A3030C00272051 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */,
+				FA19B3B525A3031100272051 /* 3D Ultrasonic ScannerTests.xctest */,
+				FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FA19B3A125A3030C00272051 /* 3D Ultrasonic Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				FA19B3A225A3030C00272051 /* AppDelegate.swift */,
+				FA19B3A425A3030C00272051 /* art.scnassets */,
+				FA19B3A625A3030C00272051 /* ViewController.swift */,
+				FA19B3A825A3030C00272051 /* Main.storyboard */,
+				FA19B3AB25A3031100272051 /* Assets.xcassets */,
+				FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */,
+				FA19B3B025A3031100272051 /* Info.plist */,
+			);
+			path = "3D Ultrasonic Scanner";
+			sourceTree = "<group>";
+		};
+		FA19B3B825A3031100272051 /* 3D Ultrasonic ScannerTests */ = {
+			isa = PBXGroup;
+			children = (
+				FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */,
+				FA19B3BB25A3031100272051 /* Info.plist */,
+			);
+			path = "3D Ultrasonic ScannerTests";
+			sourceTree = "<group>";
+		};
+		FA19B3C325A3031100272051 /* 3D Ultrasonic ScannerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */,
+				FA19B3C625A3031100272051 /* Info.plist */,
+			);
+			path = "3D Ultrasonic ScannerUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic Scanner" */;
+			buildPhases = (
+				FA19B39B25A3030C00272051 /* Sources */,
+				FA19B39C25A3030C00272051 /* Frameworks */,
+				FA19B39D25A3030C00272051 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "3D Ultrasonic Scanner";
+			productName = "3D Ultrasonic Scanner";
+			productReference = FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FA19B3B425A3031100272051 /* 3D Ultrasonic ScannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA19B3CC25A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic ScannerTests" */;
+			buildPhases = (
+				FA19B3B125A3031100272051 /* Sources */,
+				FA19B3B225A3031100272051 /* Frameworks */,
+				FA19B3B325A3031100272051 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA19B3B725A3031100272051 /* PBXTargetDependency */,
+			);
+			name = "3D Ultrasonic ScannerTests";
+			productName = "3D Ultrasonic ScannerTests";
+			productReference = FA19B3B525A3031100272051 /* 3D Ultrasonic ScannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FA19B3BF25A3031100272051 /* 3D Ultrasonic ScannerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA19B3CF25A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic ScannerUITests" */;
+			buildPhases = (
+				FA19B3BC25A3031100272051 /* Sources */,
+				FA19B3BD25A3031100272051 /* Frameworks */,
+				FA19B3BE25A3031100272051 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA19B3C225A3031100272051 /* PBXTargetDependency */,
+			);
+			name = "3D Ultrasonic ScannerUITests";
+			productName = "3D Ultrasonic ScannerUITests";
+			productReference = FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FA19B39725A3030C00272051 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1230;
+				LastUpgradeCheck = 1230;
+				TargetAttributes = {
+					FA19B39E25A3030C00272051 = {
+						CreatedOnToolsVersion = 12.3;
+					};
+					FA19B3B425A3031100272051 = {
+						CreatedOnToolsVersion = 12.3;
+						TestTargetID = FA19B39E25A3030C00272051;
+					};
+					FA19B3BF25A3031100272051 = {
+						CreatedOnToolsVersion = 12.3;
+						TestTargetID = FA19B39E25A3030C00272051;
+					};
+				};
+			};
+			buildConfigurationList = FA19B39A25A3030C00272051 /* Build configuration list for PBXProject "3D Ultrasonic Scanner" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FA19B39625A3030C00272051;
+			productRefGroup = FA19B3A025A3030C00272051 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */,
+				FA19B3B425A3031100272051 /* 3D Ultrasonic ScannerTests */,
+				FA19B3BF25A3031100272051 /* 3D Ultrasonic ScannerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FA19B39D25A3030C00272051 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA19B3A525A3030C00272051 /* art.scnassets in Resources */,
+				FA19B3AF25A3031100272051 /* LaunchScreen.storyboard in Resources */,
+				FA19B3AC25A3031100272051 /* Assets.xcassets in Resources */,
+				FA19B3AA25A3030C00272051 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3B325A3031100272051 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3BE25A3031100272051 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FA19B39B25A3030C00272051 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA19B3A725A3030C00272051 /* ViewController.swift in Sources */,
+				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3B125A3031100272051 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA19B3BA25A3031100272051 /* _D_Ultrasonic_ScannerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA19B3BC25A3031100272051 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA19B3C525A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FA19B3B725A3031100272051 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */;
+			targetProxy = FA19B3B625A3031100272051 /* PBXContainerItemProxy */;
+		};
+		FA19B3C225A3031100272051 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */;
+			targetProxy = FA19B3C125A3031100272051 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FA19B3A825A3030C00272051 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FA19B3A925A3030C00272051 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FA19B3AE25A3031100272051 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FA19B3C725A3031100272051 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FA19B3C825A3031100272051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FA19B3CA25A3031100272051 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic Scanner/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FA19B3CB25A3031100272051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic Scanner/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FA19B3CD25A3031100272051 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic ScannerTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-ScannerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3D Ultrasonic Scanner.app/3D Ultrasonic Scanner";
+			};
+			name = Debug;
+		};
+		FA19B3CE25A3031100272051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic ScannerTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-ScannerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3D Ultrasonic Scanner.app/3D Ultrasonic Scanner";
+			};
+			name = Release;
+		};
+		FA19B3D025A3031100272051 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic ScannerUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-ScannerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "3D Ultrasonic Scanner";
+			};
+			name = Debug;
+		};
+		FA19B3D125A3031100272051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "3D Ultrasonic ScannerUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-ScannerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "3D Ultrasonic Scanner";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FA19B39A25A3030C00272051 /* Build configuration list for PBXProject "3D Ultrasonic Scanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA19B3C725A3031100272051 /* Debug */,
+				FA19B3C825A3031100272051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic Scanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA19B3CA25A3031100272051 /* Debug */,
+				FA19B3CB25A3031100272051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA19B3CC25A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic ScannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA19B3CD25A3031100272051 /* Debug */,
+				FA19B3CE25A3031100272051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA19B3CF25A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic ScannerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA19B3D025A3031100272051 /* Debug */,
+				FA19B3D125A3031100272051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FA19B39725A3030C00272051 /* Project object */;
+}
