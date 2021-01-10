@@ -2,17 +2,21 @@
 //  ViewController.swift
 //  3D Ultrasonic Scanner
 //
-//  Created by Momo on 2021/1/4.
+//  Created by Po-Wen Kao on 2021/1/4.
 //
 
 import UIKit
 import SceneKit
 import ARKit
+import MetalKit
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var renderView: MTKView!
     
+    var composer: ComposeController?
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -25,6 +29,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
+        // Create composer
+        self.composer = ComposeController(arSession: sceneView.session, destination: renderView!)
+        sceneView.session.delegate = composer
+        
+
         // Set the scene to the view
         sceneView.scene = scene
     }
@@ -37,6 +46,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
         // Run the view's session
         sceneView.session.run(configuration)
+        
+
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "sInfo"{
+//            let dst = segue.destination as! InfoViewController
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -44,8 +61,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Pause the view's session
         sceneView.session.pause()
+        
     }
-
+    @IBAction func render(_ sender: Any) {
+        composer?.testRender()
+    }
+    @IBAction func selectAsset(_ sender: Any) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    @IBAction func showInfo(_ sender: Any) {
+    }
+    
     // MARK: - ARSCNViewDelegate
     
 /*
@@ -70,5 +101,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
+    }
+    
+    // MARK: - UIImagePickerControllerDelegate
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.originalImage] as? UIImage else{
+            print("Image retrival failed")
+            return
+        }
+        print("Image picked")
+        picker.dismiss(animated: true, completion: nil)
+        composer?.loadImage(image: image)
     }
 }

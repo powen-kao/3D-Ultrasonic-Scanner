@@ -15,6 +15,14 @@
 		FA19B3AF25A3031100272051 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */; };
 		FA19B3BA25A3031100272051 /* _D_Ultrasonic_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */; };
 		FA19B3C525A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */; };
+		FA19B3D925A3104200272051 /* ComposeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3D825A3104200272051 /* ComposeController.swift */; };
+		FA19B3E525A35A5700272051 /* Shader.metal in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3E425A35A5700272051 /* Shader.metal */; };
+		FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3ED25A35A9A00272051 /* Renderer.swift */; };
+		FA47F1CD25A3642200CAB94E /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47F1CC25A3642200CAB94E /* File.swift */; };
+		FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA65614225A61244009AD005 /* ProbeStreamer.swift */; };
+		FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA5F81825A800D200916611 /* MetalBuffer.swift */; };
+		FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC19CD025A87EC80080E709 /* Helpers.swift */; };
+		FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC19CE925A964F10080E709 /* InfoViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +57,16 @@
 		FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "3D Ultrasonic ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _D_Ultrasonic_ScannerUITests.swift; sourceTree = "<group>"; };
 		FA19B3C625A3031100272051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA19B3D825A3104200272051 /* ComposeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeController.swift; sourceTree = "<group>"; };
+		FA19B3E425A35A5700272051 /* Shader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shader.metal; sourceTree = "<group>"; };
+		FA19B3EC25A35A7500272051 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		FA19B3ED25A35A9A00272051 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		FA47F1CC25A3642200CAB94E /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		FA65614225A61244009AD005 /* ProbeStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStreamer.swift; sourceTree = "<group>"; };
+		FAA5F81825A800D200916611 /* MetalBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalBuffer.swift; sourceTree = "<group>"; };
+		FAC19CCC25A877670080E709 /* HeaderBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeaderBridge.h; sourceTree = "<group>"; };
+		FAC19CD025A87EC80080E709 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Helpers.swift; path = "3D Ultrasonic Scanner/Helpers.swift"; sourceTree = SOURCE_ROOT; };
+		FAC19CE925A964F10080E709 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +117,8 @@
 		FA19B3A125A3030C00272051 /* 3D Ultrasonic Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				FAC19CEE25A964FF0080E709 /* Controllers */,
+				FA19B3E325A35A1E00272051 /* Composer */,
 				FA19B3A225A3030C00272051 /* AppDelegate.swift */,
 				FA19B3A425A3030C00272051 /* art.scnassets */,
 				FA19B3A625A3030C00272051 /* ViewController.swift */,
@@ -106,6 +126,7 @@
 				FA19B3AB25A3031100272051 /* Assets.xcassets */,
 				FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */,
 				FA19B3B025A3031100272051 /* Info.plist */,
+				FAC19CCC25A877670080E709 /* HeaderBridge.h */,
 			);
 			path = "3D Ultrasonic Scanner";
 			sourceTree = "<group>";
@@ -126,6 +147,29 @@
 				FA19B3C625A3031100272051 /* Info.plist */,
 			);
 			path = "3D Ultrasonic ScannerUITests";
+			sourceTree = "<group>";
+		};
+		FA19B3E325A35A1E00272051 /* Composer */ = {
+			isa = PBXGroup;
+			children = (
+				FAC19CD025A87EC80080E709 /* Helpers.swift */,
+				FAA5F81825A800D200916611 /* MetalBuffer.swift */,
+				FA19B3D825A3104200272051 /* ComposeController.swift */,
+				FA47F1CC25A3642200CAB94E /* File.swift */,
+				FA19B3E425A35A5700272051 /* Shader.metal */,
+				FA19B3EC25A35A7500272051 /* ShaderTypes.h */,
+				FA19B3ED25A35A9A00272051 /* Renderer.swift */,
+				FA65614225A61244009AD005 /* ProbeStreamer.swift */,
+			);
+			path = Composer;
+			sourceTree = "<group>";
+		};
+		FAC19CEE25A964FF0080E709 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FAC19CE925A964F10080E709 /* InfoViewController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -259,8 +303,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA19B3E525A35A5700272051 /* Shader.metal in Sources */,
+				FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */,
+				FA47F1CD25A3642200CAB94E /* File.swift in Sources */,
 				FA19B3A725A3030C00272051 /* ViewController.swift in Sources */,
+				FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */,
+				FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */,
+				FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */,
 				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
+				FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */,
+				FA19B3D925A3104200272051 /* ComposeController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +489,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic Scanner/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -444,6 +497,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Library/Mobile Documents/com~apple~CloudDocs/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -455,6 +509,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic Scanner/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -462,6 +517,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Library/Mobile Documents/com~apple~CloudDocs/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
