@@ -10,6 +10,18 @@ import ARKit
 typealias Float2 = SIMD2<Float>
 typealias Float3 = SIMD3<Float>
 
+
+class Tools {
+    static func pairsToString(items: [String:Any]) -> String{
+        let keys = items.keys.sorted(by: >)
+        var string: String = ""
+        for key in keys{
+            string += "\(key): \(items[key]) \n"
+        }
+        return string
+    }
+}
+
 extension Float {
     static let degreesToRadian = Float.pi / 180
 }
@@ -25,7 +37,9 @@ extension matrix_float3x3 {
 
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {
-        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue] as CFDictionary
+
+        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue,
+            kCVPixelBufferMetalCompatibilityKey: kCFBooleanTrue] as CFDictionary
         var pixelBuffer : CVPixelBuffer?
         let status = CVPixelBufferCreate(kCFAllocatorDefault, Int(self.size.width), Int(self.size.height), kCVPixelFormatType_32ARGB, attrs, &pixelBuffer)
         guard status == kCVReturnSuccess else {

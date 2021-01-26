@@ -19,6 +19,7 @@
 		FA19B3E525A35A5700272051 /* Shader.metal in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3E425A35A5700272051 /* Shader.metal */; };
 		FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3ED25A35A9A00272051 /* Renderer.swift */; };
 		FA47F1CD25A3642200CAB94E /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47F1CC25A3642200CAB94E /* File.swift */; };
+		FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BB09825B99650008ABBC1 /* Capturer.swift */; };
 		FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA65614225A61244009AD005 /* ProbeStreamer.swift */; };
 		FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA5F81825A800D200916611 /* MetalBuffer.swift */; };
 		FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC19CD025A87EC80080E709 /* Helpers.swift */; };
@@ -62,6 +63,7 @@
 		FA19B3EC25A35A7500272051 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		FA19B3ED25A35A9A00272051 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		FA47F1CC25A3642200CAB94E /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		FA4BB09825B99650008ABBC1 /* Capturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capturer.swift; sourceTree = "<group>"; };
 		FA65614225A61244009AD005 /* ProbeStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStreamer.swift; sourceTree = "<group>"; };
 		FAA5F81825A800D200916611 /* MetalBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalBuffer.swift; sourceTree = "<group>"; };
 		FAC19CCC25A877670080E709 /* HeaderBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeaderBridge.h; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 		FA19B3A125A3030C00272051 /* 3D Ultrasonic Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				FA4BB09725B99640008ABBC1 /* Tools */,
 				FAC19CEE25A964FF0080E709 /* Controllers */,
 				FA19B3E325A35A1E00272051 /* Composer */,
 				FA19B3A225A3030C00272051 /* AppDelegate.swift */,
@@ -162,6 +165,14 @@
 				FA65614225A61244009AD005 /* ProbeStreamer.swift */,
 			);
 			path = Composer;
+			sourceTree = "<group>";
+		};
+		FA4BB09725B99640008ABBC1 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				FA4BB09825B99650008ABBC1 /* Capturer.swift */,
+			);
+			path = Tools;
 			sourceTree = "<group>";
 		};
 		FAC19CEE25A964FF0080E709 /* Controllers */ = {
@@ -311,6 +322,7 @@
 				FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */,
 				FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */,
 				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
+				FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */,
 				FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */,
 				FA19B3D925A3104200272051 /* ComposeController.swift in Sources */,
 			);
@@ -424,6 +436,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h\n";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -478,6 +491,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h\n";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -497,7 +511,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Library/Mobile Documents/com~apple~CloudDocs/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -517,7 +531,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Library/Mobile Documents/com~apple~CloudDocs/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

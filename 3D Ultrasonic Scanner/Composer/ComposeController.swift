@@ -16,11 +16,14 @@ import MetalKit
  */
 
 class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTKViewDelegate{
-    
+
     // Data sources
     private let arSession: ARSession
     private let probeStreamer: ProbeStreamer = ProbeStreamer()
     private var imagePixelBuffer: CVPixelBuffer?
+    
+    // device
+    private var device: MTLDevice?
     
     // Renderer
     private var renderer: Renderer?
@@ -31,16 +34,27 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     private var currentARFrame: ARFrame?
     private var viewportSize = CGSize()
     
+    var delegate: ComposerDelegate?
+    
+    // capturing
+    private var captureScope: MTLCaptureScope?
+    private var shouldCapture = false;
 
     init(arSession: ARSession, destination: RenderDestinationProvider) {
         self.arSession = arSession
         super.init()
 
-        guard let device = MTLCreateSystemDefaultDevice() else {
+        guard let _device = MTLCreateSystemDefaultDevice() else {
             print("Metal is not supported on this device")
             return
         }
+        self.device = _device
         
+        // capturing
+        captureScope = MTLCaptureManager.shared().makeCaptureScope(device: device!)
+        captureScope?.label = String.init(describing: self)
+
+
         arSession.delegate = self
         
         // Set the view to use the default device
@@ -54,7 +68,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             view.delegate = self
 
             // Configure the renderer to draw to the view
-            renderer = Renderer(metalDevice: device, renderDestination: view)
+            renderer = Renderer(metalDevice: device!, renderDestination: view)
             if (renderer == nil){
                 // call observer
                 return
@@ -84,6 +98,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         self.currentARFrame = frame
+        self.delegate?.composer?(self, didUpdate: frame)
     }
     
     // MARK: - Probe Streamer
@@ -104,10 +119,16 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             else{
                 return
             }
-            
+            captureScope?.begin()
             renderer?.render(frame: _frame, capturedImage: _buffer)
+            captureScope?.end()
+            if (self.shouldCapture){
+                self.shouldCapture = false
+                startCapture()
+            }
         }
     }
+    
 
 }
 
@@ -121,9 +142,30 @@ extension ARFrame: Comparable{
 }
 
 
-extension ComposeController{
-    
 
+extension ComposeController{
+    // debug
+    func captureNextFrame() {
+        self.shouldCapture = true
+    }
+    private func startCapture(){
+        let captureManager = MTLCaptureManager.shared()
+        let captureDescriptor = MTLCaptureDescriptor()
+        captureDescriptor.captureObject = captureScope
+        do {
+            try captureManager.startCapture(with:captureDescriptor)
+            captureManager.stopCapture()
+        }
+        catch
+        {
+            fatalError("error when trying to capture: \(error)")
+        }
+    }
+
+}
+
+@objc protocol ComposerDelegate {
+    @objc optional func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame)
 }
 
 protocol ComposerObserver{

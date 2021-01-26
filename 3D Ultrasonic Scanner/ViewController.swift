@@ -10,12 +10,14 @@ import SceneKit
 import ARKit
 import MetalKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var renderView: MTKView!
     
-    var composer: ComposeController?
+    
+    private var alertController: UIAlertController?
+    private var composer: ComposeController?
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +33,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         
         // Create composer
         self.composer = ComposeController(arSession: sceneView.session, destination: renderView!)
+        self.composer?.delegate = self
         sceneView.session.delegate = composer
         
 
@@ -76,6 +79,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     @IBAction func showInfo(_ sender: Any) {
     }
+    @IBAction func capture(_ sender: Any) {
+        Capturer.shared?.trigger()
+//        composer?.captureNextFrame()
+    }
     
     // MARK: - ARSCNViewDelegate
     
@@ -114,4 +121,22 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         picker.dismiss(animated: true, completion: nil)
         composer?.loadImage(image: image)
     }
+    
+    // MARK: - Composer
+    func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
+        switch arFrame.camera.trackingState {
+        case .normal:
+            alertController?.dismiss(animated: true, completion: nil)
+            alertController = nil
+        default:
+            if alertController == nil{
+                alertController = UIAlertController()
+                alertController?.title = "Warning AR tracking state"
+                present(alertController!, animated: true, completion: nil)
+            }
+            alertController?.message = "\(arFrame.camera.trackingState)"
+            
+        }
+    }
+
 }
