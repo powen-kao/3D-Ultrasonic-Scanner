@@ -51,10 +51,17 @@ static float3 idToPosition_3d(int id , constant VoxelInfo *info){
 }
 static int positionToId_3d(simd_int3 position, const device VoxelInfo *info){
     // clamp the range of (x, y, z)
-    position = clamp(position, simd_int3(0), info->size - 1);
+    auto _position = clamp(position, simd_int3(0), info->size - 1);
+    
+    if (_position.x != position.x ||
+        _position.y != position.y ||
+        _position.z != position.z){
+        return -1;
+    }
+    
     
     const auto xyArea = info->size.x * info->size.y;
-    return xyArea * position.z + position.y * info->size.x + position.x;
+    return xyArea * _position.z + _position.y * info->size.x + _position.x;
 }
 
 struct NearByResult{
@@ -96,9 +103,11 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
 
     // find the ID of the voxel and write corresponding data
     const int64_t targetID = positionToId_3d(vPosition, &vInfo);
+    if (targetID < 0)
+        return; // drop the target outside the voxel range
+    
     voxel[targetID].position = worldPosition.xyz;
-//    voxel[targetID].color = uImageTexture.sample(colorSampler, float2(gridX/fInfo.imageWidth, gridY/fInfo.imageHeight));
-    voxel[targetID].color = float4(0.5,0.5,0.8,0.1);
+    voxel[targetID].color = uImageTexture.sample(colorSampler, float2( float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
     
     
     // contribute to voxels
