@@ -311,7 +311,7 @@ private extension Renderer {
                                        dataStride: voxelBuffer!.stride)
         
         let colorSource = SCNGeometrySource(buffer: buffer,
-                                            vertexFormat: .float3,
+                                            vertexFormat: .float4,
                                             semantic: .color,
                                             vertexCount: Int(self.voxelCounts),
                                             dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.color)!,
