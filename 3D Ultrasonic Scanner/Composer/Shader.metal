@@ -92,13 +92,13 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     // (this provide local coordinate and scale)
     auto localPosition = worldToLocal(worldPosition.xyz, vInfo.inversedTransform);
     // TODO: check the position of "vInfo.size/2"
-    auto vPosition = simd_int3(localPosition / vInfo.stepSize) + vInfo.size/2;
+    auto vPosition = simd_int3(localPosition / vInfo.stepSize) - vInfo.size/2;
 
     // find the ID of the voxel and write corresponding data
     const int64_t targetID = positionToId_3d(vPosition, &vInfo);
     voxel[targetID].position = worldPosition.xyz;
-    voxel[targetID].location = vPosition.xyz;
-    voxel[targetID].color = uImageTexture.sample(colorSampler, float2(gridX/fInfo.imageWidth, gridY/fInfo.imageHeight)).r;
+//    voxel[targetID].color = uImageTexture.sample(colorSampler, float2(gridX/fInfo.imageWidth, gridY/fInfo.imageHeight));
+    voxel[targetID].color = float4(0.5,0.5,0.8,0.1);
     
     
     // contribute to voxels

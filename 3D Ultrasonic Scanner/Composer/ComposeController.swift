@@ -9,6 +9,8 @@ import Foundation
 import ARKit
 import Metal
 import MetalKit
+import ModelIO
+import SceneKit.ModelIO
 
 /**
  Composer does the frames matching between AR session and Ultrasonic probe.
@@ -30,7 +32,10 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     
     // output
     private var destination: MTKView?
+    private var outputAssest: MDLAsset?
+    private var scnView: SCNView
     
+    // current infos
     private var currentARFrame: ARFrame?
     private var viewportSize = CGSize()
     
@@ -40,17 +45,21 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     private var captureScope: MTLCaptureScope?
     private var shouldCapture = false;
 
-    init(arSession: ARSession, destination: RenderDestinationProvider) {
+    init(arSession: ARSession, destination: RenderDestinationProvider, scnView: SCNView) {
         self.arSession = arSession
+        self.scnView = scnView
+        
         super.init()
 
+        
+        // Get default device
         guard let _device = MTLCreateSystemDefaultDevice() else {
             print("Metal is not supported on this device")
             return
         }
         self.device = _device
         
-        // capturing
+        // Capturer for GPU tracing
         captureScope = MTLCaptureManager.shared().makeCaptureScope(device: device!)
         captureScope?.label = String.init(describing: self)
 
@@ -66,7 +75,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             view.depthStencilPixelFormat = .depth32Float
             view.contentScaleFactor = 1
             view.delegate = self
-
             // Configure the renderer to draw to the view
             renderer = Renderer(metalDevice: device!, renderDestination: view)
             if (renderer == nil){
@@ -76,6 +84,19 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             renderer?.drawRectResized(size: view.bounds.size)
             self.destination = view
         }
+        
+        // Add geometry into SCNScene
+        let scene = scnView.scene!
+        let geometryNode = SCNNode(geometry: renderer?.scnGeometry)
+        scene.rootNode.addChildNode(geometryNode)
+        
+        // Set enviroment
+        scene.background.contents = MDLSkyCubeTexture(name: "sky", channelEncoding: .float16, textureDimensions: vector_int2(128, 128), turbidity: 0, sunElevation: 1.5, sunAzimuth: 1, upperAtmosphereScattering: 0.5, groundAlbedo: 0.5)
+        
+        // Add contrains
+        let cameraNode = scene.rootNode.childNode(withName: "cameraNode", recursively: false)
+        cameraNode?.constraints = [SCNLookAtConstraint(target: geometryNode)]
+        
     }
     
     //    func findClosestARFrame() -> ARFrame{

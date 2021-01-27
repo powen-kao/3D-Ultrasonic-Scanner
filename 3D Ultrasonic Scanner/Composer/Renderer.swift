@@ -14,6 +14,9 @@ import MetalKit
 class Renderer {
     private let renderDestination: RenderDestinationProvider
     
+    // To expose
+    private(set) var scnGeometry: SCNGeometry?
+    
     private let device: MTLDevice
     private let library: MTLLibrary
     private let commandQueue: MTLCommandQueue
@@ -25,7 +28,7 @@ class Renderer {
     private let depthStencilState: MTLDepthStencilState
     
     // Voxel parameters
-    private let voxelSize = simd_int3(100, 100, 100)
+    let voxelSize = simd_int3(100, 100, 100)
     private var voxelCounts: Int32 {
         get{
             voxelSize.x * voxelSize.y * voxelSize.z
@@ -70,7 +73,7 @@ class Renderer {
     private let orientation = UIInterfaceOrientation.portrait
     private lazy var rotateToARCamera = Self.makeRotateToARCameraMatrix(orientation: orientation)
     
-    
+    // Constrains
     private let inFlightSemaphore: DispatchSemaphore
     private var maxInFlightBuffers = 1
     private let maxPoints = 500000
@@ -107,19 +110,17 @@ class Renderer {
         
         capturer = Capturer.create(with: device)
         
+        // Init values that require
+        checkVoxelBuffer()
+
+        self.scnGeometry = makeSCNGeometry() // init after buffer is created
+
     }
     
     func prepareForShader(){
-
-        // init voxel and grid buffer if input size changed or nil
-        if voxelBuffer == nil || voxelBuffer?.count != Int(voxelCounts){
-            voxelBuffer = nil // dealloc
-            voxelBuffer = .init(device: device, count: Int(voxelCounts), index: kVoxel.rawValue)
-        }
-        if gridBuffer == nil || gridBuffer?.count != imagePixelCount{
-            gridBuffer = nil
-            gridBuffer = .init(device: device, count: imagePixelCount, index: kGridPoint.rawValue)
-        }
+        
+        checkGridBuffer()
+        checkVoxelBuffer()
         
         guard let _frame = currentARFrame else {
             return
@@ -203,13 +204,9 @@ class Renderer {
 
         var kvPairs = [String: Any]()
         kvPairs["Position"] = self.voxelBuffer![Int(self.voxelCounts)/2].position
-        kvPairs["Position2"] = self.voxelBuffer![Int(self.voxelCounts)/2].position2
         kvPairs["color"] = self.voxelBuffer![0].color
         kvPairs["max"] = self.voxelInfoBuffer[0].axisMax
         kvPairs["min"] = self.voxelInfoBuffer[0].axisMin
-//        let buffer = UnsafeBufferPointer<Any>(start: self.debugInfoBuffer.contents(), count: 100)
-//        kvPairs["test"] = String(bytes: buffer, encoding: .utf8)
-
         
         InfoViewController.shared?.frameInfoText = "\(Tools.pairsToString(items: kvPairs))"
         // TODO: retaining texture?
@@ -304,6 +301,34 @@ private extension Renderer {
         }
     }
     
+    func makeSCNGeometry() -> SCNGeometry {
+        let buffer = voxelBuffer!.buffer
+        let vertexSource = SCNGeometrySource(buffer: buffer ,
+                                       vertexFormat: .float3,
+                                       semantic: .vertex,
+                                       vertexCount: Int(self.voxelCounts),
+                                       dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.position)!,
+                                       dataStride: voxelBuffer!.stride)
+        
+        let colorSource = SCNGeometrySource(buffer: buffer,
+                                            vertexFormat: .float3,
+                                            semantic: .color,
+                                            vertexCount: Int(self.voxelCounts),
+                                            dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.color)!,
+                                            dataStride: voxelBuffer!.stride)
+        
+        let element = SCNGeometryElement(data: nil, primitiveType: .point, primitiveCount: Int(voxelCounts), bytesPerIndex: MemoryLayout<Int>.size)
+        element.pointSize = 1
+        element.maximumPointScreenSpaceRadius = 10
+        element.minimumPointScreenSpaceRadius = 1
+        
+        
+        let geometry = SCNGeometry(sources: [vertexSource, colorSource],
+                                   elements: [element])
+        
+        return geometry
+    }
+    
     func makeTextureCache() -> CVMetalTextureCache {
         var cache: CVMetalTextureCache!
         let status = CVMetalTextureCacheCreate(nil, nil, device, nil, &cache)
@@ -352,6 +377,21 @@ private extension Renderer {
         let rotationAngle = Float(cameraToDisplayRotation(orientation: orientation)) * .degreesToRadian
 //        return flipYZ * matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
         return flipYZ
+    }
+    
+    func checkVoxelBuffer() {
+        // realloc if nil or shape of voxel changed
+        if voxelBuffer == nil || voxelBuffer?.count != Int(voxelCounts){
+            voxelBuffer = nil // dealloc
+            voxelBuffer = .init(device: device, count: Int(voxelCounts), index: kVoxel.rawValue)
+        }
+    }
+    func checkGridBuffer() {
+        // realloc if nil or shape of image changed
+        if gridBuffer == nil || gridBuffer?.count != imagePixelCount{
+            gridBuffer = nil
+            gridBuffer = .init(device: device, count: imagePixelCount, index: kGridPoint.rawValue)
+        }
     }
     
     func updateVoxelInfoBuffer() {

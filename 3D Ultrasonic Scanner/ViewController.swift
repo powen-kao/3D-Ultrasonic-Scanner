@@ -14,6 +14,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var renderView: MTKView!
+    @IBOutlet weak var scnView: SCNView!
     
     
     private var alertController: UIAlertController?
@@ -31,11 +32,17 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         // Create a new scene
         let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
+        // Load scene for rendering point cloud
+        let pointCloudScene = SCNScene(named: "art.scnassets/pointCloud.scn")!
+        scnView.scene = pointCloudScene
+        scnView.rendersContinuously = true
+
         // Create composer
-        self.composer = ComposeController(arSession: sceneView.session, destination: renderView!)
+        self.composer = ComposeController(arSession: sceneView.session, destination: renderView!, scnView: scnView)
         self.composer?.delegate = self
-        sceneView.session.delegate = composer
         
+        
+        sceneView.session.delegate = composer
 
         // Set the scene to the view
         sceneView.scene = scene
@@ -81,7 +88,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     @IBAction func capture(_ sender: Any) {
         Capturer.shared?.trigger()
-//        composer?.captureNextFrame()
     }
     
     // MARK: - ARSCNViewDelegate

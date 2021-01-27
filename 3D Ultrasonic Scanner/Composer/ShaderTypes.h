@@ -79,9 +79,8 @@ struct DebugInfo{
 
 struct Voxel {
     simd_float3 position; // TODO: remove later
-    simd_float3 position2;
-    float color;
-    float alpha;
+    simd_float4 color; // rgba
+//    float alpha;
     simd_int3 location;
 };
 
