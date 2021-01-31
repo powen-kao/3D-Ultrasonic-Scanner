@@ -16,9 +16,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     @IBOutlet weak var renderView: MTKView!
     @IBOutlet weak var scnView: SCNView!
     
-    
+    // Controllers
     private var alertController: UIAlertController?
     private var composer: ComposeController?
+    
+    // Scene Objects
+    private var probeNode: SCNNode?
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +38,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         // Load scene for rendering point cloud
         let pointCloudScene = SCNScene(named: "art.scnassets/pointCloud.scn")!
         scnView.scene = pointCloudScene
+        scnView.debugOptions = [.showBoundingBoxes, .showCameras, .showWorldOrigin, .showFeaturePoints]
         scnView.rendersContinuously = true
+        
+        // Get nodes
+        self.probeNode = pointCloudScene.rootNode.childNode(withName: "probe", recursively: true)
 
         // Create composer
         self.composer = ComposeController(arSession: sceneView.session, destination: renderView!, scnView: scnView)
@@ -73,8 +80,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         sceneView.session.pause()
         
     }
-    @IBAction func render(_ sender: Any) {
-        composer?.testRender()
+    @IBAction func action(_ sender: Any) {
+        let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
+        alertSheet.addAction(UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
+            self.composer?.restOrigin()
+        }))
+        
+        present(alertSheet, animated: true, completion: nil)
     }
     @IBAction func selectAsset(_ sender: Any) {
         let imagePicker = UIImagePickerController()
@@ -134,6 +146,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         case .normal:
             alertController?.dismiss(animated: true, completion: nil)
             alertController = nil
+            
+            // Update probe transform
+            self.probeNode?.transform = SCNMatrix4(arFrame.camera.transform)
         default:
             if alertController == nil{
                 alertController = UIAlertController()

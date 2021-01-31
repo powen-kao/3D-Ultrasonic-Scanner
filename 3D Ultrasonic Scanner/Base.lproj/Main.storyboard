@@ -32,7 +32,7 @@
                                                 <rect key="frame" x="0.0" y="241.66666666666669" width="414" height="241.66666666666669"/>
                                                 <color key="clearColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </mtkView>
-                                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
+                                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
                                                 <rect key="frame" x="0.0" y="483.33333333333343" width="414" height="241.66666666666669"/>
                                             </sceneKitView>
                                         </subviews>
@@ -45,17 +45,17 @@
                                                     <action selector="selectAsset:" destination="BV1-FR-VrT" id="VVI-bu-fcx"/>
                                                 </connections>
                                             </barButtonItem>
-                                            <barButtonItem title="Render" id="nKS-FW-5Rp">
-                                                <connections>
-                                                    <action selector="render:" destination="BV1-FR-VrT" id="bIu-Kk-f3R"/>
-                                                </connections>
-                                            </barButtonItem>
                                             <barButtonItem title="Capture" id="ctI-xT-tU9">
                                                 <connections>
                                                     <action selector="capture:" destination="BV1-FR-VrT" id="3wj-he-gDg"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="Mjs-cc-1oI"/>
+                                            <barButtonItem title="Action" id="nKS-FW-5Rp" userLabel="Actions">
+                                                <connections>
+                                                    <action selector="action:" destination="BV1-FR-VrT" id="8pN-Tn-bQO"/>
+                                                </connections>
+                                            </barButtonItem>
                                             <barButtonItem title="Info" id="Hrd-cG-pTW">
                                                 <connections>
                                                     <action selector="showInfo:" destination="BV1-FR-VrT" id="a4c-oo-ECz"/>

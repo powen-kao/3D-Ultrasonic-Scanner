@@ -53,9 +53,9 @@ struct Particle {
 };
 
 struct VoxelInfo{
-//    simd_float3 center;
     simd_float4x4 transform; // transform from local voxel to global position
     simd_float4x4 inversedTransform;
+    simd_float4x4 rotateToARCamera;
     simd_int3 size;
     int count;
 

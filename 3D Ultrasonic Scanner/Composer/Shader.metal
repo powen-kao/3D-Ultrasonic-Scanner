@@ -93,23 +93,30 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     
     // With a 2D point and depth, we can compute its global 3D position
     // unit in meter
-    const auto worldPosition = imageToWorld(float2(gridX, gridY),fInfo.uIntrinsicsInversed, fInfo.cameraTransform);
+    const auto worldPosition = imageToWorld(float2(gridX, gridY),fInfo.uIntrinsicsInversed, fInfo.cameraTransform * vInfo.rotateToARCamera);
 
     // transform points with inverse transform of the first frame (which serves as reference)
     // (this provide local coordinate and scale)
     auto localPosition = worldToLocal(worldPosition.xyz, vInfo.inversedTransform);
     // TODO: check the position of "vInfo.size/2"
-    auto vPosition = simd_int3(localPosition / vInfo.stepSize) - vInfo.size/2;
+    auto vPosition = simd_int3(localPosition / vInfo.stepSize) + vInfo.size/2;
 
     // find the ID of the voxel and write corresponding data
     const int64_t targetID = positionToId_3d(vPosition, &vInfo);
     if (targetID < 0)
         return; // drop the target outside the voxel range
     
+//    voxel[targetID].position = localPosition.xyz;
     voxel[targetID].position = worldPosition.xyz;
-    voxel[targetID].color = uImageTexture.sample(colorSampler, float2( float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
+    voxel[targetID].color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
+    voxel[targetID].color.a = 0.1;
     
-    
+    // debig color
+//    voxel[targetID].color = float4(float(vPosition.x)/vInfo.size.x,
+//                                   float(vPosition.y)/vInfo.size.y,
+//                                   float(vPosition.z)/vInfo.size.z,
+//                                   0.5);
+        
     // contribute to voxels
     
     

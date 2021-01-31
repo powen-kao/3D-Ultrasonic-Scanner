@@ -28,7 +28,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     private var device: MTLDevice?
     
     // Renderer
-    private var renderer: Renderer?
+    // WARNING: do not modifiy renderer from other controllers
+    private(set) var renderer: Renderer?
     
     // output
     private var destination: MTKView?
@@ -75,6 +76,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             view.depthStencilPixelFormat = .depth32Float
             view.contentScaleFactor = 1
             view.delegate = self
+            
             // Configure the renderer to draw to the view
             renderer = Renderer(metalDevice: device!, renderDestination: view)
             if (renderer == nil){
@@ -90,11 +92,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
         let geometryNode = SCNNode(geometry: renderer?.scnGeometry)
         scene.rootNode.addChildNode(geometryNode)
         
-        // Set enviroment
-        scene.background.contents = MDLSkyCubeTexture(name: "sky", channelEncoding: .float16, textureDimensions: vector_int2(128, 128), turbidity: 0, sunElevation: 1.5, sunAzimuth: 1, upperAtmosphereScattering: 0.5, groundAlbedo: 0.5)
-        
         // Add contrains
-        let cameraNode = scene.rootNode.childNode(withName: "cameraNode", recursively: false)
+        let cameraNode = scene.rootNode.childNode(withName: "camera", recursively: true)
         cameraNode?.constraints = [SCNLookAtConstraint(target: geometryNode)]
         
     }
@@ -134,10 +133,13 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     }
     
     func draw(in view: MTKView) {
+        // TODO: add offset between camera and probe
+        guard let _frame = self.currentARFrame else {
+            return
+        }
+        
         if (imagePixelBuffer != nil) {
-            guard let _buffer = imagePixelBuffer,
-                  let _frame = self.currentARFrame
-            else{
+            guard let _buffer = imagePixelBuffer else{
                 return
             }
             captureScope?.begin()
@@ -165,6 +167,12 @@ extension ARFrame: Comparable{
 
 
 extension ComposeController{
+    
+    // public functions
+    func restOrigin() {
+        self.renderer?.setCurrentARFrameAsReference()
+    }
+    
     // debug
     func captureNextFrame() {
         self.shouldCapture = true

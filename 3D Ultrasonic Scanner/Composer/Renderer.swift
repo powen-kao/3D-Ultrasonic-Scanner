@@ -16,7 +16,22 @@ class Renderer {
     
     // To expose
     private(set) var scnGeometry: SCNGeometry?
+    private(set) var state: RendererState = .Initing
+    var voxelInfo: VoxelInfo {
+        get{
+            return voxelInfoBuffer[0]
+        }
+    }
+    var localTransform: simd_float4x4 {
+        // the current local tranform in respect to first frame
+        // (including camera to AR scene coordinate transform)
+        get{
+            return voxelInfoBuffer[0].inversedTransform * (currentARFrame?.camera.transform ?? matrix_identity_float4x4)
+                * rotateToARCamera
+        }
+    }
     
+    // Basic Metal objects
     private let device: MTLDevice
     private let library: MTLLibrary
     private let commandQueue: MTLCommandQueue
@@ -36,7 +51,6 @@ class Renderer {
     }
     private var voxelStpeSize = 0.00027195 // meter per voxel step
     private var voxelOrigin: Float3?
-    private var voxelInfo: VoxelInfo = VoxelInfo()
     
     // ARFrame and CVPixelBuffer
     private var currentARFrame: ARFrame?
@@ -63,7 +77,7 @@ class Renderer {
     private var voxelBuffer: MetalBuffer<Voxel>?
     private var gridBuffer: MetalBuffer<SIMD2<Float>>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
-    private let voxelInfoBuffer: MetalBuffer<VoxelInfo>
+    private var voxelInfoBuffer: MetalBuffer<VoxelInfo> // can be modified internally
     
     // Textures
     private var imageTexture: CVMetalTexture?
@@ -81,6 +95,12 @@ class Renderer {
     // debug use
     private let capturer: Capturer
     private let debugInfoBuffer: MTLBuffer
+    
+    
+    enum RendererState {
+        case Initing
+        case Ready
+    }
 
     init(metalDevice: MTLDevice, renderDestination: RenderDestinationProvider) {
         self.renderDestination = renderDestination
@@ -91,7 +111,8 @@ class Renderer {
         self.voxelInfoBuffer = .init(device: device, count: 1, index: kVoxelInfo.rawValue)
         self.debugInfoBuffer = device.makeBuffer(length: 100, options: []) as! MTLBuffer
         inFlightSemaphore = DispatchSemaphore(value: maxInFlightBuffers)
-        
+        capturer = Capturer.create(with: device)
+
         // rbg does not need to read/write depth
         let relaxedStateDescriptor = MTLDepthStencilDescriptor()
         relaxedStencilState = device.makeDepthStencilState(descriptor: relaxedStateDescriptor)!
@@ -103,15 +124,20 @@ class Renderer {
         depthStencilState = device.makeDepthStencilState(descriptor: depthStateDescriptor)!
         
         // init the max and min points with a extream value
-        voxelInfo.axisMax = simd_float3(repeating: Float.leastNormalMagnitude)
-        voxelInfo.axisMin = simd_float3(repeating: Float.greatestFiniteMagnitude)
-        voxelInfo.state = kVInit
-        
-        
-        capturer = Capturer.create(with: device)
-        
+        voxelInfoBuffer[0].axisMax = simd_float3(repeating: Float.leastNormalMagnitude)
+        voxelInfoBuffer[0].axisMin = simd_float3(repeating: Float.greatestFiniteMagnitude)
+        voxelInfoBuffer[0].state = kVInit
+        voxelInfoBuffer[0].inversedTransform = matrix_identity_float4x4
+        voxelInfoBuffer[0].transform = matrix_identity_float4x4
+        voxelInfoBuffer[0].rotateToARCamera = rotateToARCamera
+
         // Init values that require
         checkVoxelBuffer()
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.makeVoxelGrid()
+            self.state = .Ready
+        }
 
         self.scnGeometry = makeSCNGeometry() // init after buffer is created
 
@@ -148,12 +174,9 @@ class Renderer {
         frameInfoBuffer.assign(frameInfo)
         
         // Insert Voxel info
-        // TODO: modify reference instead of copy-modify-write
-        voxelInfo = voxelInfoBuffer[0]
-        voxelInfo.size = voxelSize
-        voxelInfo.stepSize = Float(voxelStpeSize)
-        voxelInfo.count = voxelCounts
-        updateVoxelInfoBuffer()
+        voxelInfoBuffer[0].size = voxelSize
+        voxelInfoBuffer[0].stepSize = Float(voxelStpeSize)
+        voxelInfoBuffer[0].count = voxelCounts
         
     }
     
@@ -176,7 +199,7 @@ class Renderer {
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         
-        // overwrite the current frame and buffer
+        // Update the current frame and buffer
         currentARFrame = frame
         currentCVPixelBuffer = capturedImage
         
@@ -220,18 +243,13 @@ class Renderer {
             retainingTextures.removeAll()
             
             // take center of voxels as reference for origin of voxels if is first frame
-            if (self!.voxelInfo.state == kVInit){
-                let infoBuffer = self!.voxelInfoBuffer[0]
-                let center = (infoBuffer.axisMax + infoBuffer.axisMin) / 2.0
-                // take the first reliable frame as all voxel's base transform
-                self!.voxelInfo.transform = (self!.currentARFrame?.camera.transform)!
-                self!.voxelInfo.inversedTransform = self!.voxelInfo.transform.inverse
-                self!.voxelInfo.state = kVReady
-                self!.updateVoxelInfoBuffer()
-                
+            if (self!.voxelInfoBuffer[0].state == kVInit){
+                self?.setCurrentARFrameAsReference()
+
                 // increase the rendering
 //                self!.maxInFlightBuffers = 3
             }
+            
             if let self = self {
                 self.inFlightSemaphore.signal()
             }
@@ -335,8 +353,18 @@ private extension Renderer {
         return cache
     }
     
-    func makeVoxelGrid(size: SIMD3<Int>){
-        
+    func makeVoxelGrid(){
+        for z in 0...voxelSize.z-1{
+            for y in 0...voxelSize.y-1 {
+                for x in 0...voxelSize.x-1 {
+                    let xyArea = voxelSize.x * voxelSize.y
+                    let index = Int(xyArea * z + y * voxelSize.x + x)
+                    self.voxelBuffer![index].position = simd_float3(Float(x) * Float(voxelStpeSize),
+                                                                    Float(y) * Float(voxelStpeSize),
+                                                                    Float(z) * Float(voxelStpeSize)) + simd_float3(voxelSize) / 2
+                }
+            }
+        }
     }
     
     func makeTexture(fromPixelBuffer pixelBuffer: CVPixelBuffer, pixelFormat: MTLPixelFormat, planeIndex: Int) -> CVMetalTexture? {
@@ -375,8 +403,8 @@ private extension Renderer {
             [0, 0, 0, 1] )
 
         let rotationAngle = Float(cameraToDisplayRotation(orientation: orientation)) * .degreesToRadian
-//        return flipYZ * matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
-        return flipYZ
+        return flipYZ * matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
+//        return flipYZ
     }
     
     func checkVoxelBuffer() {
@@ -394,8 +422,21 @@ private extension Renderer {
         }
     }
     
-    func updateVoxelInfoBuffer() {
-        voxelInfoBuffer.assign(voxelInfo)
+}
+
+extension Renderer{
+    func setCurrentARFrameAsReference() {
+        guard let _arFrame = self.currentARFrame else {
+            return
+        }
+
+        var info = self.voxelInfoBuffer[0]
+        info.count = 10
+        
+        // take the current frame as all voxel's base transform
+        self.voxelInfoBuffer[0].transform = _arFrame.camera.transform
+        self.voxelInfoBuffer[0].inversedTransform = _arFrame.camera.transform.inverse
+        self.voxelInfoBuffer[0].state = kVReady
     }
 }
 
