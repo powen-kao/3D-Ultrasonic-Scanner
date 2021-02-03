@@ -511,7 +511,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -531,7 +531,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
