@@ -11,12 +11,13 @@
 #include <simd/simd.h>
 
 enum BufferIndices {
-    kFrameInfo = 0,
-    kVoxel = 1,
-    kGridPoint = 2,
-    kVoxelInfo = 3,
-    kTexture = 4,
-    kDebugInfo = 5
+    kFrameInfo,
+    kVoxel,
+    kImageVoxel,
+    kGridPoint,
+    kVoxelInfo,
+    kTexture,
+    kDebugInfo
 };
 
 //enum DebugInfoType{

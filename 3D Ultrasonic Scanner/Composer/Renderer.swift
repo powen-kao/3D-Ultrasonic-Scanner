@@ -15,7 +15,8 @@ class Renderer {
     private let renderDestination: RenderDestinationProvider
     
     // To expose
-    private(set) var scnGeometry: SCNGeometry?
+    private(set) var voxelGeometry: SCNGeometry?
+    private(set) var imageVoxelGeometry: SCNGeometry?
     private(set) var state: RendererState = .Initing
     var voxelInfo: VoxelInfo {
         get{
@@ -30,6 +31,7 @@ class Renderer {
                 * rotateToARCamera
         }
     }
+    var delegate: RendererDelegate?
     
     // Basic Metal objects
     private let device: MTLDevice
@@ -75,6 +77,7 @@ class Renderer {
     
     // Buffers
     private var voxelBuffer: MetalBuffer<Voxel>?
+    private var imageVoxelBuffer: MetalBuffer<Voxel>?
     private var gridBuffer: MetalBuffer<SIMD2<Float>>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
     private var voxelInfoBuffer: MetalBuffer<VoxelInfo> // can be modified internally
@@ -136,13 +139,11 @@ class Renderer {
         // Init values that require
         checkVoxelBuffer()
         
+        // Post-operations
         DispatchQueue.global(qos: .userInitiated).async {
             self.makeVoxelGrid()
             self.state = .Ready
         }
-
-        self.scnGeometry = makeSCNGeometry() // init after buffer is created
-
     }
     
     func prepareForShader(){
@@ -263,6 +264,7 @@ class Renderer {
         commandEncoder.setVertexBuffer(frameInfoBuffer)
         commandEncoder.setVertexBuffer(voxelInfoBuffer)
         commandEncoder.setVertexBuffer(voxelBuffer!)
+        commandEncoder.setVertexBuffer(imageVoxelBuffer!)
         commandEncoder.setVertexBuffer(debugInfoBuffer, offset: 0, index: Int(kDebugInfo.rawValue))
         commandEncoder.setVertexTexture(CVMetalTextureGetTexture(imageTexture!), index: Int(kTexture.rawValue))
         commandEncoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: gridBuffer!.count)
@@ -315,23 +317,22 @@ private extension Renderer {
         }
     }
     
-    func makeSCNGeometry() -> SCNGeometry {
-        let buffer = voxelBuffer!.buffer
-        let vertexSource = SCNGeometrySource(buffer: buffer ,
+    func makeVoxelSCNGeometry(buffer: MetalBuffer<Voxel>) -> SCNGeometry {
+        let vertexSource = SCNGeometrySource(buffer: buffer.buffer,
                                        vertexFormat: .float3,
                                        semantic: .vertex,
-                                       vertexCount: Int(self.voxelCounts),
+                                       vertexCount: buffer.count,
                                        dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.position)!,
                                        dataStride: voxelBuffer!.stride)
         
-        let colorSource = SCNGeometrySource(buffer: buffer,
+        let colorSource = SCNGeometrySource(buffer: buffer.buffer,
                                             vertexFormat: .float4,
                                             semantic: .color,
-                                            vertexCount: Int(self.voxelCounts),
+                                            vertexCount: buffer.count,
                                             dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.color)!,
                                             dataStride: voxelBuffer!.stride)
         
-        let element = SCNGeometryElement(data: nil, primitiveType: .point, primitiveCount: Int(voxelCounts), bytesPerIndex: MemoryLayout<Int>.size)
+        let element = SCNGeometryElement(data: nil, primitiveType: .point, primitiveCount: buffer.count, bytesPerIndex: MemoryLayout<Int>.size)
         element.pointSize = 1
         element.maximumPointScreenSpaceRadius = 10
         element.minimumPointScreenSpaceRadius = 1
@@ -408,16 +409,35 @@ private extension Renderer {
         if voxelBuffer == nil || voxelBuffer?.count != Int(voxelCounts){
             voxelBuffer = nil // dealloc
             voxelBuffer = .init(device: device, count: Int(voxelCounts), index: kVoxel.rawValue)
+            
+            // update geometry
+            self.voxelGeometry = makeVoxelSCNGeometry(buffer: voxelBuffer!)
+            delegate?.renderer(self, voxelGeometryUpdate: voxelGeometry!)
         }
     }
+    
     func checkGridBuffer() {
         // realloc if nil or shape of image changed
         if gridBuffer == nil || gridBuffer?.count != imagePixelCount{
             gridBuffer = nil
             gridBuffer = .init(device: device, count: imagePixelCount, index: kGridPoint.rawValue)
         }
+        
+        if imageVoxelBuffer == nil || imageVoxelBuffer?.count != imagePixelCount{
+            imageVoxelBuffer = nil // dealloc
+            imageVoxelBuffer = .init(device: device, count: imagePixelCount, index: kImageVoxel.rawValue)
+            
+            // update geometry
+            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: imageVoxelBuffer!)
+            delegate?.renderer(self, imageGeometryUpdate: imageVoxelGeometry!)
+        }
     }
     
+}
+
+protocol RendererDelegate {
+    func renderer(_ renderer: Renderer, voxelGeometryUpdate voxelGeometry: SCNGeometry)
+    func renderer(_ renderer: Renderer, imageGeometryUpdate imageGeometry: SCNGeometry)
 }
 
 extension Renderer{

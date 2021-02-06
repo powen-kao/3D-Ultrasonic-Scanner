@@ -37,7 +37,7 @@ static simd_float4 imageToWorld(simd_float2 cameraPoint, const device VoxelInfo 
  convert from world coordinate to camera local coordinate (not image coordinate).
  */
 static simd_float4 worldToLocal(simd_float3 worldPoint, const device VoxelInfo *vInfo) {
-    const auto localPoint = vInfo->inversedTransform * simd_float4(worldPoint, 1);
+    const auto localPoint = vInfo->inversedRotateToARCamera * vInfo->inversedTransform * simd_float4(worldPoint, 1);
     return localPoint; // without normalization
 }
 
@@ -117,6 +117,7 @@ static bool findNearby(simd_float3 position, device VoxelInfo &vInfo, thread Nea
 ///  Vertex shader that takes in a 2D grid-point and infers its 3D position in world-space, along with RGB and confidence
 vertex void unprojectVertex(uint vertexID [[vertex_id]],
                             device Voxel *voxel [[buffer(kVoxel)]],
+                            device Voxel *imgVoxel [[buffer(kImageVoxel)]],
                             constant FrameInfo &fInfo [[buffer(kFrameInfo)]],
                             device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
                             device char *dbgInfo [[buffer(kDebugInfo)]],
@@ -139,6 +140,13 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
     // TODO: check the position of "vInfo.size/2"
 //    auto vPosition = simd_int3(localPosition / vInfo.stepSize) + vInfo.size/2;
+    
+    // Prepate data
+    float4 color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
+    
+    // convert image pixel into image voxel
+    imgVoxel[vertexID].position = localPosition.xyz;
+    imgVoxel[vertexID].color = color;
 
     // find near by voxels
     NearByResult result;
@@ -149,7 +157,6 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     
     // ----- ALGORITHM BEGIN-----
     
-    float4 color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
     
     // foreach neighbor
     for (uint8_t i = 0; i < 8; i ++){
@@ -169,18 +176,18 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
 //        color = color * fInfo.colorSpaceTransform;
                 
         // update near-by voxels
-//        auto sum = voxel->color * v->weight + color * invDistance;
-//        v->weight += invDistance;
+        auto sum = voxel->color * v->weight + color * invDistance;
+        v->weight += invDistance;
 //        v->color = sum/v->weight;
-//        v->color = color;
-//        v->position = float3(vPosition) * vInfo.stepSize;
+        v->color = color;
+        v->position = float3(vPosition) * vInfo.stepSize;
     }
      
     // ----- ALGORITHM END-----
     
     
 //    auto vPosition = simd_int3(localPosition / vInfo.stepSize);
-    // find the ID of the voxel and write corresponding data
+//     find the ID of the voxel and write corresponding data
 //    const int64_t targetID = vPositionToId_3d(vPosition, &vInfo);
 //    if (targetID < 0)
 //        return; // drop the target outside the voxel range
@@ -190,21 +197,20 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
 //    voxel[targetID].color.a = 0.1;
     
 
-    const int64_t targetID = vertexID;
-    if (targetID < 1000000){
-        voxel[targetID].position = (vInfo.inversedRotateToARCamera * localPosition).xyz;
-        voxel[targetID].color = color;
-    }
-    
+//    const int64_t targetID = vertexID;
+//    if (targetID < 1000000){
+//        voxel[targetID].position = (vInfo.inversedRotateToARCamera * localPosition).xyz;
+//        voxel[targetID].color = color;
+//    }
+//
 
     
     // debug color
-//    voxel[targetID].color = float4(float(vPosition.x)/vInfo.size.x,
+//    voxel≈.color = float4(float(vPosition.x)/vInfo.size.x,
 //                                   float(vPosition.y)/vInfo.size.y,
 //                                   float(vPosition.z)/vInfo.size.z,
 //                                   0.5);
         
-    // contribute to voxels
     
     
     // update min max value of xyz
