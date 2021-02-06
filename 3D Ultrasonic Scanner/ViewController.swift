@@ -148,7 +148,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             alertController = nil
             
             // Update probe transform
-            self.probeNode?.transform = SCNMatrix4(arFrame.camera.transform)
+            self.probeNode?.transform =  SCNMatrix4(arFrame.camera.transform * (self.composer?.renderer?.voxelInfo.rotateToARCamera ?? matrix_identity_float4x4))
         default:
             if alertController == nil{
                 alertController = UIAlertController()

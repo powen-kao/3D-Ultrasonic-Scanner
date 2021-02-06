@@ -151,8 +151,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             }
         }
     }
-    
-
 }
 
 extension ARFrame: Comparable{

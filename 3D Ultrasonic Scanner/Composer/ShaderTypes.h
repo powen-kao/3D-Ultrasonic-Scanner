@@ -36,6 +36,9 @@ struct FrameInfo {
     matrix_float3x3 cameraIntrinsicsInversed;
     matrix_float3x3 uIntrinsicsInversed;
     matrix_float3x3 uIntrinsics;
+    matrix_float4x4 colorSpaceTransform;
+    matrix_float4x4 flipY;
+    
 
     simd_float2 cameraResolution;
     int imageWidth;
@@ -56,6 +59,7 @@ struct VoxelInfo{
     simd_float4x4 transform; // transform from local voxel to global position
     simd_float4x4 inversedTransform;
     simd_float4x4 rotateToARCamera;
+    simd_float4x4 inversedRotateToARCamera;
     simd_int3 size;
     int count;
 
@@ -78,10 +82,9 @@ struct DebugInfo{
 };
 
 struct Voxel {
-    simd_float3 position; // TODO: remove later
+    simd_float3 position;
     simd_float4 color; // rgba
-//    float alpha;
-    simd_int3 location;
+    float weight;
 };
 
 

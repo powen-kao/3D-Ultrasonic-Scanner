@@ -130,6 +130,8 @@ class Renderer {
         voxelInfoBuffer[0].inversedTransform = matrix_identity_float4x4
         voxelInfoBuffer[0].transform = matrix_identity_float4x4
         voxelInfoBuffer[0].rotateToARCamera = rotateToARCamera
+        voxelInfoBuffer[0].inversedRotateToARCamera = rotateToARCamera.inverse
+
 
         // Init values that require
         checkVoxelBuffer()
@@ -152,6 +154,15 @@ class Renderer {
             return
         }
         
+        // take center of voxels as reference for origin of voxels if is first frame
+        if (self.voxelInfoBuffer[0].state == kVInit){
+            if case .normal = currentARFrame?.camera.trackingState {
+                self.setCurrentARFrameAsReference()
+                // increase the rendering
+    //                self!.maxInFlightBuffers = 3
+            }
+        }
+        
         // Insert frame info
         var frameInfo = FrameInfo()
         let camera = _frame.camera
@@ -170,7 +181,17 @@ class Renderer {
         frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
                                                              [0, 3677, 0],
                                                              [imgfWidth/2.0, imgfHeight/2.0, 1]))
+        // transform that convert color to black and white
+        frameInfo.colorSpaceTransform = simd_float4x4.init([0.333, 0.333, 0.333, 1],
+                                                           [0.333, 0.333, 0.333, 1],
+                                                           [0.333, 0.333, 0.333, 1],
+                                                           [0, 0, 0, 1])
         frameInfo.uIntrinsicsInversed = frameInfo.uIntrinsics.inverse
+        frameInfo.flipY = matrix_float4x4(
+                            [1, 0, 0, 0],
+                            [0, -1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1] )
         frameInfoBuffer.assign(frameInfo)
         
         // Insert Voxel info
@@ -205,26 +226,8 @@ class Renderer {
         
         // prepare for buffers and information for shader
         prepareForShader()
-
         
-        // TODO: tryouts and remove later
-//        let point = simd_float2(Float(imageWidth)/2.0, Float(imageHeight)/2.0)
-//        let fInfo = frameInfoBuffer[0]
-//        let local =  fInfo.uIntrinsicsInversed * simd_float3(point, 1)
-//        let global = rotateToARCamera * fInfo.cameraTransform * simd_float4(simd_float3(local.x, local.y, 0), 1)
-//
-//        let tempRLocal = voxelInfo.inversedTransform * global
-//        let rLocal = simd_float3(tempRLocal.x, tempRLocal.y, tempRLocal.z)
-//
-//        let vGridPosition = simd_int3 (rLocal / voxelInfo.stepSize) &+ voxelSize / 2 // shift to center
-//
-//        let xyArea = voxelSize.x * voxelSize.y;
-//        let index = xyArea * vGridPosition.z + vGridPosition.y * voxelSize.x + vGridPosition.x
-        
-        
-//        InfoViewController.shared?.frameInfoText = "\(rLocal.x) \n \(rLocal.y) \n \(rLocal.z) \n        \(vGridPosition) \n index: \(index)"
-        
-
+        // TODO: remove later
         var kvPairs = [String: Any]()
         kvPairs["Position"] = self.voxelBuffer![Int(self.voxelCounts)/2].position
         kvPairs["color"] = self.voxelBuffer![0].color
@@ -242,13 +245,6 @@ class Renderer {
             // remove all reference to texture
             retainingTextures.removeAll()
             
-            // take center of voxels as reference for origin of voxels if is first frame
-            if (self!.voxelInfoBuffer[0].state == kVInit){
-                self?.setCurrentARFrameAsReference()
-
-                // increase the rendering
-//                self!.maxInFlightBuffers = 3
-            }
             
             if let self = self {
                 self.inFlightSemaphore.signal()
@@ -359,9 +355,15 @@ private extension Renderer {
                 for x in 0...voxelSize.x-1 {
                     let xyArea = voxelSize.x * voxelSize.y
                     let index = Int(xyArea * z + y * voxelSize.x + x)
-                    self.voxelBuffer![index].position = simd_float3(Float(x) * Float(voxelStpeSize),
-                                                                    Float(y) * Float(voxelStpeSize),
-                                                                    Float(z) * Float(voxelStpeSize)) + simd_float3(voxelSize) / 2
+//                    self.voxelBuffer![index].position = simd_float3(Float(x) * Float(voxelStpeSize),
+//                                                                    Float(y) * Float(voxelStpeSize),
+//                                                                    Float(z) * Float(voxelStpeSize)) + simd_float3(voxelSize) / 2
+                    let localPosition = simd_float4(Float(x) * Float(voxelStpeSize),
+                                                    Float(y) * Float(voxelStpeSize),
+                                                    Float(z) * Float(voxelStpeSize), 1)
+                    let globePosition = localPosition * voxelInfo.transform
+                    self.voxelBuffer![index].position = simd_float3(globePosition.x, globePosition.y, globePosition.z)
+//                    self.voxelBuffer![index].color = simd_float4(Float(x)/100.0, Float(y)/100.0, Float(z)/100.0, 1.0)
                 }
             }
         }
@@ -396,15 +398,9 @@ private extension Renderer {
     
     static func makeRotateToARCameraMatrix(orientation: UIInterfaceOrientation) -> matrix_float4x4 {
         // flip to ARKit Camera's coordinate
-        let flipYZ = matrix_float4x4(
-            [1, 0, 0, 0],
-            [0, -1, 0, 0],
-            [0, 0, -1, 0],
-            [0, 0, 0, 1] )
 
-        let rotationAngle = Float(cameraToDisplayRotation(orientation: orientation)) * .degreesToRadian
-        return flipYZ * matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
-//        return flipYZ
+        let rotationAngle = Float(cameraToDisplayRotation(orientation: .portrait)) * .degreesToRadian
+        return matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
     }
     
     func checkVoxelBuffer() {
