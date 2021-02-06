@@ -166,6 +166,8 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
         
         device Voxel *v = &voxel[id];
         int3 vPosition = idTovPosition_3d(id, &vInfo);
+        v->position = float3(vPosition) * vInfo.stepSize + (vInfo.stepSize / 2);
+
 //        position = (float4(position, 1) * vInfo.transform).xyz;
         
         // TODO: Synchronous multithreading
@@ -176,11 +178,9 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
 //        color = color * fInfo.colorSpaceTransform;
                 
         // update near-by voxels
-        auto sum = voxel->color * v->weight + color * invDistance;
+        auto sum = v->color * v->weight + color * invDistance;
         v->weight += invDistance;
-//        v->color = sum/v->weight;
-        v->color = color;
-        v->position = float3(vPosition) * vInfo.stepSize;
+        v->color = sum/v->weight;
     }
      
     // ----- ALGORITHM END-----
