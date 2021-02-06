@@ -30,7 +30,6 @@ static simd_float4 imageToWorld(simd_float2 cameraPoint, const device VoxelInfo 
     const auto worldPoint = fInfo->cameraTransform * vInfo->rotateToARCamera * fInfo->flipY * simd_float4(simd_float3(localPoint.xy, 0), 1);
     // TODO: add transform from iPhone to ultrasound image
     return worldPoint; // without normalization
-//    return worldPoint / worldPoint.w;
 }
 
 /*
@@ -86,19 +85,12 @@ struct NearByResult{
 
 static bool findNearby(simd_float3 position, device VoxelInfo &vInfo, thread NearByResult &result){
     result = {{-1}}; // set default value
-//    if (!positionIsValid(position, &vInfo)){
-//        // WARNING: ignore the points that locate outside the voxel box edge.
-//        return false;
-//    }
-//    
-    // TODO: voxel ids should be ordered properly
-    //
+    if (!positionIsValid(position, &vInfo)){
+        // WARNING: ignore the points that locate outside the voxel box edge.
+        return false;
+    }
     
     auto vPosition = simd_int3(position / vInfo.stepSize);
-//    const int64_t targetID = positionToId_3d(vPosition, &vInfo);
-//    if (targetID < 0)
-//        break; // skip the indice and leave it -1
-    
     for (uint8_t z = 0; z < 2 ; z ++){
         for (uint8_t y = 0; y < 2 ; y ++){
             for (uint8_t x = 0; x < 2 ; x ++){
@@ -123,10 +115,7 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
                             device char *dbgInfo [[buffer(kDebugInfo)]],
                             constant float2 *gridPoints [[buffer(kGridPoint)]],
                             texture2d<float, access::sample> uImageTexture [[texture(kTexture)]]
-//                            texture2d<float, access::sample> depthTexture [[texture(kTextureDepth)]],
-//                            texture2d<unsigned int, access::sample> confidenceTexture [[texture(kTextureConfidence)]]
                             ){
-    const auto gridPoint = gridPoints[vertexID];
     const auto gridX = vertexID % fInfo.imageWidth;
     const auto gridY = (int) (vertexID / fInfo.imageWidth);
     
@@ -139,7 +128,6 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     // (this provide local coordinate and scale)
     auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
     // TODO: check the position of "vInfo.size/2"
-//    auto vPosition = simd_int3(localPosition / vInfo.stepSize) + vInfo.size/2;
     
     // Prepate data
     float4 color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
@@ -156,8 +144,6 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     
     
     // ----- ALGORITHM BEGIN-----
-    
-    
     // foreach neighbor
     for (uint8_t i = 0; i < 8; i ++){
         int id = result.ids[i];
@@ -168,13 +154,11 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
         int3 vPosition = idTovPosition_3d(id, &vInfo);
         v->position = float3(vPosition) * vInfo.stepSize + (vInfo.stepSize / 2);
 
-//        position = (float4(position, 1) * vInfo.transform).xyz;
-        
         // TODO: Synchronous multithreading
-        
-        // TODO: retrieve color and convert to B&W
 
         float invDistance = 1.0/distance(localPosition.xyz, v->position);
+        
+        // WARNING: retrieve colors and convert to B&W
 //        color = color * fInfo.colorSpaceTransform;
                 
         // update near-by voxels
@@ -182,37 +166,8 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
         v->weight += invDistance;
         v->color = sum/v->weight;
     }
-     
     // ----- ALGORITHM END-----
-    
-    
-//    auto vPosition = simd_int3(localPosition / vInfo.stepSize);
-//     find the ID of the voxel and write corresponding data
-//    const int64_t targetID = vPositionToId_3d(vPosition, &vInfo);
-//    if (targetID < 0)
-//        return; // drop the target outside the voxel range
-//
-//    voxel[targetID].position = worldPosition.xyz;
-//    voxel[targetID].color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
-//    voxel[targetID].color.a = 0.1;
-    
-
-//    const int64_t targetID = vertexID;
-//    if (targetID < 1000000){
-//        voxel[targetID].position = (vInfo.inversedRotateToARCamera * localPosition).xyz;
-//        voxel[targetID].color = color;
-//    }
-//
-
-    
-    // debug color
-//    voxel≈.color = float4(float(vPosition.x)/vInfo.size.x,
-//                                   float(vPosition.y)/vInfo.size.y,
-//                                   float(vPosition.z)/vInfo.size.z,
-//                                   0.5);
         
-    
-    
     // update min max value of xyz
     if (vInfo.axisMax.x < worldPosition.x){
         vInfo.axisMax.x = worldPosition.x;

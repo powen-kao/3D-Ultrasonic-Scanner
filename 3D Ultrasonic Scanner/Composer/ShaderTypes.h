@@ -7,7 +7,6 @@
 
 #ifndef ShaderTypes_h
 #define ShaderTypes_h
-//#include <string>
 #include <simd/simd.h>
 
 enum BufferIndices {
@@ -19,10 +18,6 @@ enum BufferIndices {
     kTexture,
     kDebugInfo
 };
-
-//enum DebugInfoType{
-//    kDbgInfo
-//}
 
 typedef enum State{
     kVInit,

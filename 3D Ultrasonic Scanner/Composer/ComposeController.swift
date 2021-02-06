@@ -101,10 +101,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
         
     }
     
-    //    func findClosestARFrame() -> ARFrame{
-    //        return nil
-    //    }
-    
     func loadImage(image: UIImage) {
         self.imagePixelBuffer = image.toCVPixelBuffer()
     }

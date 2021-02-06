@@ -23,14 +23,6 @@ class Renderer {
             return voxelInfoBuffer[0]
         }
     }
-    var localTransform: simd_float4x4 {
-        // the current local tranform in respect to first frame
-        // (including camera to AR scene coordinate transform)
-        get{
-            return voxelInfoBuffer[0].inversedTransform * (currentARFrame?.camera.transform ?? matrix_identity_float4x4)
-                * rotateToARCamera
-        }
-    }
     var delegate: RendererDelegate?
     
     // Basic Metal objects
@@ -160,28 +152,22 @@ class Renderer {
             if case .normal = currentARFrame?.camera.trackingState {
                 self.setCurrentARFrameAsReference()
                 // increase the rendering
-    //                self!.maxInFlightBuffers = 3
+//                self!.maxInFlightBuffers = 3
             }
         }
         
         // Insert frame info
         var frameInfo = FrameInfo()
         let camera = _frame.camera
-//        let cameraIntrinsicsInversed = camera.intrinsics.inverse
         let viewMatrix = camera.viewMatrix(for: orientation)
-        let viewMatrixInversed = viewMatrix.inverse
         let projectionMatrix = camera.projectionMatrix(for: orientation, viewportSize: viewportSize, zNear: 0.001, zFar: 0)
         frameInfo.viewProjectionMatrix = projectionMatrix * viewMatrix
-//        frameInfo.cameraToWorld = viewMatrixInversed * rotateToARCamera
         frameInfo.cameraTransform = camera.transform
         frameInfo.imageWidth = Int32(imageWidth)
         frameInfo.imageHeight = Int32(imageHeight)
-        
-        let imgfWidth = Float(imageWidth)
-        let imgfHeight = Float(imageHeight)
         frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
                                                              [0, 3677, 0],
-                                                             [imgfWidth/2.0, imgfHeight/2.0, 1]))
+                                                             [Float(imageWidth)/2.0, Float(imageHeight)/2.0, 1]))
         // transform that convert color to black and white
         frameInfo.colorSpaceTransform = simd_float4x4.init([0.333, 0.333, 0.333, 1],
                                                            [0.333, 0.333, 0.333, 1],
@@ -346,7 +332,7 @@ private extension Renderer {
     
     func makeTextureCache() -> CVMetalTextureCache {
         var cache: CVMetalTextureCache!
-        let status = CVMetalTextureCacheCreate(nil, nil, device, nil, &cache)
+        _ = CVMetalTextureCacheCreate(nil, nil, device, nil, &cache)
         return cache
     }
     
@@ -356,9 +342,6 @@ private extension Renderer {
                 for x in 0...voxelSize.x-1 {
                     let xyArea = voxelSize.x * voxelSize.y
                     let index = Int(xyArea * z + y * voxelSize.x + x)
-//                    self.voxelBuffer![index].position = simd_float3(Float(x) * Float(voxelStpeSize),
-//                                                                    Float(y) * Float(voxelStpeSize),
-//                                                                    Float(z) * Float(voxelStpeSize)) + simd_float3(voxelSize) / 2
                     let localPosition = simd_float4(Float(x) * Float(voxelStpeSize),
                                                     Float(y) * Float(voxelStpeSize),
                                                     Float(z) * Float(voxelStpeSize), 1)
