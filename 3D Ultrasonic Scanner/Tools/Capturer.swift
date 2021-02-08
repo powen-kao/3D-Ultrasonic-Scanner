@@ -46,7 +46,7 @@ class Capturer {
             let captureDescriptor = MTLCaptureDescriptor()
             captureDescriptor.captureObject = self.device
             do {
-              try captureManager?.startCapture(with: captureDescriptor)
+                try captureManager?.startCapture(with: captureDescriptor)
             }
             catch
             {

@@ -7,21 +7,18 @@
 
 #ifndef ShaderTypes_h
 #define ShaderTypes_h
-//#include <string>
 #include <simd/simd.h>
 
 enum BufferIndices {
-    kFrameInfo = 0,
-    kVoxel = 1,
-    kGridPoint = 2,
-    kVoxelInfo = 3,
-    kTexture = 4,
-    kDebugInfo = 5
+    kFrameInfo,
+    kVoxel,
+    kCopyVoxel,
+    kImageVoxel,
+    kGridPoint,
+    kVoxelInfo,
+    kTexture,
+    kDebugInfo
 };
-
-//enum DebugInfoType{
-//    kDbgInfo
-//}
 
 typedef enum State{
     kVInit,
@@ -36,6 +33,9 @@ struct FrameInfo {
     matrix_float3x3 cameraIntrinsicsInversed;
     matrix_float3x3 uIntrinsicsInversed;
     matrix_float3x3 uIntrinsics;
+    matrix_float4x4 colorSpaceTransform;
+    matrix_float4x4 flipY;
+    
 
     simd_float2 cameraResolution;
     int imageWidth;
@@ -56,8 +56,9 @@ struct VoxelInfo{
     simd_float4x4 transform; // transform from local voxel to global position
     simd_float4x4 inversedTransform;
     simd_float4x4 rotateToARCamera;
-    simd_int3 size;
-    int count;
+    simd_float4x4 inversedRotateToARCamera;
+    simd_uint3 size;
+    uint count;
 
     // flag
     VoxelInfoState state;
@@ -78,10 +79,10 @@ struct DebugInfo{
 };
 
 struct Voxel {
-    simd_float3 position; // TODO: remove later
+    simd_float3 position;
     simd_float4 color; // rgba
-//    float alpha;
-    simd_int3 location;
+    float weight;
+    uint8_t touched;
 };
 
 

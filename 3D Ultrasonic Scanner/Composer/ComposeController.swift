@@ -17,8 +17,11 @@ import SceneKit.ModelIO
  The matched frames are sent to (Metal) render for point cloud conversion.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTKViewDelegate{
-
+class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTKViewDelegate, RendererDelegate{
+    
+    // delegate
+    var delegate: ComposerDelegate?
+    
     // Data sources
     private let arSession: ARSession
     private let probeStreamer: ProbeStreamer = ProbeStreamer()
@@ -39,8 +42,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     // current infos
     private var currentARFrame: ARFrame?
     private var viewportSize = CGSize()
-    
-    var delegate: ComposerDelegate?
+    private let voxelNode = SCNNode()
+    private let imageVoxelNode = SCNNode()
     
     // capturing
     private var captureScope: MTLCaptureScope?
@@ -79,29 +82,24 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             
             // Configure the renderer to draw to the view
             renderer = Renderer(metalDevice: device!, renderDestination: view)
-            if (renderer == nil){
-                // call observer
-                return
-            }
+            renderer?.delegate = self
             renderer?.drawRectResized(size: view.bounds.size)
             self.destination = view
         }
-        
-        // Add geometry into SCNScene
+
+        // Add geometries into SCNScene
         let scene = scnView.scene!
-        let geometryNode = SCNNode(geometry: renderer?.scnGeometry)
-        scene.rootNode.addChildNode(geometryNode)
+        scene.rootNode.addChildNode(voxelNode)
+        scene.rootNode.addChildNode(imageVoxelNode)
         
+        // add gemeotry
+        voxelNode.geometry = renderer?.voxelGeometry
+
         // Add contrains
         let cameraNode = scene.rootNode.childNode(withName: "camera", recursively: true)
-        cameraNode?.constraints = [SCNLookAtConstraint(target: geometryNode)]
+        cameraNode?.constraints = [SCNLookAtConstraint(target: voxelNode)]
         
     }
-    
-    //    func findClosestARFrame() -> ARFrame{
-    //        return nil
-    //    }
-    
     
     func loadImage(image: UIImage) {
         self.imagePixelBuffer = image.toCVPixelBuffer()
@@ -152,7 +150,14 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
         }
     }
     
-
+    func postProcess() {
+        // fill holes
+        renderer?.fillHoles()
+        
+        // smoothing surface?
+        
+        // TODO: save file
+    }
 }
 
 extension ARFrame: Comparable{
@@ -189,6 +194,16 @@ extension ComposeController{
         {
             fatalError("error when trying to capture: \(error)")
         }
+    }
+    
+    // MARK: Renderer delegate
+    
+    func renderer(_ renderer: Renderer, voxelGeometryUpdate voxelGeometry: SCNGeometry) {
+        voxelNode.geometry = voxelGeometry
+    }
+    
+    func renderer(_ renderer: Renderer, imageGeometryUpdate imageGeometry: SCNGeometry) {
+        imageVoxelNode.geometry = imageGeometry
     }
 
 }

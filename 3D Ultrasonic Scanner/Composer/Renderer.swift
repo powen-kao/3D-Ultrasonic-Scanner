@@ -15,27 +15,22 @@ class Renderer {
     private let renderDestination: RenderDestinationProvider
     
     // To expose
-    private(set) var scnGeometry: SCNGeometry?
+    private(set) var voxelGeometry: SCNGeometry?
+    private(set) var imageVoxelGeometry: SCNGeometry?
     private(set) var state: RendererState = .Initing
     var voxelInfo: VoxelInfo {
         get{
             return voxelInfoBuffer[0]
         }
     }
-    var localTransform: simd_float4x4 {
-        // the current local tranform in respect to first frame
-        // (including camera to AR scene coordinate transform)
-        get{
-            return voxelInfoBuffer[0].inversedTransform * (currentARFrame?.camera.transform ?? matrix_identity_float4x4)
-                * rotateToARCamera
-        }
-    }
+    var delegate: RendererDelegate?
     
     // Basic Metal objects
     private let device: MTLDevice
     private let library: MTLLibrary
     private let commandQueue: MTLCommandQueue
     private lazy var unprojectionPipelineState = makeUnprojectionPipelineState()!
+    private lazy var fillingPipelineState = makeFillingPipelineState()!
     private lazy var textureCache: CVMetalTextureCache = makeTextureCache()
     
     // Rendering objects
@@ -43,8 +38,8 @@ class Renderer {
     private let depthStencilState: MTLDepthStencilState
     
     // Voxel parameters
-    let voxelSize = simd_int3(100, 100, 100)
-    private var voxelCounts: Int32 {
+    let voxelSize = simd_uint3(100, 100, 100)
+    private var voxelCounts: UInt32 {
         get{
             voxelSize.x * voxelSize.y * voxelSize.z
         }
@@ -75,6 +70,8 @@ class Renderer {
     
     // Buffers
     private var voxelBuffer: MetalBuffer<Voxel>?
+    private var voxelCopyBuffer: MetalBuffer<Voxel>?
+    private var imageVoxelBuffer: MetalBuffer<Voxel>?
     private var gridBuffer: MetalBuffer<SIMD2<Float>>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
     private var voxelInfoBuffer: MetalBuffer<VoxelInfo> // can be modified internally
@@ -100,6 +97,7 @@ class Renderer {
     enum RendererState {
         case Initing
         case Ready
+        case Processing
     }
 
     init(metalDevice: MTLDevice, renderDestination: RenderDestinationProvider) {
@@ -126,21 +124,24 @@ class Renderer {
         // init the max and min points with a extream value
         voxelInfoBuffer[0].axisMax = simd_float3(repeating: Float.leastNormalMagnitude)
         voxelInfoBuffer[0].axisMin = simd_float3(repeating: Float.greatestFiniteMagnitude)
+        voxelInfoBuffer[0].size = voxelSize
+        voxelInfoBuffer[0].stepSize = Float(voxelStpeSize)
+        voxelInfoBuffer[0].count = voxelCounts
         voxelInfoBuffer[0].state = kVInit
         voxelInfoBuffer[0].inversedTransform = matrix_identity_float4x4
         voxelInfoBuffer[0].transform = matrix_identity_float4x4
         voxelInfoBuffer[0].rotateToARCamera = rotateToARCamera
+        voxelInfoBuffer[0].inversedRotateToARCamera = rotateToARCamera.inverse
+
 
         // Init values that require
         checkVoxelBuffer()
         
+        // Post-operations
         DispatchQueue.global(qos: .userInitiated).async {
             self.makeVoxelGrid()
             self.state = .Ready
         }
-
-        self.scnGeometry = makeSCNGeometry() // init after buffer is created
-
     }
     
     func prepareForShader(){
@@ -152,25 +153,38 @@ class Renderer {
             return
         }
         
+        // take center of voxels as reference for origin of voxels if is first frame
+        if (self.voxelInfoBuffer[0].state == kVInit){
+            if case .normal = currentARFrame?.camera.trackingState {
+                self.setCurrentARFrameAsReference()
+                // increase the rendering
+//                self!.maxInFlightBuffers = 3
+            }
+        }
+        
         // Insert frame info
         var frameInfo = FrameInfo()
         let camera = _frame.camera
-//        let cameraIntrinsicsInversed = camera.intrinsics.inverse
         let viewMatrix = camera.viewMatrix(for: orientation)
-        let viewMatrixInversed = viewMatrix.inverse
         let projectionMatrix = camera.projectionMatrix(for: orientation, viewportSize: viewportSize, zNear: 0.001, zFar: 0)
         frameInfo.viewProjectionMatrix = projectionMatrix * viewMatrix
-//        frameInfo.cameraToWorld = viewMatrixInversed * rotateToARCamera
         frameInfo.cameraTransform = camera.transform
         frameInfo.imageWidth = Int32(imageWidth)
         frameInfo.imageHeight = Int32(imageHeight)
-        
-        let imgfWidth = Float(imageWidth)
-        let imgfHeight = Float(imageHeight)
         frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
                                                              [0, 3677, 0],
-                                                             [imgfWidth/2.0, imgfHeight/2.0, 1]))
+                                                             [Float(imageWidth)/2.0, Float(imageHeight)/2.0, 1]))
+        // transform that convert color to black and white
+        frameInfo.colorSpaceTransform = simd_float4x4.init([0.333, 0.333, 0.333, 1],
+                                                           [0.333, 0.333, 0.333, 1],
+                                                           [0.333, 0.333, 0.333, 1],
+                                                           [0, 0, 0, 1])
         frameInfo.uIntrinsicsInversed = frameInfo.uIntrinsics.inverse
+        frameInfo.flipY = matrix_float4x4(
+                            [1, 0, 0, 0],
+                            [0, -1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1] )
         frameInfoBuffer.assign(frameInfo)
         
         // Insert Voxel info
@@ -184,7 +198,6 @@ class Renderer {
     ### Convert captured image into 3D points clouds using transform from frame
      */
     func render (frame: ARFrame, capturedImage: CVPixelBuffer){
-        capturer.begin()
 
         
         // Pipeline: vertex (from 2D pixel to point cloud) -> (point cloud to Voxel) -> fragement (ignore the point with alpha value less than 0.1?)
@@ -194,6 +207,8 @@ class Renderer {
               let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)else{
             return
         }
+        
+        state = .Processing
         
         // wait for Semaphore
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
@@ -205,26 +220,8 @@ class Renderer {
         
         // prepare for buffers and information for shader
         prepareForShader()
-
         
-        // TODO: tryouts and remove later
-//        let point = simd_float2(Float(imageWidth)/2.0, Float(imageHeight)/2.0)
-//        let fInfo = frameInfoBuffer[0]
-//        let local =  fInfo.uIntrinsicsInversed * simd_float3(point, 1)
-//        let global = rotateToARCamera * fInfo.cameraTransform * simd_float4(simd_float3(local.x, local.y, 0), 1)
-//
-//        let tempRLocal = voxelInfo.inversedTransform * global
-//        let rLocal = simd_float3(tempRLocal.x, tempRLocal.y, tempRLocal.z)
-//
-//        let vGridPosition = simd_int3 (rLocal / voxelInfo.stepSize) &+ voxelSize / 2 // shift to center
-//
-//        let xyArea = voxelSize.x * voxelSize.y;
-//        let index = xyArea * vGridPosition.z + vGridPosition.y * voxelSize.x + vGridPosition.x
-        
-        
-//        InfoViewController.shared?.frameInfoText = "\(rLocal.x) \n \(rLocal.y) \n \(rLocal.z) \n        \(vGridPosition) \n index: \(index)"
-        
-
+        // TODO: remove later
         var kvPairs = [String: Any]()
         kvPairs["Position"] = self.voxelBuffer![Int(self.voxelCounts)/2].position
         kvPairs["color"] = self.voxelBuffer![0].color
@@ -236,23 +233,12 @@ class Renderer {
         imageTexture = makeTexture(fromPixelBuffer: capturedImage, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
         
-        commandBuffer.addCompletedHandler { [weak self] commandBuffer in
-            self?.capturer.end()
-            
+        commandBuffer.addCompletedHandler { [self] commandBuffer in
+            state = .Ready
             // remove all reference to texture
             retainingTextures.removeAll()
             
-            // take center of voxels as reference for origin of voxels if is first frame
-            if (self!.voxelInfoBuffer[0].state == kVInit){
-                self?.setCurrentARFrameAsReference()
-
-                // increase the rendering
-//                self!.maxInFlightBuffers = 3
-            }
-            
-            if let self = self {
-                self.inFlightSemaphore.signal()
-            }
+            inFlightSemaphore.signal()
             
             DispatchQueue.main.sync { [self] in
 //                InfoViewController.shared?.frameInfoText = "GPU processing time: \((commandBuffer.gpuEndTime-commandBuffer.gpuStartTime)*1000) ms";
@@ -267,6 +253,7 @@ class Renderer {
         commandEncoder.setVertexBuffer(frameInfoBuffer)
         commandEncoder.setVertexBuffer(voxelInfoBuffer)
         commandEncoder.setVertexBuffer(voxelBuffer!)
+        commandEncoder.setVertexBuffer(imageVoxelBuffer!)
         commandEncoder.setVertexBuffer(debugInfoBuffer, offset: 0, index: Int(kDebugInfo.rawValue))
         commandEncoder.setVertexTexture(CVMetalTextureGetTexture(imageTexture!), index: Int(kTexture.rawValue))
         commandEncoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: gridBuffer!.count)
@@ -276,11 +263,48 @@ class Renderer {
         commandBuffer.commit()
     }
     
-    func draw() {
+    func fillHoles() {
+        
+ 
+        // make a copy of voxel metal buffer
+        voxelCopyBuffer = .init(device: device, from: voxelBuffer!, index: kCopyVoxel.rawValue)
+        
+        // MARK: uncomment trigger() to enable frame capture on called
+//        capturer.trigger()
+        
+        capturer.begin()
         
         
+        guard let _commandBuffer = commandQueue.makeCommandBuffer(),
+              let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
+            return
+        }
         
+        state = .Processing
+        
+        _commandBuffer.addCompletedHandler({ [self]_ in
+            state = .Ready
+            capturer.end()
+            print("Filling Finished [\((_commandBuffer.gpuEndTime - _commandBuffer.gpuStartTime)*1000) ms]")
+        })
+
+        
+        // compute thread size
+        let threadGroupSize = MTLSize(width: 8,height: 8, depth: 8)
+        var threadGroupCount = MTLSize()
+        threadGroupCount.width  = (Int(voxelInfo.size.x) + threadGroupSize.width -  1) / threadGroupSize.width;
+        threadGroupCount.height  = (Int(voxelInfo.size.y) + threadGroupSize.height -  1) / threadGroupSize.height;
+        threadGroupCount.depth  = (Int(voxelInfo.size.z) + threadGroupSize.depth -  1) / threadGroupSize.depth;
+        
+        _commandEncoder.setComputePipelineState(fillingPipelineState)
+        _commandEncoder.setBuffer(voxelBuffer!)
+        _commandEncoder.setBuffer(voxelCopyBuffer!)
+        _commandEncoder.setBuffer(voxelInfoBuffer)
+        _commandEncoder.dispatchThreadgroups(threadGroupCount, threadsPerThreadgroup: threadGroupSize)
+        _commandEncoder.endEncoding()
+        _commandBuffer.commit()
     }
+    
     func drawRectResized(size: CGSize) {
         viewportSize = size
     }
@@ -319,23 +343,30 @@ private extension Renderer {
         }
     }
     
-    func makeSCNGeometry() -> SCNGeometry {
-        let buffer = voxelBuffer!.buffer
-        let vertexSource = SCNGeometrySource(buffer: buffer ,
+    func makeFillingPipelineState() -> MTLComputePipelineState? {
+        guard let vertexFunction = library.makeFunction(name: "holeFilling")
+        else {
+                return nil
+        }
+        return try? device.makeComputePipelineState(function: vertexFunction)
+    }
+    
+    func makeVoxelSCNGeometry(buffer: MetalBuffer<Voxel>) -> SCNGeometry {
+        let vertexSource = SCNGeometrySource(buffer: buffer.buffer,
                                        vertexFormat: .float3,
                                        semantic: .vertex,
-                                       vertexCount: Int(self.voxelCounts),
+                                       vertexCount: buffer.count,
                                        dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.position)!,
                                        dataStride: voxelBuffer!.stride)
         
-        let colorSource = SCNGeometrySource(buffer: buffer,
+        let colorSource = SCNGeometrySource(buffer: buffer.buffer,
                                             vertexFormat: .float4,
                                             semantic: .color,
-                                            vertexCount: Int(self.voxelCounts),
+                                            vertexCount: buffer.count,
                                             dataOffset: MemoryLayout<Voxel>.offset(of: \Voxel.color)!,
                                             dataStride: voxelBuffer!.stride)
         
-        let element = SCNGeometryElement(data: nil, primitiveType: .point, primitiveCount: Int(voxelCounts), bytesPerIndex: MemoryLayout<Int>.size)
+        let element = SCNGeometryElement(data: nil, primitiveType: .point, primitiveCount: buffer.count, bytesPerIndex: MemoryLayout<Int>.size)
         element.pointSize = 1
         element.maximumPointScreenSpaceRadius = 10
         element.minimumPointScreenSpaceRadius = 1
@@ -349,7 +380,7 @@ private extension Renderer {
     
     func makeTextureCache() -> CVMetalTextureCache {
         var cache: CVMetalTextureCache!
-        let status = CVMetalTextureCacheCreate(nil, nil, device, nil, &cache)
+        _ = CVMetalTextureCacheCreate(nil, nil, device, nil, &cache)
         return cache
     }
     
@@ -359,9 +390,12 @@ private extension Renderer {
                 for x in 0...voxelSize.x-1 {
                     let xyArea = voxelSize.x * voxelSize.y
                     let index = Int(xyArea * z + y * voxelSize.x + x)
-                    self.voxelBuffer![index].position = simd_float3(Float(x) * Float(voxelStpeSize),
-                                                                    Float(y) * Float(voxelStpeSize),
-                                                                    Float(z) * Float(voxelStpeSize)) + simd_float3(voxelSize) / 2
+                    let localPosition = simd_float4(Float(x) * Float(voxelStpeSize),
+                                                    Float(y) * Float(voxelStpeSize),
+                                                    Float(z) * Float(voxelStpeSize), 1)
+                    let globePosition = localPosition * voxelInfo.transform
+                    self.voxelBuffer![index].position = simd_float3(globePosition.x, globePosition.y, globePosition.z)
+//                    self.voxelBuffer![index].color = simd_float4(Float(x)/100.0, Float(y)/100.0, Float(z)/100.0, 1.0)
                 }
             }
         }
@@ -396,15 +430,9 @@ private extension Renderer {
     
     static func makeRotateToARCameraMatrix(orientation: UIInterfaceOrientation) -> matrix_float4x4 {
         // flip to ARKit Camera's coordinate
-        let flipYZ = matrix_float4x4(
-            [1, 0, 0, 0],
-            [0, -1, 0, 0],
-            [0, 0, -1, 0],
-            [0, 0, 0, 1] )
 
-        let rotationAngle = Float(cameraToDisplayRotation(orientation: orientation)) * .degreesToRadian
-        return flipYZ * matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
-//        return flipYZ
+        let rotationAngle = Float(cameraToDisplayRotation(orientation: .portrait)) * .degreesToRadian
+        return matrix_float4x4(simd_quaternion(rotationAngle, Float3(0, 0, 1)))
     }
     
     func checkVoxelBuffer() {
@@ -412,16 +440,35 @@ private extension Renderer {
         if voxelBuffer == nil || voxelBuffer?.count != Int(voxelCounts){
             voxelBuffer = nil // dealloc
             voxelBuffer = .init(device: device, count: Int(voxelCounts), index: kVoxel.rawValue)
+            
+            // update geometry
+            self.voxelGeometry = makeVoxelSCNGeometry(buffer: voxelBuffer!)
+            delegate?.renderer(self, voxelGeometryUpdate: voxelGeometry!)
         }
     }
+    
     func checkGridBuffer() {
         // realloc if nil or shape of image changed
         if gridBuffer == nil || gridBuffer?.count != imagePixelCount{
             gridBuffer = nil
             gridBuffer = .init(device: device, count: imagePixelCount, index: kGridPoint.rawValue)
         }
+        
+        if imageVoxelBuffer == nil || imageVoxelBuffer?.count != imagePixelCount{
+            imageVoxelBuffer = nil // dealloc
+            imageVoxelBuffer = .init(device: device, count: imagePixelCount, index: kImageVoxel.rawValue)
+            
+            // update geometry
+            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: imageVoxelBuffer!)
+            delegate?.renderer(self, imageGeometryUpdate: imageVoxelGeometry!)
+        }
     }
     
+}
+
+protocol RendererDelegate {
+    func renderer(_ renderer: Renderer, voxelGeometryUpdate voxelGeometry: SCNGeometry)
+    func renderer(_ renderer: Renderer, imageGeometryUpdate imageGeometry: SCNGeometry)
 }
 
 extension Renderer{

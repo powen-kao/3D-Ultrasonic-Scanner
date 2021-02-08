@@ -82,9 +82,19 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     @IBAction func action(_ sender: Any) {
         let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
-        alertSheet.addAction(UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
-            self.composer?.restOrigin()
-        }))
+        alertSheet.addAction(
+            UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
+                self.composer?.restOrigin()
+            })
+        )
+        alertSheet.addAction(
+            UIAlertAction(title: "Finish", style: .default, handler: {_ in
+                self.composer?.postProcess()
+            })
+        )
+        alertSheet.addAction(
+            UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        )
         
         present(alertSheet, animated: true, completion: nil)
     }
@@ -148,7 +158,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             alertController = nil
             
             // Update probe transform
-            self.probeNode?.transform = SCNMatrix4(arFrame.camera.transform)
+            self.probeNode?.transform =  SCNMatrix4(arFrame.camera.transform * (self.composer?.renderer?.voxelInfo.rotateToARCamera ?? matrix_identity_float4x4))
         default:
             if alertController == nil{
                 alertController = UIAlertController()
