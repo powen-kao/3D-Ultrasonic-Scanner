@@ -54,6 +54,22 @@ struct MetalBuffer<Element>: Resource {
         self.index = Int(index)
     }
     
+    /// make copy from another buffer
+    
+    init(device: MTLDevice, from: MetalBuffer<Element>, index: UInt32, options: MTLResourceOptions = []) {
+        
+        guard let buffer = device.makeBuffer(bytes: from.buffer.contents(), length: from.buffer.length, options: options) else {
+            fatalError("Failed to create MTLBuffer.")
+        }
+        
+        self.buffer = buffer
+        self.buffer.label = from.buffer.label
+        self.count = from.count
+        
+        // configure its own index
+        self.index = Int(index)
+    }
+    
     /// Replaces the buffer's memory at the specified element index with the provided value.
     func assign<T>(_ value: T, at index: Int = 0) {
         precondition(index <= count - 1, "Index \(index) is greater than maximum allowable index of \(count - 1) for this buffer.")
@@ -112,6 +128,12 @@ extension MTLRenderCommandEncoder {
         if let texture = resource as? Texture {
             setFragmentTexture(texture.texture, index: texture.index)
         }
+    }
+}
+
+extension MTLComputeCommandEncoder {
+    func setBuffer<T>(_ vertexBuffer: MetalBuffer<T>, offset: Int = 0) {
+        setBuffer(vertexBuffer.buffer, offset: offset, index: vertexBuffer.index)
     }
 }
 

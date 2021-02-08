@@ -149,6 +149,15 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             }
         }
     }
+    
+    func postProcess() {
+        // fill holes
+        renderer?.fillHoles()
+        
+        // smoothing surface?
+        
+        // TODO: save file
+    }
 }
 
 extension ARFrame: Comparable{

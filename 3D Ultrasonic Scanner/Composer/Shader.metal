@@ -47,9 +47,9 @@ static int3 idTovPosition_3d(int id , const device VoxelInfo *vInfo){
     const auto x = id % vInfo->size.x;
     return int3(x, y, z);
 }
-static int vPositionToId_3d(simd_int3 vPosition, const device VoxelInfo *vInfo){
+static int vPositionToId_3d(int3 vPosition, const device VoxelInfo *vInfo){
     // clamp the range of (x, y, z)
-    auto _vPosition = clamp(vPosition, simd_int3(0), vInfo->size - 1);
+    auto _vPosition = clamp(vPosition, int3(0), int3(vInfo->size) - 1);
     
     if (_vPosition.x != vPosition.x ||
         _vPosition.y != vPosition.y ||
@@ -165,6 +165,9 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
         auto sum = v->color * v->weight + color * invDistance;
         v->weight += invDistance;
         v->color = sum/v->weight;
+        
+        // update state
+        v->touched = true;
     }
     // ----- ALGORITHM END-----
         
@@ -191,6 +194,55 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     }
 
 }
+
+kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
+                        constant Voxel *voxelCopy [[buffer(kCopyVoxel)]],
+                        device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
+                        uint3 grid_pos [[thread_position_in_grid]]
+                        ){
+    
+    if (grid_pos.x >= vInfo.size.x ||
+        grid_pos.y >= vInfo.size.y ||
+        grid_pos.z >= vInfo.size.z)
+        return;
+        
+    uint vertexID = vPositionToId_3d(int3(grid_pos), &vInfo);
+    if (vertexID < 0)
+        return;
+    
+    // ----- ALGORITHM BEGIN-----
+    if (voxel[vertexID].weight != 0)
+        return; // is not empty
+
+    int count = 0;
+    float sum = 0;
+    
+    // find neighbors
+    for (int z = -1; z < 2 ; z++){
+        for (int y = -1; y < 2 ; y++){
+            for (int x = -1; x < 2 ; x++){
+                // check if the neighbor has value
+                int _id = vPositionToId_3d(int3(grid_pos) + int3(x, y, z), &vInfo);
+                if (_id < 0)
+                    continue; // skip of neighbor is outside
+
+                constant Voxel &vc = voxelCopy[_id];
+                float _color = dot(vc.color.xyz, float3(0.333, 0.333, 0.333));
+                // ignore this neighbor if it's doesn't has any color value
+                if (_color > 0){
+                    sum += _color;
+                    count ++;
+                }
+            }
+        }
+    }
+    if (count > 0){
+        // TODO: what about transparency?
+        voxel[vertexID].color = float4(float3(sum / count), 1);
+    }
+    // ----- ALGORITHM END-----
+}
+
 
 vertex VoxelVertexOut voxelVertex(uint vertexID [[vertex_id]],
                                   constant Voxel *voxel [[buffer(kVoxel)]],

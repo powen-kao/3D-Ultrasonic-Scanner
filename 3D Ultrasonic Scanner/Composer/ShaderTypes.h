@@ -12,6 +12,7 @@
 enum BufferIndices {
     kFrameInfo,
     kVoxel,
+    kCopyVoxel,
     kImageVoxel,
     kGridPoint,
     kVoxelInfo,
@@ -56,8 +57,8 @@ struct VoxelInfo{
     simd_float4x4 inversedTransform;
     simd_float4x4 rotateToARCamera;
     simd_float4x4 inversedRotateToARCamera;
-    simd_int3 size;
-    int count;
+    simd_uint3 size;
+    uint count;
 
     // flag
     VoxelInfoState state;
@@ -81,6 +82,7 @@ struct Voxel {
     simd_float3 position;
     simd_float4 color; // rgba
     float weight;
+    uint8_t touched;
 };
 
 

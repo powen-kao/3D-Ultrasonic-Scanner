@@ -30,6 +30,7 @@ class Renderer {
     private let library: MTLLibrary
     private let commandQueue: MTLCommandQueue
     private lazy var unprojectionPipelineState = makeUnprojectionPipelineState()!
+    private lazy var fillingPipelineState = makeFillingPipelineState()!
     private lazy var textureCache: CVMetalTextureCache = makeTextureCache()
     
     // Rendering objects
@@ -37,8 +38,8 @@ class Renderer {
     private let depthStencilState: MTLDepthStencilState
     
     // Voxel parameters
-    let voxelSize = simd_int3(100, 100, 100)
-    private var voxelCounts: Int32 {
+    let voxelSize = simd_uint3(100, 100, 100)
+    private var voxelCounts: UInt32 {
         get{
             voxelSize.x * voxelSize.y * voxelSize.z
         }
@@ -69,6 +70,7 @@ class Renderer {
     
     // Buffers
     private var voxelBuffer: MetalBuffer<Voxel>?
+    private var voxelCopyBuffer: MetalBuffer<Voxel>?
     private var imageVoxelBuffer: MetalBuffer<Voxel>?
     private var gridBuffer: MetalBuffer<SIMD2<Float>>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
@@ -95,6 +97,7 @@ class Renderer {
     enum RendererState {
         case Initing
         case Ready
+        case Processing
     }
 
     init(metalDevice: MTLDevice, renderDestination: RenderDestinationProvider) {
@@ -121,6 +124,9 @@ class Renderer {
         // init the max and min points with a extream value
         voxelInfoBuffer[0].axisMax = simd_float3(repeating: Float.leastNormalMagnitude)
         voxelInfoBuffer[0].axisMin = simd_float3(repeating: Float.greatestFiniteMagnitude)
+        voxelInfoBuffer[0].size = voxelSize
+        voxelInfoBuffer[0].stepSize = Float(voxelStpeSize)
+        voxelInfoBuffer[0].count = voxelCounts
         voxelInfoBuffer[0].state = kVInit
         voxelInfoBuffer[0].inversedTransform = matrix_identity_float4x4
         voxelInfoBuffer[0].transform = matrix_identity_float4x4
@@ -192,7 +198,6 @@ class Renderer {
     ### Convert captured image into 3D points clouds using transform from frame
      */
     func render (frame: ARFrame, capturedImage: CVPixelBuffer){
-        capturer.begin()
 
         
         // Pipeline: vertex (from 2D pixel to point cloud) -> (point cloud to Voxel) -> fragement (ignore the point with alpha value less than 0.1?)
@@ -202,6 +207,8 @@ class Renderer {
               let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)else{
             return
         }
+        
+        state = .Processing
         
         // wait for Semaphore
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
@@ -226,16 +233,12 @@ class Renderer {
         imageTexture = makeTexture(fromPixelBuffer: capturedImage, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
         
-        commandBuffer.addCompletedHandler { [weak self] commandBuffer in
-            self?.capturer.end()
-            
+        commandBuffer.addCompletedHandler { [self] commandBuffer in
+            state = .Ready
             // remove all reference to texture
             retainingTextures.removeAll()
             
-            
-            if let self = self {
-                self.inFlightSemaphore.signal()
-            }
+            inFlightSemaphore.signal()
             
             DispatchQueue.main.sync { [self] in
 //                InfoViewController.shared?.frameInfoText = "GPU processing time: \((commandBuffer.gpuEndTime-commandBuffer.gpuStartTime)*1000) ms";
@@ -260,11 +263,48 @@ class Renderer {
         commandBuffer.commit()
     }
     
-    func draw() {
+    func fillHoles() {
+        
+ 
+        // make a copy of voxel metal buffer
+        voxelCopyBuffer = .init(device: device, from: voxelBuffer!, index: kCopyVoxel.rawValue)
+        
+        // MARK: uncomment trigger() to enable frame capture on called
+//        capturer.trigger()
+        
+        capturer.begin()
         
         
+        guard let _commandBuffer = commandQueue.makeCommandBuffer(),
+              let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
+            return
+        }
         
+        state = .Processing
+        
+        _commandBuffer.addCompletedHandler({ [self]_ in
+            state = .Ready
+            capturer.end()
+            print("Filling Finished [\((_commandBuffer.gpuEndTime - _commandBuffer.gpuStartTime)*1000) ms]")
+        })
+
+        
+        // compute thread size
+        let threadGroupSize = MTLSize(width: 8,height: 8, depth: 8)
+        var threadGroupCount = MTLSize()
+        threadGroupCount.width  = (Int(voxelInfo.size.x) + threadGroupSize.width -  1) / threadGroupSize.width;
+        threadGroupCount.height  = (Int(voxelInfo.size.y) + threadGroupSize.height -  1) / threadGroupSize.height;
+        threadGroupCount.depth  = (Int(voxelInfo.size.z) + threadGroupSize.depth -  1) / threadGroupSize.depth;
+        
+        _commandEncoder.setComputePipelineState(fillingPipelineState)
+        _commandEncoder.setBuffer(voxelBuffer!)
+        _commandEncoder.setBuffer(voxelCopyBuffer!)
+        _commandEncoder.setBuffer(voxelInfoBuffer)
+        _commandEncoder.dispatchThreadgroups(threadGroupCount, threadsPerThreadgroup: threadGroupSize)
+        _commandEncoder.endEncoding()
+        _commandBuffer.commit()
     }
+    
     func drawRectResized(size: CGSize) {
         viewportSize = size
     }
@@ -301,6 +341,14 @@ private extension Renderer {
             print("\(error)")
             return nil
         }
+    }
+    
+    func makeFillingPipelineState() -> MTLComputePipelineState? {
+        guard let vertexFunction = library.makeFunction(name: "holeFilling")
+        else {
+                return nil
+        }
+        return try? device.makeComputePipelineState(function: vertexFunction)
     }
     
     func makeVoxelSCNGeometry(buffer: MetalBuffer<Voxel>) -> SCNGeometry {
