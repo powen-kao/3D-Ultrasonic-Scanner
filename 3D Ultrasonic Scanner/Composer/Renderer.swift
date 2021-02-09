@@ -221,14 +221,15 @@ class Renderer {
         // prepare for buffers and information for shader
         prepareForShader()
         
-        // TODO: remove later
+        // MARK: debug info printing for unprojection
         var kvPairs = [String: Any]()
         kvPairs["Position"] = self.voxelBuffer![Int(self.voxelCounts)/2].position
         kvPairs["color"] = self.voxelBuffer![0].color
         kvPairs["max"] = self.voxelInfoBuffer[0].axisMax
         kvPairs["min"] = self.voxelInfoBuffer[0].axisMin
-        
         InfoViewController.shared?.frameInfoText = "\(Tools.pairsToString(items: kvPairs))"
+        
+        
         // TODO: retaining texture?
         imageTexture = makeTexture(fromPixelBuffer: capturedImage, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
@@ -265,7 +266,6 @@ class Renderer {
     
     func fillHoles() {
         
- 
         // make a copy of voxel metal buffer
         voxelCopyBuffer = .init(device: device, from: voxelBuffer!, index: kCopyVoxel.rawValue)
         

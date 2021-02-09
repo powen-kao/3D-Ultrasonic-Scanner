@@ -17,7 +17,7 @@ import SceneKit.ModelIO
  The matched frames are sent to (Metal) render for point cloud conversion.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTKViewDelegate, RendererDelegate{
+class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStreamerDelegate, RendererDelegate, ARRecorderDelegate{
     
     // delegate
     var delegate: ComposerDelegate?
@@ -45,6 +45,16 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     private let voxelNode = SCNNode()
     private let imageVoxelNode = SCNNode()
     
+    // Recorder and Player
+    internal let recorder: ARRecorder = ARRecorder()
+    internal var recorderState: ARRecorderState = .Init
+    var recordingURL: URL{
+        didSet{
+            recorderURLChangedHandler()
+        }
+    }
+    private let player: ARPlayer = ARPlayer()
+    
     // capturing
     private var captureScope: MTLCaptureScope?
     private var shouldCapture = false;
@@ -52,7 +62,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
     init(arSession: ARSession, destination: RenderDestinationProvider, scnView: SCNView) {
         self.arSession = arSession
         self.scnView = scnView
-        
+        self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Recording.txt") // defualt file path
         super.init()
 
         
@@ -86,19 +97,43 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             renderer?.drawRectResized(size: view.bounds.size)
             self.destination = view
         }
+        
+        // Rest of the settings
 
         // Add geometries into SCNScene
         let scene = scnView.scene!
         scene.rootNode.addChildNode(voxelNode)
         scene.rootNode.addChildNode(imageVoxelNode)
         
-        // add gemeotry
+        // Add gemeotry
         voxelNode.geometry = renderer?.voxelGeometry
 
         // Add contrains
         let cameraNode = scene.rootNode.childNode(withName: "camera", recursively: true)
         cameraNode?.constraints = [SCNLookAtConstraint(target: voxelNode)]
         
+        
+        // Open recording file
+        recorder.open(file: recordingURL, size: nil)
+        recorder.delegate = self
+        recorderState = .Ready
+    }
+    
+    func startRecording() {
+        recorderState = .Recording
+        recorder.save(completeHandler: nil)
+    }
+    
+    func stopRecording() {
+        recorderState = .Busy
+        recorder.save { [self] (recorder, success) in
+            print("[Save success: \(success)] \(recorder)")
+            recorder.close()
+            recorderState = .Ready
+        }
+    }
+    func replay() {
+        player.read(file: recordingURL)
     }
     
     func loadImage(image: UIImage) {
@@ -142,6 +177,9 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeStreamerDelegate, MTK
             }
             captureScope?.begin()
             renderer?.render(frame: _frame, capturedImage: _buffer)
+            if (recorderState == .Recording){
+                recorder.append(frame: _frame)
+            }
             captureScope?.end()
             if (self.shouldCapture){
                 self.shouldCapture = false
@@ -172,6 +210,11 @@ extension ARFrame: Comparable{
 
 
 extension ComposeController{
+    
+    func recorderURLChangedHandler() {
+        // Open file for recorder
+        recorder.open(file: recordingURL, size: nil)
+    }
     
     // public functions
     func restOrigin() {
@@ -205,8 +248,22 @@ extension ComposeController{
     func renderer(_ renderer: Renderer, imageGeometryUpdate imageGeometry: SCNGeometry) {
         imageVoxelNode.geometry = imageGeometry
     }
-
+    
+    // MARK: Recorder delegate
+    func recorder(_ recorder: ARRecorder, fullness: Float) {
+        // TODO: remove later
+        InfoViewController.shared?.progressBar.progress = fullness;
+    }
+    
 }
+
+enum ARRecorderState {
+    case Init
+    case Ready
+    case Recording
+    case Busy // writing or reading files
+}
+
 
 @objc protocol ComposerDelegate {
     @objc optional func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame)
@@ -216,4 +273,12 @@ protocol ComposerObserver{
     func composer(message: String)
 }
 
+protocol ComposerInfoProvider {
+    var recorder: ARRecorder {get}
+    var recorderState: ARRecorderState {get}
+}
+
+extension ComposeController: ComposerInfoProvider{
+    
+}
 

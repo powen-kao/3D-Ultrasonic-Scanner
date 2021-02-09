@@ -22,6 +22,9 @@
 		FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BB09825B99650008ABBC1 /* Capturer.swift */; };
 		FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA65614225A61244009AD005 /* ProbeStreamer.swift */; };
 		FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA5F81825A800D200916611 /* MetalBuffer.swift */; };
+		FABE577025C8243400F87982 /* ARRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE576F25C8243300F87982 /* ARRecorder.swift */; };
+		FABE577625C8256A00F87982 /* ARPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE577525C8256A00F87982 /* ARPlayer.swift */; };
+		FABE577B25C8257B00F87982 /* ARFrameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE577A25C8257A00F87982 /* ARFrameModel.swift */; };
 		FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC19CD025A87EC80080E709 /* Helpers.swift */; };
 		FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC19CE925A964F10080E709 /* InfoViewController.swift */; };
 /* End PBXBuildFile section */
@@ -66,6 +69,9 @@
 		FA4BB09825B99650008ABBC1 /* Capturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capturer.swift; sourceTree = "<group>"; };
 		FA65614225A61244009AD005 /* ProbeStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStreamer.swift; sourceTree = "<group>"; };
 		FAA5F81825A800D200916611 /* MetalBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalBuffer.swift; sourceTree = "<group>"; };
+		FABE576F25C8243300F87982 /* ARRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARRecorder.swift; sourceTree = "<group>"; };
+		FABE577525C8256A00F87982 /* ARPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlayer.swift; sourceTree = "<group>"; };
+		FABE577A25C8257A00F87982 /* ARFrameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARFrameModel.swift; sourceTree = "<group>"; };
 		FAC19CCC25A877670080E709 /* HeaderBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeaderBridge.h; sourceTree = "<group>"; };
 		FAC19CD025A87EC80080E709 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Helpers.swift; path = "3D Ultrasonic Scanner/Helpers.swift"; sourceTree = SOURCE_ROOT; };
 		FAC19CE925A964F10080E709 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
@@ -119,6 +125,7 @@
 		FA19B3A125A3030C00272051 /* 3D Ultrasonic Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				FABE577425C8254100F87982 /* ARRecorder */,
 				FA4BB09725B99640008ABBC1 /* Tools */,
 				FAC19CEE25A964FF0080E709 /* Controllers */,
 				FA19B3E325A35A1E00272051 /* Composer */,
@@ -173,6 +180,16 @@
 				FA4BB09825B99650008ABBC1 /* Capturer.swift */,
 			);
 			path = Tools;
+			sourceTree = "<group>";
+		};
+		FABE577425C8254100F87982 /* ARRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				FABE576F25C8243300F87982 /* ARRecorder.swift */,
+				FABE577525C8256A00F87982 /* ARPlayer.swift */,
+				FABE577A25C8257A00F87982 /* ARFrameModel.swift */,
+			);
+			path = ARRecorder;
 			sourceTree = "<group>";
 		};
 		FAC19CEE25A964FF0080E709 /* Controllers */ = {
@@ -318,12 +335,15 @@
 				FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */,
 				FA47F1CD25A3642200CAB94E /* File.swift in Sources */,
 				FA19B3A725A3030C00272051 /* ViewController.swift in Sources */,
+				FABE577025C8243400F87982 /* ARRecorder.swift in Sources */,
 				FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */,
+				FABE577625C8256A00F87982 /* ARPlayer.swift in Sources */,
 				FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */,
 				FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */,
 				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
 				FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */,
 				FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */,
+				FABE577B25C8257B00F87982 /* ARFrameModel.swift in Sources */,
 				FA19B3D925A3104200272051 /* ComposeController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

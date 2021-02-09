@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Lpn-sl-Nrq">
-    <device id="retina6_5" orientation="portrait" appearance="light"/>
+    <device id="retina6_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -13,32 +13,32 @@
             <objects>
                 <viewController id="BV1-FR-VrT" customClass="ViewController" customModule="_D_Ultrasonic_Scanner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="U0K-SW-4ec">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ygC-cE-jfy">
-                                <rect key="frame" x="0.0" y="44" width="414" height="769"/>
+                                <rect key="frame" x="0.0" y="44" width="428" height="799"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="F4z-Mj-udL">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="725"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="428" height="655"/>
                                         <subviews>
                                             <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
-                                                <rect key="frame" x="0.0" y="0.0" width="414" height="241.66666666666666"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="428" height="218.33333333333334"/>
                                                 <connections>
                                                     <outlet property="delegate" destination="BV1-FR-VrT" id="Vp5-E4-QCS"/>
                                                 </connections>
                                             </arscnView>
                                             <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="YNl-sr-DLp">
-                                                <rect key="frame" x="0.0" y="241.66666666666669" width="414" height="241.66666666666669"/>
+                                                <rect key="frame" x="0.0" y="218.33333333333331" width="428" height="218.33333333333331"/>
                                                 <color key="clearColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </mtkView>
                                             <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
-                                                <rect key="frame" x="0.0" y="483.33333333333343" width="414" height="241.66666666666669"/>
+                                                <rect key="frame" x="0.0" y="436.66666666666669" width="428" height="218.33333333333331"/>
                                             </sceneKitView>
                                         </subviews>
                                     </stackView>
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="Dc1-nP-s02">
-                                        <rect key="frame" x="0.0" y="725" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="655" width="428" height="144"/>
                                         <items>
                                             <barButtonItem title="Import" id="3uI-QA-edN">
                                                 <connections>
@@ -71,8 +71,9 @@
                                     </toolbar>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="F4z-Mj-udL" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="top" id="StW-9Z-hYt"/>
+                                    <constraint firstItem="Dc1-nP-s02" firstAttribute="top" secondItem="F4z-Mj-udL" secondAttribute="bottom" id="Ul9-A0-khL"/>
                                     <constraint firstItem="F4z-Mj-udL" firstAttribute="leading" secondItem="ygC-cE-jfy" secondAttribute="leading" id="ro6-92-IXK"/>
-                                    <constraint firstItem="F4z-Mj-udL" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="top" id="sWF-wh-iEK"/>
                                     <constraint firstAttribute="trailing" secondItem="F4z-Mj-udL" secondAttribute="trailing" id="xjX-F5-iUq"/>
                                 </constraints>
                             </stackView>
@@ -102,22 +103,34 @@
             <objects>
                 <viewController id="rKP-Xa-xg4" customClass="InfoViewController" customModule="_D_Ultrasonic_Scanner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="46O-0v-3Os">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="428" height="872"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="mcj-I2-pRz">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
+                                <rect key="frame" x="0.0" y="0.0" width="428" height="838"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="w0X-oW-Kqt">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="404"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="428" height="279.33333333333331"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <color key="textColor" systemColor="labelColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
+                                    <stackView opaque="NO" contentMode="scaleAspectFit" axis="vertical" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="AEm-SS-aeM" userLabel="ItemStack">
+                                        <rect key="frame" x="0.0" y="279.33333333333337" width="428" height="279.33333333333337"/>
+                                        <subviews>
+                                            <progressView opaque="NO" contentMode="scaleAspectFit" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="rJb-P6-y4A">
+                                                <rect key="frame" x="0.0" y="0.0" width="428" height="4"/>
+                                            </progressView>
+                                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2gr-Ms-F8I">
+                                                <rect key="frame" x="0.0" y="77.333333333333371" width="428" height="202"/>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                            </view>
+                                        </subviews>
+                                    </stackView>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="gai-2S-06g">
-                                        <rect key="frame" x="0.0" y="404" width="414" height="404"/>
+                                        <rect key="frame" x="0.0" y="558.66666666666663" width="428" height="279.33333333333337"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <color key="textColor" systemColor="labelColor"/>
@@ -139,6 +152,7 @@
                     <tabBarItem key="tabBarItem" title="Item 2" id="1MM-5s-d4C"/>
                     <connections>
                         <outlet property="frameInfoTextView" destination="w0X-oW-Kqt" id="Efi-dU-Msg"/>
+                        <outlet property="progressBar" destination="rJb-P6-y4A" id="33D-b5-VZM"/>
                         <outlet property="voxelInfoTextView" destination="gai-2S-06g" id="fTL-m3-OCM"/>
                     </connections>
                 </viewController>
@@ -151,11 +165,11 @@
             <objects>
                 <viewController id="ROY-nc-Yv6" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="g4o-Qs-HrV">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="2SC-8q-ptJ">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="813"/>
+                                <rect key="frame" x="0.0" y="0.0" width="428" height="843"/>
                             </mtkView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Ij0-1P-Pik"/>

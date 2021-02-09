@@ -19,6 +19,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     // Controllers
     private var alertController: UIAlertController?
     private var composer: ComposeController?
+    private var composerInfo: ComposerInfoProvider?
     
     // Scene Objects
     private var probeNode: SCNNode?
@@ -47,12 +48,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         // Create composer
         self.composer = ComposeController(arSession: sceneView.session, destination: renderView!, scnView: scnView)
         self.composer?.delegate = self
-        
-        
-        sceneView.session.delegate = composer
+        self.composerInfo = composer
+                
 
         // Set the scene to the view
         sceneView.scene = scene
+        sceneView.session.delegate = composer
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,20 +84,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     @IBAction func action(_ sender: Any) {
         let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
-        alertSheet.addAction(
-            UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
-                self.composer?.restOrigin()
-            })
-        )
-        alertSheet.addAction(
-            UIAlertAction(title: "Finish", style: .default, handler: {_ in
-                self.composer?.postProcess()
-            })
-        )
-        alertSheet.addAction(
-            UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        )
-        
+        makeAlertActions(alertController: alertSheet)
         present(alertSheet, animated: true, completion: nil)
     }
     @IBAction func selectAsset(_ sender: Any) {
@@ -150,7 +139,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         composer?.loadImage(image: image)
     }
     
-    // MARK: - Composer
+    // MARK: - Composer Delegate
     func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
         switch arFrame.camera.trackingState {
         case .normal:
@@ -169,5 +158,41 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             
         }
     }
+}
 
+extension ViewController{
+    func makeAlertActions(alertController: UIAlertController) {
+        alertController.addAction(
+            UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
+                self.composer?.restOrigin()
+            })
+        )
+        alertController.addAction(
+            UIAlertAction(title: "Finish", style: .default, handler: {_ in
+                self.composer?.postProcess()
+            })
+        )
+        
+        if self.composer?.recorderState == .Ready {
+            alertController.addAction(
+                UIAlertAction(title: "Start Recording", style: .default, handler: {_ in
+                    self.composer?.startRecording()
+                })
+            )
+        } else{
+            alertController.addAction(
+                UIAlertAction(title: "Stop Recording", style: .default, handler: {_ in
+                    self.composer?.stopRecording()
+                })
+            )
+        }
+        alertController.addAction(
+            UIAlertAction(title: "Replay", style: .default, handler: {_ in
+                self.composer?.replay()
+            })
+        )
+        alertController.addAction(
+            UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        )
+    }
 }
