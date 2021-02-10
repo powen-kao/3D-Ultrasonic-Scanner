@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FA19B39E25A3030C00272051"
-               BuildableName = "3D Ultrasonic Scanner.app"
-               BlueprintName = "3D Ultrasonic Scanner"
+               BuildableName = "UltrasoundScanner.app"
+               BlueprintName = "UltrasoundScanner"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -65,8 +65,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FA19B39E25A3030C00272051"
-            BuildableName = "3D Ultrasonic Scanner.app"
-            BlueprintName = "3D Ultrasonic Scanner"
+            BuildableName = "UltrasoundScanner.app"
+            BlueprintName = "UltrasoundScanner"
             ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -82,8 +82,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FA19B39E25A3030C00272051"
-            BuildableName = "3D Ultrasonic Scanner.app"
-            BlueprintName = "3D Ultrasonic Scanner"
+            BuildableName = "UltrasoundScanner.app"
+            BlueprintName = "UltrasoundScanner"
             ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

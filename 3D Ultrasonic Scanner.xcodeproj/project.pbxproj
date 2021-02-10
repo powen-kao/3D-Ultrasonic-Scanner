@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E336893625D3647900BF27B3 /* ARReplayTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E336893525D3647900BF27B3 /* ARReplayTest.swift */; };
 		FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A225A3030C00272051 /* AppDelegate.swift */; };
 		FA19B3A525A3030C00272051 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3A425A3030C00272051 /* art.scnassets */; };
 		FA19B3A725A3030C00272051 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A625A3030C00272051 /* ViewController.swift */; };
@@ -47,7 +48,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3D Ultrasonic Scanner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E336893525D3647900BF27B3 /* ARReplayTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARReplayTest.swift; sourceTree = "<group>"; };
+		FA19B39F25A3030C00272051 /* UltrasoundScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltrasoundScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA19B3A225A3030C00272051 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA19B3A425A3030C00272051 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		FA19B3A625A3030C00272051 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -115,7 +117,7 @@
 		FA19B3A025A3030C00272051 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */,
+				FA19B39F25A3030C00272051 /* UltrasoundScanner.app */,
 				FA19B3B525A3031100272051 /* 3D Ultrasonic ScannerTests.xctest */,
 				FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */,
 			);
@@ -144,6 +146,7 @@
 		FA19B3B825A3031100272051 /* 3D Ultrasonic ScannerTests */ = {
 			isa = PBXGroup;
 			children = (
+				E336893525D3647900BF27B3 /* ARReplayTest.swift */,
 				FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */,
 				FA19B3BB25A3031100272051 /* Info.plist */,
 			);
@@ -203,9 +206,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */ = {
+		FA19B39E25A3030C00272051 /* UltrasoundScanner */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic Scanner" */;
+			buildConfigurationList = FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "UltrasoundScanner" */;
 			buildPhases = (
 				FA19B39B25A3030C00272051 /* Sources */,
 				FA19B39C25A3030C00272051 /* Frameworks */,
@@ -215,9 +218,9 @@
 			);
 			dependencies = (
 			);
-			name = "3D Ultrasonic Scanner";
+			name = UltrasoundScanner;
 			productName = "3D Ultrasonic Scanner";
-			productReference = FA19B39F25A3030C00272051 /* 3D Ultrasonic Scanner.app */;
+			productReference = FA19B39F25A3030C00272051 /* UltrasoundScanner.app */;
 			productType = "com.apple.product-type.application";
 		};
 		FA19B3B425A3031100272051 /* 3D Ultrasonic ScannerTests */ = {
@@ -262,7 +265,7 @@
 		FA19B39725A3030C00272051 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1230;
+				LastSwiftUpdateCheck = 1240;
 				LastUpgradeCheck = 1230;
 				TargetAttributes = {
 					FA19B39E25A3030C00272051 = {
@@ -291,7 +294,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */,
+				FA19B39E25A3030C00272051 /* UltrasoundScanner */,
 				FA19B3B425A3031100272051 /* 3D Ultrasonic ScannerTests */,
 				FA19B3BF25A3031100272051 /* 3D Ultrasonic ScannerUITests */,
 			);
@@ -353,6 +356,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA19B3BA25A3031100272051 /* _D_Ultrasonic_ScannerTests.swift in Sources */,
+				E336893625D3647900BF27B3 /* ARReplayTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,12 +373,12 @@
 /* Begin PBXTargetDependency section */
 		FA19B3B725A3031100272051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */;
+			target = FA19B39E25A3030C00272051 /* UltrasoundScanner */;
 			targetProxy = FA19B3B625A3031100272051 /* PBXContainerItemProxy */;
 		};
 		FA19B3C225A3031100272051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FA19B39E25A3030C00272051 /* 3D Ultrasonic Scanner */;
+			target = FA19B39E25A3030C00272051 /* UltrasoundScanner */;
 			targetProxy = FA19B3C125A3031100272051 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -456,7 +460,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h\n";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -511,7 +515,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/momo/Documents/Projects/3D Ultrasonic Scanner/3D Ultrasonic Scanner/HeaderBridge.h\n";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -531,7 +535,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -551,7 +554,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "kao.powen.-D-Ultrasonic-Scanner";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/3D Ultrasonic Scanner/HeaderBridge.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -563,6 +565,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic ScannerTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -574,7 +577,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3D Ultrasonic Scanner.app/3D Ultrasonic Scanner";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UltrasoundScanner.app/UltrasoundScanner";
 			};
 			name = Debug;
 		};
@@ -584,6 +587,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic ScannerTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -595,7 +599,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3D Ultrasonic Scanner.app/3D Ultrasonic Scanner";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UltrasoundScanner.app/UltrasoundScanner";
 			};
 			name = Release;
 		};
@@ -604,6 +608,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic ScannerUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -623,6 +628,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WB4X756XSE;
 				INFOPLIST_FILE = "3D Ultrasonic ScannerUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -649,7 +655,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "3D Ultrasonic Scanner" */ = {
+		FA19B3C925A3031100272051 /* Build configuration list for PBXNativeTarget "UltrasoundScanner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA19B3CA25A3031100272051 /* Debug */,

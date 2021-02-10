@@ -32,10 +32,9 @@ class ARPlayer {
         }
         
         // read data
-        _data.withUnsafeBytes{ (_buffer: UnsafePointer<ARFrameModel>) in
-            buffer = Array(UnsafeBufferPointer(start: _buffer, count: _elementCount))
+        buffer = _data.withUnsafeBytes { (_buffer: UnsafeRawBufferPointer) -> Array<ARFrameModel> in
+            Array(_buffer.bindMemory(to: ARFrameModel.self))
         }
-        
     }
 }
 

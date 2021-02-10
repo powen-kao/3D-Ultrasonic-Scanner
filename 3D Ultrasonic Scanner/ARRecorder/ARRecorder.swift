@@ -77,7 +77,7 @@ class ARRecorder: NSObject{
             do {
                 try data.write(to: _url)
             } catch {
-                completeHandler!(self, false)
+                completeHandler?(self, false)
                 print(error)
             }
             completeHandler?(self, true)
