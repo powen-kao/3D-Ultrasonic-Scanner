@@ -23,6 +23,8 @@ class ARReplayTest: XCTestCase {
                                  [12, 13, 14, 55])
     
     
+    let metaFile = RecorderMeta(begin: Date().timeIntervalSince1970, frameRate: 60, duration: TimeInterval(10))
+    
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -42,18 +44,16 @@ class ARReplayTest: XCTestCase {
         for (i, _input) in inputs.enumerated(){
             let timestamp: TimeInterval = TimeInterval(5566 + i)
 
-            recorder.open(file: url, size: nil)
+            recorder.open(folder: url, size: nil)
             recorder.append(frame: ARFrameModel(transform: _input, timestamp: timestamp))
             recorder.save(completeHandler: {[self] _,_ in
-                player.read(file: url)
-                XCTAssertEqual(player.buffer![0].transform, _input)
-                XCTAssertEqual(player.buffer![0].timestamp, timestamp)
+                player.read(folder: url)
+                XCTAssertEqual(player.buffer[0].transform, _input)
+                XCTAssertEqual(player.buffer[0].timestamp, timestamp)
+                XCTAssertEqual(player.filemeta, metaFile)
             })
             recorder.close()
         }
-
-        
-        
     }
     
     func testExample() throws {

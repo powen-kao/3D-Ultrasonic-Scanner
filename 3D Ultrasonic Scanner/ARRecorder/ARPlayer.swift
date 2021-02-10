@@ -8,19 +8,26 @@
 
 import Foundation
 
-class ARPlayer {
+class ARPlayer: ARRecorderBase {
     var delegate: ARPlayerDelegate?
-    var buffer: [ARFrameModel]?
     
-    init() {
-        
-    }
+    internal var fileURL: URL?
+    internal var buffer = [ARFrameModel]()
+    
+    internal var metaURL: URL?
+    internal var filemeta: RecorderMeta?
+    
+    private let decoder = JSONDecoder()
     
     /// Read to buffer
-    func read(file: URL) {
+    func read(folder: URL) {
+        self.fileURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .ARFrameData), relativeTo: folder)
+        self.metaURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .RecorderMeta), relativeTo: folder)
+        
         let _data: Data
         do {
-            _data = try Data(contentsOf: file)
+            _data = try Data(contentsOf: fileURL!)
+            filemeta = try? decoder.decode(RecorderMeta.self, from: try Data(contentsOf: metaURL!))
         } catch {
             print(error)
             return

@@ -114,7 +114,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
         
         
         // Open recording file
-        recorder.open(file: recordingURL, size: nil)
+        recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
         recorderState = .Ready
     }
@@ -133,7 +133,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
         }
     }
     func replay() {
-        player.read(file: recordingURL)
+        player.read(folder: recordingURL)
     }
     
     func loadImage(image: UIImage) {
@@ -213,7 +213,7 @@ extension ComposeController{
     
     func recorderURLChangedHandler() {
         // Open file for recorder
-        recorder.open(file: recordingURL, size: nil)
+        recorder.open(folder: recordingURL, size: nil)
     }
     
     // public functions

@@ -10,25 +10,40 @@ import Foundation
 import ARKit
 import UIKit
 
-class ARRecorder: NSObject{
+class ARRecorder: ARRecorderBase{
     
     var dataSource: ARRecoderDataSource?
     var delegate: ARRecorderDelegate?
     
     private let defaultEstimateSize =  60 * 60 * 3 // approximately 10 mins
-    private var buffer = [ARFrameModel]()
     
-    private(set) var fileURL: URL?
+    internal var fileURL: URL?
+    internal var buffer = [ARFrameModel]()
+    
+    internal var metaURL: URL?
+    internal var filemeta: RecorderMeta?
     
     var bufferFullness: Float {
         return Float(buffer.count) / Float(defaultEstimateSize)
     }
     
+    private let encoder = JSONEncoder()
+    
     typealias SaveCompleteHandler = (_ recorder: ARRecorder, _ success: Bool) -> Void
     
+    override init() {
+        super.init()
+        encoder.outputFormatting = .prettyPrinted
+    }
+    
 
-    func open(file: URL, size: Int?){
-        self.fileURL = file
+    func open(folder: URL, size: Int?){
+        filemeta = RecorderMeta(begin: Date().timeIntervalSince1970)
+        filemeta?.frameRate = 60 // default replay framerate
+        
+        self.fileURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .ARFrameData), relativeTo: folder)
+        self.metaURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .RecorderMeta), relativeTo: folder)
+
         
         // TODO: check whethrer the folder is writable
         
@@ -65,17 +80,27 @@ class ARRecorder: NSObject{
     }
     
     func save(completeHandler: SaveCompleteHandler?) {
+        
+        guard buffer.count > 0 else {
+            return // nothing to save
+        }
+        
+        filemeta?.duration = buffer.last!.timestamp - buffer.first!.timestamp
+        
         // TODO: write file in background thread
         let data = Data(bytesNoCopy: &buffer, count: buffer.count * MemoryLayout<ARFrameModel>.stride, deallocator: .none)
+        let metaData = try! encoder.encode(filemeta)
         
-        guard let _url = self.fileURL else {
+        guard let _fileUrl = self.fileURL,
+              let _metaUrl = self.metaURL else {
             print("URL of recorder cannot be nil")
             return
         }
         
         DispatchQueue.global(qos: .background).async {
             do {
-                try data.write(to: _url)
+                try data.write(to: _fileUrl)
+                try metaData.write(to: _metaUrl)
             } catch {
                 completeHandler?(self, false)
                 print(error)
