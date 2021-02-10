@@ -110,6 +110,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E3301E4D25D3E1A0001EE43F /* Probe */ = {
+			isa = PBXGroup;
+			children = (
+				FA65614225A61244009AD005 /* ProbeStreamer.swift */,
+			);
+			path = Probe;
+			sourceTree = "<group>";
+		};
 		FA19B39625A3030C00272051 = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +179,7 @@
 		FA19B3E325A35A1E00272051 /* Composer */ = {
 			isa = PBXGroup;
 			children = (
+				E3301E4D25D3E1A0001EE43F /* Probe */,
 				FAC19CD025A87EC80080E709 /* Helpers.swift */,
 				FAA5F81825A800D200916611 /* MetalBuffer.swift */,
 				FA19B3D825A3104200272051 /* ComposeController.swift */,
@@ -178,7 +187,6 @@
 				FA19B3E425A35A5700272051 /* Shader.metal */,
 				FA19B3EC25A35A7500272051 /* ShaderTypes.h */,
 				FA19B3ED25A35A9A00272051 /* Renderer.swift */,
-				FA65614225A61244009AD005 /* ProbeStreamer.swift */,
 			);
 			path = Composer;
 			sourceTree = "<group>";
