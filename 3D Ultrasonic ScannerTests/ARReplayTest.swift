@@ -37,13 +37,12 @@ class ARReplayTest: XCTestCase {
     }
 
     func testDataWriteAndRead() {
-        let url = URL(fileURLWithPath: "testCase.file", relativeTo: baseUrl)
+        let url = URL(fileURLWithPath: "testCaseFolder", relativeTo: baseUrl)
         
         let inputs = [inputA, inputB]
         
         for (i, _input) in inputs.enumerated(){
             let timestamp: TimeInterval = TimeInterval(5566 + i)
-
             recorder.open(folder: url, size: nil)
             recorder.append(frame: ARFrameModel(transform: _input, timestamp: timestamp))
             recorder.save(completeHandler: {[self] _,_ in

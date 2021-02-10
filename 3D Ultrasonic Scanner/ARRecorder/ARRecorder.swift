@@ -17,11 +17,11 @@ class ARRecorder: ARRecorderBase{
     
     private let defaultEstimateSize =  60 * 60 * 3 // approximately 10 mins
     
-    internal var fileURL: URL?
-    internal var buffer = [ARFrameModel]()
+    private var fileURL: URL?
+    private(set) var buffer = [ARFrameModel]()
     
-    internal var metaURL: URL?
-    internal var filemeta: RecorderMeta?
+    private var metaURL: URL?
+    private(set) var filemeta: RecorderMeta?
     
     var bufferFullness: Float {
         return Float(buffer.count) / Float(defaultEstimateSize)
@@ -41,9 +41,12 @@ class ARRecorder: ARRecorderBase{
         filemeta = RecorderMeta(begin: Date().timeIntervalSince1970)
         filemeta?.frameRate = 60 // default replay framerate
         
-        self.fileURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .ARFrameData), relativeTo: folder)
-        self.metaURL = URL(fileURLWithPath: RecordFiles.getNameWithExtension(fileType: .RecorderMeta), relativeTo: folder)
+        // create folder if doesn't exist
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true, attributes: nil)
 
+        
+        self.fileURL = RecordFiles.getURL(at: folder, with: .ARFrameData)
+        self.metaURL = RecordFiles.getURL(at: folder, with: .RecorderMeta)
         
         // TODO: check whethrer the folder is writable
         

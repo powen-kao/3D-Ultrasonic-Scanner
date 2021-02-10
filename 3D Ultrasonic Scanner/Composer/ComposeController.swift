@@ -63,7 +63,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
         self.arSession = arSession
         self.scnView = scnView
         self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Recording.txt") // defualt file path
+            .appendingPathComponent("Recordings") // default file path
         super.init()
 
         

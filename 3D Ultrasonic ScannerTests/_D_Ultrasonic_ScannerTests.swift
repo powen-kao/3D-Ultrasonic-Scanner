@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import _D_Ultrasonic_Scanner
+//@testable import _D_Ultrasonic_Scanner
 
 class _D_Ultrasonic_ScannerTests: XCTestCase {
 

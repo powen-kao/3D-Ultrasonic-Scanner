@@ -37,6 +37,17 @@
                BlueprintName = "3D Ultrasonic ScannerTests"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ARReplayTest/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests/testPerformanceExample()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">
@@ -47,6 +58,14 @@
                BlueprintName = "3D Ultrasonic ScannerUITests"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ARReplayTest/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests/testPerformanceExample()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

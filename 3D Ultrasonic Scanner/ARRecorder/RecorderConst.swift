@@ -23,4 +23,10 @@ enum RecordFiles: String {
         }
         return fileType.rawValue.appending(".\(ext)")
     }
+    
+    static func getURL(at url: URL, with fileType: RecordFiles) -> URL{
+        var _url  = URL(fileURLWithPath: url.absoluteString)
+        _url.appendPathComponent(getNameWithExtension(fileType: fileType))
+        return _url
+    }
 }
