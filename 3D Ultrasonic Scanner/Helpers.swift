@@ -38,8 +38,7 @@ extension matrix_float3x3 {
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {
 
-        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue,
-            kCVPixelBufferMetalCompatibilityKey: kCFBooleanTrue] as CFDictionary
+        let attrs = Probe.defaultPixelBufferAttributes as CFDictionary
         var pixelBuffer : CVPixelBuffer?
         let status = CVPixelBufferCreate(kCFAllocatorDefault, Int(self.size.width), Int(self.size.height), kCVPixelFormatType_32BGRA, attrs, &pixelBuffer)
         guard status == kCVReturnSuccess else {

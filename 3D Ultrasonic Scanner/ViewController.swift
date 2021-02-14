@@ -9,6 +9,7 @@ import UIKit
 import SceneKit
 import ARKit
 import MetalKit
+import AVKit
 
 class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
 
@@ -99,6 +100,19 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     @IBAction func capture(_ sender: Any) {
         Capturer.shared?.trigger()
+    }
+    @IBAction func preview(_ sender: Any) {
+        let player = composer?.probe?.avPlayer
+        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 1))
+        player?.play()
+        
+//        let avViewController = AVPlayerViewController()
+//        avViewController.entersFullScreenWhenPlaybackBegins = false
+//        avViewController.allowsPictureInPicturePlayback = true
+//        avViewController.player = composer?.probe?.avPlayer
+//        avViewController.player?.play()
+//        avViewController.player?.play()
+//        present(avViewController, animated: true, completion: nil)
     }
     
     // MARK: - ARSCNViewDelegate

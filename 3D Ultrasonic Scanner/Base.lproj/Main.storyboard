@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Lpn-sl-Nrq">
-    <device id="retina6_7" orientation="portrait" appearance="light"/>
+    <device id="retina6_7" orientation="portrait" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -11,34 +11,62 @@
         <!--Item-->
         <scene sceneID="tXr-a1-R10">
             <objects>
-                <viewController id="BV1-FR-VrT" customClass="ViewController" customModule="_D_Ultrasonic_Scanner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BV1-FR-VrT" customClass="ViewController" customModule="UltrasoundScanner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="U0K-SW-4ec">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ygC-cE-jfy">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Gbc-bZ-Xoo">
                                 <rect key="frame" x="0.0" y="44" width="428" height="799"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="F4z-Mj-udL">
-                                        <rect key="frame" x="0.0" y="0.0" width="428" height="655"/>
-                                        <subviews>
-                                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
-                                                <rect key="frame" x="0.0" y="0.0" width="428" height="218.33333333333334"/>
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="top" translatesAutoresizingMaskIntoConstraints="NO" id="fRK-ID-axd" userLabel="Top Toolbar">
+                                        <rect key="frame" x="0.0" y="0.0" width="428" height="49"/>
+                                        <items>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
+                                            <barButtonItem title="Preview" image="play.circle" catalog="system" id="mgB-iB-cG2">
                                                 <connections>
-                                                    <outlet property="delegate" destination="BV1-FR-VrT" id="Vp5-E4-QCS"/>
+                                                    <action selector="preview:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
                                                 </connections>
-                                            </arscnView>
-                                            <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="YNl-sr-DLp">
-                                                <rect key="frame" x="0.0" y="218.33333333333331" width="428" height="218.33333333333331"/>
-                                                <color key="clearColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            </mtkView>
-                                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
-                                                <rect key="frame" x="0.0" y="436.66666666666669" width="428" height="218.33333333333331"/>
-                                            </sceneKitView>
+                                            </barButtonItem>
+                                            <barButtonItem title="Item" image="gearshape.fill" catalog="system" id="Ovb-Zg-oFW" userLabel="Setting">
+                                                <connections>
+                                                    <segue destination="bov-0D-poQ" kind="popoverPresentation" popoverAnchorBarButtonItem="Ovb-Zg-oFW" id="tpM-Xd-w2D">
+                                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                                    </segue>
+                                                </connections>
+                                            </barButtonItem>
+                                        </items>
+                                    </toolbar>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ygC-cE-jfy" userLabel="Render Stack View">
+                                        <rect key="frame" x="0.0" y="49" width="428" height="706"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="F4z-Mj-udL">
+                                                <rect key="frame" x="0.0" y="0.0" width="428" height="706"/>
+                                                <subviews>
+                                                    <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
+                                                        <rect key="frame" x="0.0" y="0.0" width="428" height="235.33333333333334"/>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="BV1-FR-VrT" id="Vp5-E4-QCS"/>
+                                                        </connections>
+                                                    </arscnView>
+                                                    <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="YNl-sr-DLp">
+                                                        <rect key="frame" x="0.0" y="235.33333333333331" width="428" height="235.33333333333331"/>
+                                                        <color key="clearColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </mtkView>
+                                                    <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
+                                                        <rect key="frame" x="0.0" y="470.66666666666657" width="428" height="235.33333333333331"/>
+                                                    </sceneKitView>
+                                                </subviews>
+                                            </stackView>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstItem="F4z-Mj-udL" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="top" id="StW-9Z-hYt"/>
+                                            <constraint firstItem="F4z-Mj-udL" firstAttribute="leading" secondItem="ygC-cE-jfy" secondAttribute="leading" id="ro6-92-IXK"/>
+                                            <constraint firstAttribute="trailing" secondItem="F4z-Mj-udL" secondAttribute="trailing" id="xjX-F5-iUq"/>
+                                        </constraints>
                                     </stackView>
-                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="Dc1-nP-s02">
-                                        <rect key="frame" x="0.0" y="655" width="428" height="144"/>
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="Dc1-nP-s02" userLabel="Bottom Toolbar">
+                                        <rect key="frame" x="0.0" y="755" width="428" height="44"/>
                                         <items>
                                             <barButtonItem title="Import" id="3uI-QA-edN">
                                                 <connections>
@@ -70,21 +98,15 @@
                                         </connections>
                                     </toolbar>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="F4z-Mj-udL" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="top" id="StW-9Z-hYt"/>
-                                    <constraint firstItem="Dc1-nP-s02" firstAttribute="top" secondItem="F4z-Mj-udL" secondAttribute="bottom" id="Ul9-A0-khL"/>
-                                    <constraint firstItem="F4z-Mj-udL" firstAttribute="leading" secondItem="ygC-cE-jfy" secondAttribute="leading" id="ro6-92-IXK"/>
-                                    <constraint firstAttribute="trailing" secondItem="F4z-Mj-udL" secondAttribute="trailing" id="xjX-F5-iUq"/>
-                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="ygC-cE-jfy" secondAttribute="bottom" id="8NC-lj-JMi"/>
-                            <constraint firstItem="ygC-cE-jfy" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="AtI-9L-BRQ"/>
-                            <constraint firstAttribute="trailing" secondItem="ygC-cE-jfy" secondAttribute="trailing" id="CYB-mK-mmW"/>
-                            <constraint firstItem="ygC-cE-jfy" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="eeY-LG-iNB"/>
+                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="Gbc-bZ-Xoo" secondAttribute="bottom" id="6ZH-QT-kpb"/>
+                            <constraint firstItem="Gbc-bZ-Xoo" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="Cmt-Hj-lqN"/>
+                            <constraint firstItem="Gbc-bZ-Xoo" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="UVY-h4-3DV"/>
+                            <constraint firstAttribute="trailing" secondItem="Gbc-bZ-Xoo" secondAttribute="trailing" id="ZM8-SQ-8qN"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" id="YwM-KR-5Xs"/>
@@ -101,7 +123,7 @@
         <!--Item 2-->
         <scene sceneID="KRG-b4-TTo">
             <objects>
-                <viewController id="rKP-Xa-xg4" customClass="InfoViewController" customModule="_D_Ultrasonic_Scanner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="rKP-Xa-xg4" customClass="InfoViewController" customModule="UltrasoundScanner" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="46O-0v-3Os">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="872"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -185,7 +207,94 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HVJ-nP-qgZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="892.75362318840587" y="-225"/>
+            <point key="canvasLocation" x="1049" y="-910"/>
+        </scene>
+        <!--Setting View Controller-->
+        <scene sceneID="Yn4-tB-keV">
+            <objects>
+                <tableViewController id="bov-0D-poQ" userLabel="Setting View Controller" customClass="SettingViewController" customModule="UltrasoundScanner" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="q1w-Go-5fo">
+                        <rect key="frame" x="0.0" y="0.0" width="428" height="872"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="checkedRow" textLabel="7xX-xf-8b5" detailTextLabel="nQx-8J-GIY" rowHeight="50" style="IBUITableViewCellStyleSubtitle" id="PpZ-3A-ODj">
+                                <rect key="frame" x="20" y="55.333332061767578" width="388" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PpZ-3A-ODj" id="MNj-jb-EMA">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Use Fake Probe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="7xX-xf-8b5" userLabel="title">
+                                            <rect key="frame" x="20" y="7.9999999999999982" width="119" height="20.333333333333332"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Read from file instead of streaming from probe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nQx-8J-GIY" userLabel="subtitle">
+                                            <rect key="frame" x="20" y="28.333333333333332" width="264" height="14.333333333333334"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="YnB-Pa-YcC">
+                                <rect key="frame" x="20" y="105.33333206176758" width="388" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YnB-Pa-YcC" id="9NB-MS-APg">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdx-uf-eje">
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="gdx-uf-eje" firstAttribute="leading" secondItem="9NB-MS-APg" secondAttribute="leading" id="13M-Fo-v1q"/>
+                                        <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="LjR-7M-sSq"/>
+                                        <constraint firstAttribute="trailing" secondItem="gdx-uf-eje" secondAttribute="trailing" id="OeE-43-qqT"/>
+                                        <constraint firstItem="gdx-uf-eje" firstAttribute="top" secondItem="9NB-MS-APg" secondAttribute="top" id="mTA-as-cYF"/>
+                                        <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="twH-MH-3qG"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="cjc-6S-Dn0">
+                                <rect key="frame" x="20" y="155.33333206176758" width="388" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cjc-6S-Dn0" id="Uzc-dC-bst">
+                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x8R-YW-1Bt">
+                                            <rect key="frame" x="49" y="-19" width="200" height="110"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </stackView>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <sections/>
+                        <connections>
+                            <outlet property="dataSource" destination="bov-0D-poQ" id="w3o-4Y-C53"/>
+                            <outlet property="delegate" destination="bov-0D-poQ" id="sjg-p8-DRX"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DLr-Ei-eAQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="914" y="-150"/>
+        </scene>
+        <!--AV Player View Controller-->
+        <scene sceneID="MTo-I6-hoN">
+            <objects>
+                <avPlayerViewController videoGravity="AVLayerVideoGravityResizeAspect" id="14V-v4-XHB" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oLm-ca-HtF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1664" y="-211"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="SHu-uO-cdg">
@@ -207,6 +316,8 @@
         </scene>
     </scenes>
     <resources>
+        <image name="gearshape.fill" catalog="system" width="128" height="121"/>
+        <image name="play.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

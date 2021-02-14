@@ -14,17 +14,18 @@ import SceneKit.ModelIO
 
 /**
  Composer does the frames matching between AR session and Ultrasonic probe.
- The matched frames are sent to (Metal) render for point cloud conversion.
+ The matched frames are sent to (Metal) render for point cloud unprojection.
+ The frame composition is ultrasound-image-driven rather than ARFrame.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStreamerDelegate, RendererDelegate, ARRecorderDelegate{
+class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate{
     
     // delegate
     var delegate: ComposerDelegate?
     
     // Data sources
     private let arSession: ARSession
-    private let probeStreamer: ProbeStreamer = ProbeStreamer()
+    private(set) var probe: Probe?
     private var imagePixelBuffer: CVPixelBuffer?
     
     // device
@@ -64,6 +65,9 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
         self.scnView = scnView
         self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Recordings") // default file path
+        
+        // TODO: use the fake probe now, but replace with real probe streamer in the future
+        self.probe = FakeProbe(file: URL(fileURLWithPath: "video.mov", isDirectory: false, relativeTo: self.recordingURL))
         super.init()
 
         
@@ -112,11 +116,14 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
         let cameraNode = scene.rootNode.childNode(withName: "camera", recursively: true)
         cameraNode?.constraints = [SCNLookAtConstraint(target: voxelNode)]
         
-        
         // Open recording file
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
         recorderState = .Ready
+        
+        // Setup probe
+        probe?.delegate = self
+        probe?.open()
     }
     
     func startRecording() {
@@ -155,10 +162,12 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeStre
     }
     
     // MARK: - Probe Streamer
-    func probe(streamer: ProbeStreamer, newFrame: UFrame) {
-        
+    func probe(_ probe: Probe, new frame: UFrameProvider) {
+        guard let _frame = self.currentARFrame else{
+            return
+        }
+        renderer?.render(frame: _frame, capturedImage: frame.pixelBuffer)
     }
-    
     
     // MARK: - MTKViewDelegate
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {

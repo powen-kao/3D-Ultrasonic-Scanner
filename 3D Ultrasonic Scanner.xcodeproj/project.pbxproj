@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E3301E4F25D3E20C001EE43F /* Probe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3301E4E25D3E20C001EE43F /* Probe.swift */; };
 		E336893625D3647900BF27B3 /* ARReplayTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E336893525D3647900BF27B3 /* ARReplayTest.swift */; };
 		E33689B725D385D600BF27B3 /* RecorderMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689B625D385D600BF27B3 /* RecorderMeta.swift */; };
 		E33689C525D388E100BF27B3 /* RecorderConst.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689C425D388E100BF27B3 /* RecorderConst.swift */; };
 		E33689CA25D3A05E00BF27B3 /* ARRecorderBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689C925D3A05E00BF27B3 /* ARRecorderBase.swift */; };
+		E3E7F2D025D52BCE00DEA676 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */; };
+		E3E7F2D525D6624400DEA676 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2D425D6624400DEA676 /* SettingModel.swift */; };
+		E3E7F2DA25D6C16100DEA676 /* VideoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2D925D6C16100DEA676 /* VideoPreviewViewController.swift */; };
 		FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A225A3030C00272051 /* AppDelegate.swift */; };
 		FA19B3A525A3030C00272051 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3A425A3030C00272051 /* art.scnassets */; };
 		FA19B3A725A3030C00272051 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3A625A3030C00272051 /* ViewController.swift */; };
@@ -24,7 +28,7 @@
 		FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3ED25A35A9A00272051 /* Renderer.swift */; };
 		FA47F1CD25A3642200CAB94E /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47F1CC25A3642200CAB94E /* File.swift */; };
 		FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BB09825B99650008ABBC1 /* Capturer.swift */; };
-		FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA65614225A61244009AD005 /* ProbeStreamer.swift */; };
+		FA65614325A61244009AD005 /* FakeProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA65614225A61244009AD005 /* FakeProbe.swift */; };
 		FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA5F81825A800D200916611 /* MetalBuffer.swift */; };
 		FABE577025C8243400F87982 /* ARRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE576F25C8243300F87982 /* ARRecorder.swift */; };
 		FABE577625C8256A00F87982 /* ARPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE577525C8256A00F87982 /* ARPlayer.swift */; };
@@ -51,10 +55,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E3301E4E25D3E20C001EE43F /* Probe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Probe.swift; sourceTree = "<group>"; };
 		E336893525D3647900BF27B3 /* ARReplayTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARReplayTest.swift; sourceTree = "<group>"; };
 		E33689B625D385D600BF27B3 /* RecorderMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderMeta.swift; sourceTree = "<group>"; };
 		E33689C425D388E100BF27B3 /* RecorderConst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderConst.swift; sourceTree = "<group>"; };
 		E33689C925D3A05E00BF27B3 /* ARRecorderBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARRecorderBase.swift; sourceTree = "<group>"; };
+		E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
+		E3E7F2D425D6624400DEA676 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
+		E3E7F2D925D6C16100DEA676 /* VideoPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPreviewViewController.swift; sourceTree = "<group>"; };
 		FA19B39F25A3030C00272051 /* UltrasoundScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltrasoundScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA19B3A225A3030C00272051 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA19B3A425A3030C00272051 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -75,7 +83,7 @@
 		FA19B3ED25A35A9A00272051 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		FA47F1CC25A3642200CAB94E /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		FA4BB09825B99650008ABBC1 /* Capturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capturer.swift; sourceTree = "<group>"; };
-		FA65614225A61244009AD005 /* ProbeStreamer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeStreamer.swift; sourceTree = "<group>"; };
+		FA65614225A61244009AD005 /* FakeProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeProbe.swift; sourceTree = "<group>"; };
 		FAA5F81825A800D200916611 /* MetalBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalBuffer.swift; sourceTree = "<group>"; };
 		FABE576F25C8243300F87982 /* ARRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARRecorder.swift; sourceTree = "<group>"; };
 		FABE577525C8256A00F87982 /* ARPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlayer.swift; sourceTree = "<group>"; };
@@ -113,7 +121,8 @@
 		E3301E4D25D3E1A0001EE43F /* Probe */ = {
 			isa = PBXGroup;
 			children = (
-				FA65614225A61244009AD005 /* ProbeStreamer.swift */,
+				FA65614225A61244009AD005 /* FakeProbe.swift */,
+				E3301E4E25D3E20C001EE43F /* Probe.swift */,
 			);
 			path = Probe;
 			sourceTree = "<group>";
@@ -216,6 +225,9 @@
 			isa = PBXGroup;
 			children = (
 				FAC19CE925A964F10080E709 /* InfoViewController.swift */,
+				E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */,
+				E3E7F2D425D6624400DEA676 /* SettingModel.swift */,
+				E3E7F2D925D6C16100DEA676 /* VideoPreviewViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -351,6 +363,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3E7F2D525D6624400DEA676 /* SettingModel.swift in Sources */,
 				FA19B3E525A35A5700272051 /* Shader.metal in Sources */,
 				FAA5F81925A800D200916611 /* MetalBuffer.swift in Sources */,
 				FA47F1CD25A3642200CAB94E /* File.swift in Sources */,
@@ -359,13 +372,16 @@
 				FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */,
 				FABE577625C8256A00F87982 /* ARPlayer.swift in Sources */,
 				FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */,
+				E3301E4F25D3E20C001EE43F /* Probe.swift in Sources */,
 				E33689CA25D3A05E00BF27B3 /* ARRecorderBase.swift in Sources */,
 				E33689B725D385D600BF27B3 /* RecorderMeta.swift in Sources */,
-				FA65614325A61244009AD005 /* ProbeStreamer.swift in Sources */,
+				E3E7F2DA25D6C16100DEA676 /* VideoPreviewViewController.swift in Sources */,
+				FA65614325A61244009AD005 /* FakeProbe.swift in Sources */,
 				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
 				E33689C525D388E100BF27B3 /* RecorderConst.swift in Sources */,
 				FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */,
 				FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */,
+				E3E7F2D025D52BCE00DEA676 /* SettingViewController.swift in Sources */,
 				FABE577B25C8257B00F87982 /* ARFrameModel.swift in Sources */,
 				FA19B3D925A3104200272051 /* ComposeController.swift in Sources */,
 			);
