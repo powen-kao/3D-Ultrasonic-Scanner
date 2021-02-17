@@ -18,9 +18,10 @@ class FakeProbe: Probe, AVPlayerItemOutputPullDelegate{
     private var itemOutput: AVPlayerItemVideoOutput?
     private var file: URL
     
-    // Display link
-    private var displayLink: CADisplayLink?
-    private var framerate: Float = 60 // framerate of source
+    
+    private var player: AVPlayer?
+
+    
     var frameInterval: TimeInterval {
         TimeInterval(1 / framerate)
     }
@@ -39,7 +40,7 @@ class FakeProbe: Probe, AVPlayerItemOutputPullDelegate{
         let videoTrack = self.asset?.tracks(withMediaType: .video)[0]
         self.framerate = videoTrack!.nominalFrameRate
         
-        os_log(.debug, "read vidoe file with framerate at \(self.framerate)")
+        os_log(.info, "read vidoe file with framerate at \(self.framerate)")
     }
     
     override func open() -> Bool{
@@ -53,24 +54,33 @@ class FakeProbe: Probe, AVPlayerItemOutputPullDelegate{
         itemOutput!.setDelegate(self, queue: nil)
         avPlayerItem.add(itemOutput!)
         
-        avPlayer = AVPlayer(playerItem: avPlayerItem)
-        
-        // setup display link
-        self.displayLink = CADisplayLink(target: self, selector: #selector(displayLinkStep))
-        self.displayLink?.add(to: .current, forMode: .default)
-        
+        player = AVPlayer(playerItem: avPlayerItem)
+
         return true
     }
     
     override func close() {
-        
+        removeDisplayLink()
     }
     
     override func start(){
-    
+        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 1))
+        player?.play()
+        
+        makeDisplayLink(block: nil)
     }
     
     override func stop() {
+        removeDisplayLink()
+    }
+    
+    override func makeDisplayLink(block: Probe.DisplayLinkCallback?) {
+        // setup display link
+        self.displayLink = CADisplayLink(target: self, selector: #selector(displayLinkStep))
+        self.displayLink?.add(to: .current, forMode: .default)
+    }
+
+    override func removeDisplayLink() {
         self.displayLink?.invalidate()
     }
     

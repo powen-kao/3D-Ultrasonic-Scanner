@@ -11,7 +11,7 @@ import ARKit
 import MetalKit
 import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var renderView: MTKView!
@@ -74,6 +74,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         if segue.identifier == "sInfo"{
 //            let dst = segue.destination as! InfoViewController
         }
+        if segue.identifier == "sSetting"{
+            let dst = segue.destination as! SettingViewController
+            dst.delegate = self
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -102,17 +106,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         Capturer.shared?.trigger()
     }
     @IBAction func preview(_ sender: Any) {
-        let player = composer?.probe?.avPlayer
-        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 1))
-        player?.play()
         
-//        let avViewController = AVPlayerViewController()
-//        avViewController.entersFullScreenWhenPlaybackBegins = false
-//        avViewController.allowsPictureInPicturePlayback = true
-//        avViewController.player = composer?.probe?.avPlayer
-//        avViewController.player?.play()
-//        avViewController.player?.play()
-//        present(avViewController, animated: true, completion: nil)
     }
     
     // MARK: - ARSCNViewDelegate
@@ -141,17 +135,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         
     }
     
-    // MARK: - UIImagePickerControllerDelegate
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let image = info[.originalImage] as? UIImage else{
-            print("Image retrival failed")
-            return
-        }
-        print("Image picked")
-        picker.dismiss(animated: true, completion: nil)
-        composer?.loadImage(image: image)
-    }
     
     // MARK: - Composer Delegate
     func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
@@ -172,6 +155,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             
         }
     }
+    
+    // MARK: - Setting Delegate
+    func sourceChanged(source: ComposerSource, folder: URL?) {
+        composer?.switchSource(source: source, folder: folder)
+    }
+    
 }
 
 extension ViewController{

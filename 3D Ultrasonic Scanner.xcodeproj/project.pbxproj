@@ -12,6 +12,7 @@
 		E33689B725D385D600BF27B3 /* RecorderMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689B625D385D600BF27B3 /* RecorderMeta.swift */; };
 		E33689C525D388E100BF27B3 /* RecorderConst.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689C425D388E100BF27B3 /* RecorderConst.swift */; };
 		E33689CA25D3A05E00BF27B3 /* ARRecorderBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689C925D3A05E00BF27B3 /* ARRecorderBase.swift */; };
+		E378E5A825DD383C00D2FFCD /* StaticProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E378E5A725DD383C00D2FFCD /* StaticProbe.swift */; };
 		E3E7F2D025D52BCE00DEA676 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */; };
 		E3E7F2D525D6624400DEA676 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2D425D6624400DEA676 /* SettingModel.swift */; };
 		E3E7F2DA25D6C16100DEA676 /* VideoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2D925D6C16100DEA676 /* VideoPreviewViewController.swift */; };
@@ -60,6 +61,7 @@
 		E33689B625D385D600BF27B3 /* RecorderMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderMeta.swift; sourceTree = "<group>"; };
 		E33689C425D388E100BF27B3 /* RecorderConst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderConst.swift; sourceTree = "<group>"; };
 		E33689C925D3A05E00BF27B3 /* ARRecorderBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARRecorderBase.swift; sourceTree = "<group>"; };
+		E378E5A725DD383C00D2FFCD /* StaticProbe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StaticProbe.swift; sourceTree = "<group>"; };
 		E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		E3E7F2D425D6624400DEA676 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
 		E3E7F2D925D6C16100DEA676 /* VideoPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPreviewViewController.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 		E3301E4D25D3E1A0001EE43F /* Probe */ = {
 			isa = PBXGroup;
 			children = (
+				E378E5A725DD383C00D2FFCD /* StaticProbe.swift */,
 				FA65614225A61244009AD005 /* FakeProbe.swift */,
 				E3301E4E25D3E20C001EE43F /* Probe.swift */,
 			);
@@ -371,6 +374,7 @@
 				FABE577025C8243400F87982 /* ARRecorder.swift in Sources */,
 				FAC19CEA25A964F10080E709 /* InfoViewController.swift in Sources */,
 				FABE577625C8256A00F87982 /* ARPlayer.swift in Sources */,
+				E378E5A825DD383C00D2FFCD /* StaticProbe.swift in Sources */,
 				FAC19CD125A87EC80080E709 /* Helpers.swift in Sources */,
 				E3301E4F25D3E20C001EE43F /* Probe.swift in Sources */,
 				E33689CA25D3A05E00BF27B3 /* ARRecorderBase.swift in Sources */,

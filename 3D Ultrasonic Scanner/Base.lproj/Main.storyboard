@@ -30,7 +30,7 @@
                                             </barButtonItem>
                                             <barButtonItem title="Item" image="gearshape.fill" catalog="system" id="Ovb-Zg-oFW" userLabel="Setting">
                                                 <connections>
-                                                    <segue destination="bov-0D-poQ" kind="popoverPresentation" popoverAnchorBarButtonItem="Ovb-Zg-oFW" id="tpM-Xd-w2D">
+                                                    <segue destination="bov-0D-poQ" kind="popoverPresentation" identifier="sSetting" popoverAnchorBarButtonItem="Ovb-Zg-oFW" id="tpM-Xd-w2D">
                                                         <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                                     </segue>
                                                 </connections>
@@ -213,76 +213,71 @@
         <scene sceneID="Yn4-tB-keV">
             <objects>
                 <tableViewController id="bov-0D-poQ" userLabel="Setting View Controller" customClass="SettingViewController" customModule="UltrasoundScanner" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="q1w-Go-5fo">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="q1w-Go-5fo">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="872"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="checkedRow" textLabel="7xX-xf-8b5" detailTextLabel="nQx-8J-GIY" rowHeight="50" style="IBUITableViewCellStyleSubtitle" id="PpZ-3A-ODj">
-                                <rect key="frame" x="20" y="55.333332061767578" width="388" height="50"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PpZ-3A-ODj" id="MNj-jb-EMA">
-                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Use Fake Probe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="7xX-xf-8b5" userLabel="title">
-                                            <rect key="frame" x="20" y="7.9999999999999982" width="119" height="20.333333333333332"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Read from file instead of streaming from probe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nQx-8J-GIY" userLabel="subtitle">
-                                            <rect key="frame" x="20" y="28.333333333333332" width="264" height="14.333333333333334"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="YnB-Pa-YcC">
-                                <rect key="frame" x="20" y="105.33333206176758" width="388" height="50"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YnB-Pa-YcC" id="9NB-MS-APg">
-                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdx-uf-eje">
+                        <sections>
+                            <tableViewSection id="Zta-CF-c84">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="YnB-Pa-YcC">
+                                        <rect key="frame" x="20" y="18" width="388" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YnB-Pa-YcC" id="9NB-MS-APg">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
-                                        </stackView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="gdx-uf-eje" firstAttribute="leading" secondItem="9NB-MS-APg" secondAttribute="leading" id="13M-Fo-v1q"/>
-                                        <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="LjR-7M-sSq"/>
-                                        <constraint firstAttribute="trailing" secondItem="gdx-uf-eje" secondAttribute="trailing" id="OeE-43-qqT"/>
-                                        <constraint firstItem="gdx-uf-eje" firstAttribute="top" secondItem="9NB-MS-APg" secondAttribute="top" id="mTA-as-cYF"/>
-                                        <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="twH-MH-3qG"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="cjc-6S-Dn0">
-                                <rect key="frame" x="20" y="155.33333206176758" width="388" height="50"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cjc-6S-Dn0" id="Uzc-dC-bst">
-                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x8R-YW-1Bt">
-                                            <rect key="frame" x="49" y="-19" width="200" height="110"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        </stackView>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <sections/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdx-uf-eje">
+                                                    <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                                    <subviews>
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="V8l-af-Azx">
+                                                            <rect key="frame" x="0.0" y="0.0" width="388" height="51"/>
+                                                            <segments>
+                                                                <segment title="Streaming"/>
+                                                                <segment title="Recording"/>
+                                                                <segment title="Static"/>
+                                                            </segments>
+                                                            <connections>
+                                                                <action selector="sourceChanged:" destination="bov-0D-poQ" eventType="valueChanged" id="TjH-3g-kCf"/>
+                                                            </connections>
+                                                        </segmentedControl>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="gdx-uf-eje" firstAttribute="leading" secondItem="9NB-MS-APg" secondAttribute="leading" id="13M-Fo-v1q"/>
+                                                <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="LjR-7M-sSq"/>
+                                                <constraint firstAttribute="trailing" secondItem="gdx-uf-eje" secondAttribute="trailing" id="OeE-43-qqT"/>
+                                                <constraint firstItem="gdx-uf-eje" firstAttribute="top" secondItem="9NB-MS-APg" secondAttribute="top" id="mTA-as-cYF"/>
+                                                <constraint firstAttribute="bottom" secondItem="gdx-uf-eje" secondAttribute="bottom" id="twH-MH-3qG"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="50" id="cjc-6S-Dn0">
+                                        <rect key="frame" x="20" y="68" width="388" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cjc-6S-Dn0" id="Uzc-dC-bst">
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x8R-YW-1Bt">
+                                                    <rect key="frame" x="49" y="-19" width="200" height="110"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </stackView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
                         <connections>
                             <outlet property="dataSource" destination="bov-0D-poQ" id="w3o-4Y-C53"/>
                             <outlet property="delegate" destination="bov-0D-poQ" id="sjg-p8-DRX"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="sourceSegment" destination="V8l-af-Azx" id="YxO-dI-Y8u"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DLr-Ei-eAQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

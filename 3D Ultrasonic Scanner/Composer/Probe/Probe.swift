@@ -10,8 +10,9 @@ import ARKit
 
 
 /// Abstract class of  Probe device
-class Probe: NSObject, ProbeInterface{
-    
+class Probe: NSObject, ProbeInterface, DisplayLinkableProbe{
+
+    // MARK: ProbeInterface
     // compatiable attributes
     static let defaultPixelBufferAttributes: [CFString: Any?] =
                 [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
@@ -19,9 +20,9 @@ class Probe: NSObject, ProbeInterface{
                  kCVPixelBufferMetalCompatibilityKey: kCFBooleanTrue,
                  kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA]
     
-    var avPlayer: AVPlayer?
     var delegate: ProbeDelegate? = nil
-    
+
+        
     func open() -> Bool{
         producePreconditionError(sender: self.open)
         return false
@@ -37,6 +38,18 @@ class Probe: NSObject, ProbeInterface{
     func stop() {
         producePreconditionError(sender: self.stop)
     }
+    
+    
+    // MARK: DisplayLinkableProbe
+    var displayLink: CADisplayLink?
+    var framerate: Float = 60
+
+    func makeDisplayLink(block: DisplayLinkCallback?) {
+    }
+    
+    func removeDisplayLink() {
+    }
+    
 }
 
 extension Probe{
@@ -48,7 +61,6 @@ extension Probe{
 protocol ProbeInterface {
 
     var delegate: ProbeDelegate? { get set }
-    var avPlayer: AVPlayer? { get }
     
     func open() -> Bool
     func close()
@@ -57,6 +69,19 @@ protocol ProbeInterface {
     func stop()
     
 }
+
+
+protocol DisplayLinkableProbe {
+    // Display link
+    var displayLink: CADisplayLink? { get }
+    var framerate: Float { get } // framerate of source
+    
+    func makeDisplayLink(block: DisplayLinkCallback?)
+    func removeDisplayLink()
+    
+    typealias DisplayLinkCallback = () -> Void
+}
+
 
 protocol ProbeDelegate {
     func probe(_ probe: Probe, new frame: UFrameProvider)
@@ -84,3 +109,4 @@ protocol UFrameProvider{
     var timestamp: TimeInterval? { get }
     var pixelBuffer: CVPixelBuffer { get set }
 }
+

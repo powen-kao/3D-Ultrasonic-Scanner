@@ -11,6 +11,7 @@ import Metal
 import MetalKit
 import ModelIO
 import SceneKit.ModelIO
+import os
 
 /**
  Composer does the frames matching between AR session and Ultrasonic probe.
@@ -22,7 +23,8 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
     
     // delegate
     var delegate: ComposerDelegate?
-    
+    var source: ComposerSource = .Recording // TODO: read from setting
+        
     // Data sources
     private let arSession: ARSession
     private(set) var probe: Probe?
@@ -65,9 +67,6 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         self.scnView = scnView
         self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Recordings") // default file path
-        
-        // TODO: use the fake probe now, but replace with real probe streamer in the future
-        self.probe = FakeProbe(file: URL(fileURLWithPath: "video.mov", isDirectory: false, relativeTo: self.recordingURL))
         super.init()
 
         
@@ -120,10 +119,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
         recorderState = .Ready
-        
-        // Setup probe
-        probe?.delegate = self
-        probe?.open()
+
     }
     
     func startRecording() {
@@ -143,9 +139,50 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         player.read(folder: recordingURL)
     }
     
-    func loadImage(image: UIImage) {
-        self.imagePixelBuffer = image.toCVPixelBuffer()
+    
+    /// Switch between different source. The folder parameter is only used in Static and Recording source
+    func switchSource(source: ComposerSource, folder: URL?){
+        probe?.stop()
+        probe?.close()
+        
+        switch source {
+        case .Recording:
+            guard let _file = folder?.appendingPathComponent("video.mov") else {
+                os_log(.debug, "Recording Probe load failed due to invalid path")
+                return
+            }
+            // Setup probe
+            // TODO: use the fake probe now, but replace with real probe streamer in the future
+            self.probe = FakeProbe(file: _file)
+
+        case .StaticImage:
+            guard let _file = folder?.appendingPathComponent("image.jpg") else {
+                os_log(.debug, "Static Probe load failed due to invalid path")
+                return
+            }
+            self.probe = StaticProbe(file: _file)
+
+            break
+        case .Streaming:
+            // TODO: implement real-time streaming
+            break
+        }
+        
+        os_log(.info, "Probe loaded from source : \(String(reflecting: source))")
+
+        probe?.delegate = self
+        // open probe
+        guard probe?.open() == true else {
+            os_log(.info, "Probe open failed")
+            return
+        }
+        probe?.start()
+        os_log(.info, "Probe opened success")
     }
+    
+//    func loadImage(image: UIImage) {
+//        self.imagePixelBuffer = image.toCVPixelBuffer()
+//    }
     
     func testRender() {
         guard let _buffer = imagePixelBuffer else {
@@ -264,6 +301,13 @@ extension ComposeController{
         InfoViewController.shared?.progressBar.progress = fullness;
     }
     
+}
+
+enum ComposerSource: Int {
+    // keep the same order as in storyboard
+    case Streaming
+    case Recording
+    case StaticImage
 }
 
 enum ARRecorderState {
