@@ -239,7 +239,7 @@
                                                             <rect key="frame" x="53.666666666666657" y="0.0" width="294.33333333333337" height="39"/>
                                                             <segments>
                                                                 <segment title="Streaming"/>
-                                                                <segment title="Recording"/>
+                                                                <segment title="Recorded"/>
                                                                 <segment title="Static"/>
                                                             </segments>
                                                             <connections>

@@ -51,7 +51,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
         buffer = _data.withUnsafeBytes { (_buffer: UnsafeRawBufferPointer) -> Array<ARFrameModel> in
             Array(_buffer.bindMemory(to: ARFrameModel.self))
         }
-        return false
+        return true
     }
     
     override func start() {
