@@ -34,6 +34,17 @@ extension matrix_float3x3 {
     }
 }
 
+extension CVPixelBuffer{
+    func width() -> Int {
+        CVPixelBufferGetWidth(self)
+    }
+    func height() -> Int{
+        CVPixelBufferGetHeight(self)
+    }
+    func pixelCount() -> Int {
+        width() * height()
+    }
+}
 
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {

@@ -10,17 +10,20 @@ import Foundation
 import ARKit
 
 struct ARFrameModel : Codable{
-    let transform: float4x4
     let timestamp: TimeInterval
+    let camera: ARCameraModel
     init(transform: float4x4, timestamp: TimeInterval) {
-        self.transform = transform
+        self.camera = ARCameraModel(transform: transform)
         self.timestamp = timestamp
     }
     init(frame: ARFrame) {
-        transform = frame.camera.transform
+        self.camera = ARCameraModel(transform: frame.camera.transform)
         timestamp = NSDate.now.timeIntervalSince1970
     }
-    
+}
+
+struct ARCameraModel: Codable {
+    var transform: float4x4
 }
 
 extension float4x4: Codable {

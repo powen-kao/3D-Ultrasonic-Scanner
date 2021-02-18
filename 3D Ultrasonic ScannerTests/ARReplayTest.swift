@@ -9,7 +9,7 @@ import XCTest
 @testable import UltrasoundScanner
 class ARReplayTest: XCTestCase {
     let recorder = ARRecorder()
-    let player = ARPlayer()
+    let player = FakeARPlayer()
     // test input
     let baseUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     
@@ -51,7 +51,7 @@ class ARReplayTest: XCTestCase {
                 XCTAssertEqual(player.buffer[0].timestamp, timestamp)
                 XCTAssertEqual(player.filemeta, metaFile)
             })
-            recorder.close()
+            recorder.clear()
         }
     }
     

@@ -69,9 +69,7 @@ protocol ProbeInterface {
     func stop()
     
 }
-
-
-protocol DisplayLinkableProbe {
+protocol DisplayLinkable {
     // Display link
     var displayLink: CADisplayLink? { get }
     var framerate: Float { get } // framerate of source
@@ -81,6 +79,7 @@ protocol DisplayLinkableProbe {
     
     typealias DisplayLinkCallback = () -> Void
 }
+typealias DisplayLinkableProbe = DisplayLinkable
 
 
 protocol ProbeDelegate {

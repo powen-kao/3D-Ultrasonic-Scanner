@@ -75,7 +75,7 @@ class ARRecorder: ARRecorderBase{
         }
     }
     
-    func close() {
+    func clear() {
         // TODO: add close complete handler
         
         // clean buffer

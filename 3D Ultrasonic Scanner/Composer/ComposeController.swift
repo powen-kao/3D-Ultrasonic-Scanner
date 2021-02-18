@@ -19,11 +19,13 @@ import os
  The frame composition is ultrasound-image-driven rather than ARFrame.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate{
+class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate, ARPlayerDelegate{
     
-    // delegate
+    // Public properties
     var delegate: ComposerDelegate?
-    var source: ComposerSource = .Recording // TODO: read from setting
+    private(set) var probeSource: ProbeSource = .Streaming // TODO: read from setting
+    private(set) var arSource: ARSource = .RealtimeAR
+    private var estimateDelay: Double = 0.1 // second
         
     // Data sources
     private let arSession: ARSession
@@ -43,7 +45,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     private var scnView: SCNView
     
     // current infos
-    private var currentARFrame: ARFrame?
+    private var currentARFrame: ARFrameModel?
     private var currentPixelBuffer: CVPixelBuffer?
     private var viewportSize = CGSize()
     private let voxelNode = SCNNode()
@@ -57,7 +59,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             recorderURLChangedHandler()
         }
     }
-    private let player: ARPlayer = ARPlayer()
+    private var arPlayer: ARPlayer?
     
     // capturing
     private var captureScope: MTLCaptureScope?
@@ -69,7 +71,9 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Recordings") // default file path
         super.init()
-
+        
+        switchARSource(source: arSource)
+        switchProbeSource(source: probeSource, folder: nil)
         
         // Get default device
         guard let _device = MTLCreateSystemDefaultDevice() else {
@@ -88,7 +92,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // Rest of the settings
         
         // Set delegate
-        arSession.delegate = self
+//        arSession.delegate = self
         renderer?.delegate = self
 
         // Add geometries into SCNScene
@@ -112,48 +116,60 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     
     func startRecording() {
         recorderState = .Recording
-        recorder.save(completeHandler: nil)
     }
     
     func stopRecording() {
         recorderState = .Busy
         recorder.save { [self] (recorder, success) in
             print("[Save success: \(success)] \(recorder)")
-            recorder.close()
+            recorder.clear()
             recorderState = .Ready
         }
     }
-    func replay() {
-        player.read(folder: recordingURL)
+    
+    func start() {
+        switch arSource {
+        case .RecordedAR:
+            arPlayer?.start()
+            probe?.start()
+        default:
+            break
+        }
+    }
+    
+    func stop() {
+        arPlayer?.reset()
     }
     
     
     /// Switch between different source. The folder parameter is only used in Static and Recording source
-    func switchSource(source: ComposerSource, folder: URL?){
+    func switchProbeSource(source: ProbeSource, folder: URL?){
+        self.probeSource = source
+
         probe?.stop()
         probe?.close()
         
         switch source {
-        case .Recording:
-            guard let _file = folder?.appendingPathComponent("video.mov") else {
-                os_log(.debug, "Recording Probe load failed due to invalid path")
-                return
-            }
-            // Setup probe
-            // TODO: use the fake probe now, but replace with real probe streamer in the future
-            self.probe = FakeProbe(file: _file)
+            case .Video:
+                guard let _file = folder?.appendingPathComponent("video.mov") else {
+                    os_log(.debug, "Recording Probe load failed due to invalid path")
+                    return
+                }
+                // Setup probe
+                // TODO: use the fake probe now, but replace with real probe streamer in the future
+                self.probe = FakeProbe(file: _file)
 
-        case .StaticImage:
-            guard let _file = folder?.appendingPathComponent("image.jpg") else {
-                os_log(.debug, "Static Probe load failed due to invalid path")
-                return
-            }
-            self.probe = StaticProbe(file: _file)
+            case .Image:
+                guard let _file = folder?.appendingPathComponent("image.jpg") else {
+                    os_log(.debug, "Static Probe load failed due to invalid path")
+                    return
+                }
+                self.probe = StaticProbe(file: _file)
 
-            break
-        case .Streaming:
-            // TODO: implement real-time streaming
-            break
+                break
+            case .Streaming:
+                // TODO: implement real-time streaming
+                return
         }
         
         os_log(.info, "Probe loaded from source : \(String(reflecting: source))")
@@ -164,15 +180,31 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             os_log(.info, "Probe open failed")
             return
         }
-        probe?.start()
+        
         os_log(.info, "Probe opened success")
+        
+        probe?.start()
+
     }
     
-    func testRender() {
-        guard let _buffer = imagePixelBuffer else {
+    func switchARSource(source: ARSource) {
+        arSource = source
+        switch source {
+            case .RealtimeAR:
+                arPlayer = RealtimeARPlayer(session: arSession)
+            case .RecordedAR:
+                arPlayer = FakeARPlayer(folder: recordingURL)
+                break
+        }
+        
+        guard arPlayer!.open() else {
+            os_log("AR player open failed")
             return
         }
-        renderer?.unproject(frame: arSession.currentFrame!, capturedImage: _buffer)
+        
+        os_log(.info, "AR player open success")
+        arPlayer?.delegate = self
+        arPlayer?.start()
     }
     
     func postProcess() {
@@ -182,6 +214,10 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // smoothing surface?
         
         // TODO: save file
+    }
+    
+    private func compose(){
+        
     }
 }
 
@@ -205,7 +241,10 @@ extension ComposeController{
     
     // public functions
     func restOrigin() {
-        self.renderer?.setCurrentARFrameAsReference()
+        guard let _frame = currentARFrame else {
+            return
+        }
+        self.renderer?.setARFrameAsReference(frame: _frame)
     }
     
     // debug
@@ -226,29 +265,6 @@ extension ComposeController{
         }
     }
     
-    // MARK: - ARSessionDelegate
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        self.currentARFrame = frame
-        self.delegate?.composer?(self, didUpdate: frame)
-        
-        guard let _frame = currentARFrame,
-              let _pixelBuffer = currentPixelBuffer else {
-            return
-        }
-        // preview update is synced with ARFrame update
-        renderer?.renderPreview(frame: _frame, capturedImage: _pixelBuffer)
-    }
-    
-    // MARK: - Probe Streamer
-    func probe(_ probe: Probe, new frame: UFrameProvider) {
-        currentPixelBuffer = frame.pixelBuffer
-
-        guard let _frame = self.currentARFrame else{
-            return
-        }
-        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
-    }
-    
     // MARK: - MTKViewDelegate
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         print("will resize")
@@ -263,19 +279,45 @@ extension ComposeController{
         imageVoxelNode.geometry = imageGeometry
     }
     
+    // MARK: - Probe Delegate
+    func probe(_ probe: Probe, new frame: UFrameProvider) {
+        currentPixelBuffer = frame.pixelBuffer
+
+        guard let _frame = self.currentARFrame else{
+            return
+        }
+        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
+    }
+    
+    // MARK: ARPlayer delegate
+    func player(_ player: ARPlayer, new frame: ARFrameModel) {
+        if (recorderState == .Recording){
+            recorder.append(frame: frame)
+        }
+        
+        guard let _pixelBuffer = currentPixelBuffer else {
+            return
+        }
+        renderer?.renderPreview(frame: frame, image: _pixelBuffer)
+    }
+    
     // MARK: Recorder delegate
     func recorder(_ recorder: ARRecorder, fullness: Float) {
         // TODO: remove later
         InfoViewController.shared?.progressBar.progress = fullness;
     }
-    
 }
 
-enum ComposerSource: Int {
+enum ProbeSource: Int {
     // keep the same order as in storyboard
     case Streaming
-    case Recording
-    case StaticImage
+    case Video
+    case Image
+}
+
+enum ARSource: Int {
+    case RealtimeAR
+    case RecordedAR
 }
 
 enum ARRecorderState {

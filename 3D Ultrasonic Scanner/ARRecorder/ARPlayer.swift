@@ -5,47 +5,40 @@
 //  Created by Po-Wen Kao on 2021/2/1.
 //
 
-
 import Foundation
-
-class ARPlayer: ARRecorderBase {
+import ARKit
+class ARPlayer: NSObject ,ARPLayerInterface {
+    
     var delegate: ARPlayerDelegate?
-    
-    private var fileURL: URL?
-    private(set) var buffer = [ARFrameModel]()
-    
-    private var metaURL: URL?
-    private(set) var filemeta: RecorderMeta?
-    
-    private let decoder = JSONDecoder()
-    
-    /// Read to buffer
-    func read(folder: URL) {
-        
-        self.fileURL = RecordFiles.getURL(at: folder, with: .ARFrameData)
-        self.metaURL = RecordFiles.getURL(at: folder, with: .RecorderMeta)
-        
-        let _data: Data
-        do {
-            _data = try Data(contentsOf: fileURL!)
-            filemeta = try? decoder.decode(RecorderMeta.self, from: try Data(contentsOf: metaURL!))
-        } catch {
-            print(error)
-            return
-        }
-        
-        let _elementCount = _data.count / MemoryLayout<ARFrameModel>.stride
-        guard _elementCount > 0 else {
-            return
-        }
-        
-        // read data
-        buffer = _data.withUnsafeBytes { (_buffer: UnsafeRawBufferPointer) -> Array<ARFrameModel> in
-            Array(_buffer.bindMemory(to: ARFrameModel.self))
-        }
+
+    func open() -> Bool{
+        return false
     }
+    func start() {
+    }
+    
+    func stop() {
+    }
+    
+    func close() {
+    }
+    func reset() {
+    }
+    
+    
 }
 
+protocol ARPLayerInterface {
+    
+    func open() -> Bool
+    func start()
+    func stop()
+    func close()
+    func reset()
+    
+}
+
+
 protocol ARPlayerDelegate {
-    func arPlayer(new frame: ARFrameModel)
+    func player(_ player: ARPlayer, new frame: ARFrameModel)
 }

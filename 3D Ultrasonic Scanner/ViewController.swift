@@ -53,7 +53,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
         // Set the scene to the view
         sceneView.scene = scene
-        sceneView.session.delegate = composer
 
     }
     
@@ -105,7 +104,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         Capturer.shared?.trigger()
     }
     @IBAction func preview(_ sender: Any) {
-        
+        self.composer?.start()
     }
     
     // MARK: - ARSCNViewDelegate
@@ -156,9 +155,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     
     // MARK: - Setting Delegate
-    func sourceChanged(source: ComposerSource, folder: URL?) {
-        composer?.switchSource(source: source, folder: folder)
+    func probeSourceChanged(source: ProbeSource, folder: URL?) {
+        composer?.switchProbeSource(source: source, folder: folder)
     }
+    func arSourceChanged(source: ARSource) {
+        composer?.switchARSource(source: source)
+    }
+    
     
 }
 
