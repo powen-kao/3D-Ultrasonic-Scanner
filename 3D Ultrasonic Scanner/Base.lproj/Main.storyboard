@@ -226,23 +226,34 @@
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="60"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <segmentedControl opaque="NO" contentMode="scaleToFill" restorationIdentifier="sourceSegmentRID" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="V8l-af-Azx">
-                                                    <rect key="frame" x="20" y="11" width="348" height="39"/>
-                                                    <segments>
-                                                        <segment title="Streaming"/>
-                                                        <segment title="Recording"/>
-                                                        <segment title="Static"/>
-                                                    </segments>
-                                                    <connections>
-                                                        <action selector="sourceChanged:" destination="bov-0D-poQ" eventType="valueChanged" id="TjH-3g-kCf"/>
-                                                    </connections>
-                                                </segmentedControl>
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="Dh7-yN-nWJ">
+                                                    <rect key="frame" x="20" y="11" width="348" height="38"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Probe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="fbV-fo-ivH">
+                                                            <rect key="frame" x="0.0" y="0.0" width="53.666666666666664" height="38"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" restorationIdentifier="sourceSegmentRID" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="V8l-af-Azx">
+                                                            <rect key="frame" x="53.666666666666657" y="0.0" width="294.33333333333337" height="39"/>
+                                                            <segments>
+                                                                <segment title="Streaming"/>
+                                                                <segment title="Recording"/>
+                                                                <segment title="Static"/>
+                                                            </segments>
+                                                            <connections>
+                                                                <action selector="sourceChanged:" destination="bov-0D-poQ" eventType="valueChanged" id="TjH-3g-kCf"/>
+                                                            </connections>
+                                                        </segmentedControl>
+                                                    </subviews>
+                                                </stackView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="V8l-af-Azx" secondAttribute="trailing" id="B0n-sc-ZFU"/>
-                                                <constraint firstItem="V8l-af-Azx" firstAttribute="top" secondItem="9NB-MS-APg" secondAttribute="topMargin" id="FNE-oG-Tby"/>
-                                                <constraint firstItem="V8l-af-Azx" firstAttribute="leading" secondItem="9NB-MS-APg" secondAttribute="leadingMargin" id="myM-Dl-slb"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="V8l-af-Azx" secondAttribute="bottom" id="pNQ-u9-bZI"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Dh7-yN-nWJ" secondAttribute="bottom" id="7kO-al-hpR"/>
+                                                <constraint firstItem="Dh7-yN-nWJ" firstAttribute="top" secondItem="9NB-MS-APg" secondAttribute="topMargin" id="Xd7-9x-0cf"/>
+                                                <constraint firstItem="Dh7-yN-nWJ" firstAttribute="leading" secondItem="9NB-MS-APg" secondAttribute="leadingMargin" id="f1l-Ju-HSQ"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Dh7-yN-nWJ" secondAttribute="trailing" id="gOx-i0-mud"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -253,22 +264,33 @@
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="60"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uTt-Fk-o7M">
-                                                    <rect key="frame" x="30" y="11" width="328" height="39"/>
-                                                    <segments>
-                                                        <segment title="Realtime"/>
-                                                        <segment title="Recoreded"/>
-                                                    </segments>
-                                                    <connections>
-                                                        <action selector="arSourceChanged:" destination="bov-0D-poQ" eventType="valueChanged" id="aBK-MJ-nZa"/>
-                                                    </connections>
-                                                </segmentedControl>
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="k6x-db-wOi">
+                                                    <rect key="frame" x="20" y="11" width="348" height="38"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AR" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="60" translatesAutoresizingMaskIntoConstraints="NO" id="8dN-72-CvC">
+                                                            <rect key="frame" x="0.0" y="0.0" width="39.333333333333336" height="38"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uTt-Fk-o7M">
+                                                            <rect key="frame" x="39.333333333333343" y="0.0" width="308.66666666666663" height="39"/>
+                                                            <segments>
+                                                                <segment title="Realtime"/>
+                                                                <segment title="Recoreded"/>
+                                                            </segments>
+                                                            <connections>
+                                                                <action selector="arSourceChanged:" destination="bov-0D-poQ" eventType="valueChanged" id="aBK-MJ-nZa"/>
+                                                            </connections>
+                                                        </segmentedControl>
+                                                    </subviews>
+                                                </stackView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="uTt-Fk-o7M" secondAttribute="trailing" constant="10" id="8xg-0d-has"/>
-                                                <constraint firstItem="uTt-Fk-o7M" firstAttribute="leading" secondItem="60p-km-koT" secondAttribute="leadingMargin" constant="10" id="c9G-Bv-jWv"/>
-                                                <constraint firstItem="uTt-Fk-o7M" firstAttribute="bottom" secondItem="60p-km-koT" secondAttribute="bottomMargin" id="gdm-mw-XGi"/>
-                                                <constraint firstItem="uTt-Fk-o7M" firstAttribute="top" secondItem="60p-km-koT" secondAttribute="topMargin" id="lR3-Qx-5E0"/>
+                                                <constraint firstItem="k6x-db-wOi" firstAttribute="top" secondItem="60p-km-koT" secondAttribute="topMargin" id="HME-BC-mCZ"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="k6x-db-wOi" secondAttribute="bottom" id="TG6-EC-CB0"/>
+                                                <constraint firstItem="k6x-db-wOi" firstAttribute="leading" secondItem="60p-km-koT" secondAttribute="leadingMargin" id="lea-l8-qPw"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="k6x-db-wOi" secondAttribute="trailing" id="vSN-M4-wRK"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
