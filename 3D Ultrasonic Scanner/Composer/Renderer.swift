@@ -34,7 +34,7 @@ class Renderer {
     private let device: MTLDevice
     private let library: MTLLibrary
     private let commandQueue: MTLCommandQueue
-    private lazy var unprojectionPipelineState = makeUnprojectionPipelineState()!
+    private lazy var unprojectionPipelineState = makeComputePipelineState(name: "unproject")
     private lazy var fillingPipelineState = makeFillingPipelineState()!
     private lazy var previewPipelineState = makePreviewPiplineState()!
     private lazy var textureCache: CVMetalTextureCache = makeTextureCache()
@@ -162,9 +162,8 @@ class Renderer {
      */
     func unproject (frame: ARFrame, capturedImage: CVPixelBuffer){
                 
-        guard let descriptor = renderDestination.currentRenderPassDescriptor,
-              let commandBuffer = commandQueue.makeCommandBuffer(),
-              let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)else{
+        guard let _commandBuffer = commandQueue.makeCommandBuffer(),
+              let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
             return
         }
         
@@ -189,12 +188,12 @@ class Renderer {
         InfoViewController.shared?.frameInfoText = "\(Tools.pairsToString(items: kvPairs))"
         
         
-        // TODO: retaining texture?
         imageTexture = makeTexture(fromPixelBuffer: capturedImage, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
         
-        commandBuffer.addCompletedHandler { [self] commandBuffer in
+        _commandBuffer.addCompletedHandler { [self] commandBuffer in
             state = .Ready
+            
             // remove all reference to texture
             retainingTextures.removeAll()
             
@@ -205,19 +204,25 @@ class Renderer {
                 // # WARNING: the message is not sychronous
             }
         }
-
-        commandEncoder.setDepthStencilState(relaxedStencilState)
-        commandEncoder.setRenderPipelineState(unprojectionPipelineState)
-        commandEncoder.setVertexBuffer(gridBuffer!)
-        commandEncoder.setVertexBuffer(frameInfoBuffer)
-        commandEncoder.setVertexBuffer(voxelInfoBuffer)
-        commandEncoder.setVertexBuffer(voxelBuffer!)
-        commandEncoder.setVertexTexture(CVMetalTextureGetTexture(imageTexture!), index: Int(kTexture.rawValue))
-        commandEncoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: gridBuffer!.count)
-        commandEncoder.endEncoding()
         
-        commandBuffer.present(renderDestination.currentDrawable!)
-        commandBuffer.commit()
+        // TODO: replace frameInfo, ARFrame, gridBuffer with matching result
+        // compute thread size
+        let width = Int(frameInfo.imageWidth)
+        let height = Int(frameInfo.imageHeight)
+        
+        let threadGroupSize = MTLSize(width: 1, height: 1, depth: 1)
+        let threadGroupCount = getThreadGroupCount(threadGroupSize: threadGroupSize, gridSize: MTLSize(width: width, height: height, depth: 1))
+
+        _commandEncoder.setComputePipelineState(unprojectionPipelineState!)
+        _commandEncoder.setBuffer(gridBuffer!)
+        _commandEncoder.setBuffer(frameInfoBuffer)
+        _commandEncoder.setBuffer(voxelInfoBuffer)
+        _commandEncoder.setBuffer(voxelBuffer!)
+        _commandEncoder.setTexture(CVMetalTextureGetTexture(imageTexture!), index: Int(kTexture.rawValue))
+        _commandEncoder.dispatchThreadgroups(threadGroupCount, threadsPerThreadgroup: threadGroupSize)
+        _commandEncoder.endEncoding()
+        
+        _commandBuffer.commit()
     }
     
     /// Render image preview
@@ -226,7 +231,6 @@ class Renderer {
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
             return
         }
-        
         
         // create FrameInfoBuffer from real-time AR frame (preview)
         let _previewFrameInfoBuffer = MetalBuffer<FrameInfo>.init(device: device, count: 1, index: kPreviewFrameInfo.rawValue)
@@ -254,7 +258,7 @@ class Renderer {
         _commandEncoder.setBuffer(imageVoxelBuffer!)
         _commandEncoder.setBuffer(_previewFrameInfoBuffer)
         _commandEncoder.setBuffer(voxelInfoBuffer)
-        _commandEncoder.setTexture(CVMetalTextureGetTexture(_imageTexture), index: Int(kTexture.rawValue))
+        _commandEncoder.setTexture(CVMetalTextureGetTexture(_imageTexture), index: Int(kPreviewTexture.rawValue))
         _commandEncoder.dispatchThreadgroups(threadGroupCount, threadsPerThreadgroup: threadGroupSize)
         _commandEncoder.endEncoding()
         _commandBuffer.commit()
@@ -310,34 +314,20 @@ class Renderer {
 }
 
 private extension Renderer {
-    func makeUnprojectionPipelineState() -> MTLRenderPipelineState? {
-        guard let vertexFunction = library.makeFunction(name: "unprojectVertex")
-//              let fragmentFunction = library.makeFunction(name: "particleFragment")
+    func getThreadGroupCount(threadGroupSize: MTLSize, gridSize: MTLSize) -> MTLSize{
+        var threadGroupCount = MTLSize()
+        threadGroupCount.width  = (Int(gridSize.width) + threadGroupSize.width -  1) / threadGroupSize.width;
+        threadGroupCount.height  = (Int(gridSize.height) + threadGroupSize.height -  1) / threadGroupSize.height;
+        threadGroupCount.depth  = (Int(gridSize.depth) + threadGroupSize.depth -  1) / threadGroupSize.depth;
+        return threadGroupCount
+    }
+    
+    func makeComputePipelineState(name: String) -> MTLComputePipelineState?{
+        guard let vertexFunction = library.makeFunction(name: name)
         else {
                 return nil
         }
-        
-        let descriptor = MTLRenderPipelineDescriptor()
-        descriptor.vertexFunction = vertexFunction
-//        descriptor.fragmentFunction = fragmentFunction
-//        descriptor.isRasterizationEnabled = true
-
-        descriptor.isRasterizationEnabled = false
-        descriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
-        descriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
-        
-        // for fragement
-//        descriptor.colorAttachments[0].isBlendingEnabled = true
-//        descriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
-//        descriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-//        descriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
-        
-        do {
-            return try device.makeRenderPipelineState(descriptor: descriptor)
-        } catch{
-            print("\(error)")
-            return nil
-        }
+        return try? device.makeComputePipelineState(function: vertexFunction)
     }
     
     func makeFillingPipelineState() -> MTLComputePipelineState? {

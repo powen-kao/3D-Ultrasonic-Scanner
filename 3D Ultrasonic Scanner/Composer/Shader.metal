@@ -120,7 +120,7 @@ kernel void renderPreview(uint2 grid_pos [[thread_position_in_grid]],
                           device Voxel *imgVoxel [[buffer(kImageVoxel)]],
                           constant FrameInfo &fInfo [[buffer(kPreviewFrameInfo)]],
                           device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
-                          texture2d<float, access::sample> uImageTexture [[texture(kTexture)]]
+                          texture2d<float, access::sample> uImageTexture [[texture(kPreviewTexture)]]
                           ){
     
     const int vertexID = vPositionToId_2d(int2(grid_pos), &fInfo);
@@ -140,14 +140,14 @@ kernel void renderPreview(uint2 grid_pos [[thread_position_in_grid]],
 }
 
 ///  Vertex shader that takes in a 2D grid-point and infers its 3D position in world-space, along with RGB and confidence
-vertex void unprojectVertex(uint vertexID [[vertex_id]],
+kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
                             device Voxel *voxel [[buffer(kVoxel)]],
                             constant FrameInfo &fInfo [[buffer(kFrameInfo)]],
                             device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
                             texture2d<float, access::sample> uImageTexture [[texture(kTexture)]]
                             ){
-    const auto gridX = vertexID % fInfo.imageWidth;
-    const auto gridY = (int) (vertexID / fInfo.imageWidth);
+    const auto gridX = grid_pos.x;
+    const auto gridY = grid_pos.y;
     
     
     // With a 2D point and depth, we can compute its global 3D position
