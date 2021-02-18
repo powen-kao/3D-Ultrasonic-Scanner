@@ -249,10 +249,8 @@ class Renderer {
         
         // compute thread size
         let threadGroupSize = MTLSize(width: 8,height: 8, depth: 1)
-        var threadGroupCount = MTLSize()
-        threadGroupCount.width  = (Int(_frameInfo.imageWidth) + threadGroupSize.width -  1) / threadGroupSize.width
-        threadGroupCount.height  = (Int(_frameInfo.imageHeight) + threadGroupSize.height -  1) / threadGroupSize.height
-        threadGroupCount.depth  = 1
+        let threadGroupCount = getThreadGroupCount(threadGroupSize: threadGroupSize, gridSize: MTLSize(width: imageWidth, height: imageHeight, depth: 1))
+
         
         _commandEncoder.setComputePipelineState(previewPipelineState)
         _commandEncoder.setBuffer(imageVoxelBuffer!)
@@ -292,10 +290,10 @@ class Renderer {
         
         // compute thread size
         let threadGroupSize = MTLSize(width: 8,height: 8, depth: 8)
-        var threadGroupCount = MTLSize()
-        threadGroupCount.width  = (Int(voxelInfo.size.x) + threadGroupSize.width -  1) / threadGroupSize.width;
-        threadGroupCount.height  = (Int(voxelInfo.size.y) + threadGroupSize.height -  1) / threadGroupSize.height;
-        threadGroupCount.depth  = (Int(voxelInfo.size.z) + threadGroupSize.depth -  1) / threadGroupSize.depth;
+        let threadGroupCount = getThreadGroupCount(threadGroupSize: threadGroupSize,
+                                                   gridSize: MTLSize(width: Int(voxelInfo.size.x),
+                                                                     height: Int(voxelInfo.size.y),
+                                                                     depth: Int(voxelInfo.size.z)))
         
         _commandEncoder.setComputePipelineState(fillingPipelineState)
         _commandEncoder.setBuffer(voxelBuffer!)
