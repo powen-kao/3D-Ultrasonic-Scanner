@@ -77,6 +77,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
         let _index = lastIndex + 1
         guard _index < buffer.count else {
             stop()
+            delegate?.finished(self)
             return nil
         }
         
@@ -102,7 +103,6 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
             return
         }
         let itemTime = CMTime(seconds: CACurrentMediaTime() - _startTime, preferredTimescale: 1)
-        
         
         // get frame of target item time
         guard let frame = getFrame(forItemTime: itemTime) else {

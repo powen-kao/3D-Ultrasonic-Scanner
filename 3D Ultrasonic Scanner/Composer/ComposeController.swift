@@ -25,6 +25,16 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     var delegate: ComposerDelegate?
     private(set) var probeSource: ProbeSource = .Streaming // TODO: read from setting
     private(set) var arSource: ARSource = .RealtimeAR
+    private(set) var composeState: ComposeState = .Ready {
+        didSet{
+            if composeState == .Ready{
+                self.arPlayer?.stop()
+                self.probe?.stop()
+            }
+            delegate?.composer?(self, stateChanged: composeState)
+        }
+    }
+
     private var estimateDelay: Double = 0.1 // second
         
     // Data sources
@@ -92,7 +102,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // Rest of the settings
         
         // Set delegate
-//        arSession.delegate = self
         renderer?.delegate = self
 
         // Add geometries into SCNScene
@@ -127,27 +136,12 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         }
     }
     
-    func start() {
-        switch arSource {
-        case .RecordedAR:
-            arPlayer?.start()
-            probe?.start()
-        default:
-            break
-        }
-    }
-    
-    func stop() {
-        arPlayer?.reset()
-    }
-    
     
     /// Switch between different source. The folder parameter is only used in Static and Recording source
     func switchProbeSource(source: ProbeSource, folder: URL?){
         self.probeSource = source
 
-        probe?.stop()
-        probe?.close()
+        composeState = .Ready
         
         switch source {
             case .Video:
@@ -182,13 +176,13 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         }
         
         os_log(.info, "Probe opened success")
-        
-        probe?.start()
-
     }
     
     func switchARSource(source: ARSource) {
         arSource = source
+        
+        composeState = .Ready
+        
         switch source {
             case .RealtimeAR:
                 arPlayer = RealtimeARPlayer(session: arSession)
@@ -204,7 +198,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         
         os_log(.info, "AR player open success")
         arPlayer?.delegate = self
-        arPlayer?.start()
     }
     
     func postProcess() {
@@ -216,8 +209,18 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // TODO: save file
     }
     
-    private func compose(){
+    func startCompose(){
+        probe?.start()
+        arPlayer?.start()
+
+        composeState = .Composing
+    }
+    
+    func stopCompose() {
+        probe?.stop()
+        arPlayer?.stop()
         
+        composeState = .Ready
     }
 }
 
@@ -289,6 +292,10 @@ extension ComposeController{
         renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
     }
     
+    func finished(_ probe: Probe) {
+        composeState = .Ready
+    }
+    
     // MARK: ARPlayer delegate
     func player(_ player: ARPlayer, new frame: ARFrameModel) {
         if (recorderState == .Recording){
@@ -299,6 +306,10 @@ extension ComposeController{
             return
         }
         renderer?.renderPreview(frame: frame, image: _pixelBuffer)
+    }
+    
+    func finished(_ player: ARPlayer) {
+        composeState = .Ready
     }
     
     // MARK: Recorder delegate
@@ -327,9 +338,16 @@ enum ARRecorderState {
     case Busy // writing or reading files
 }
 
+@objc enum ComposeState: Int {
+    case Ready
+    case Composing
+    case HoleFilling
+}
+
 
 @objc protocol ComposerDelegate {
     @objc optional func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame)
+    @objc optional func composer(_ composer: ComposeController, stateChanged: ComposeState)
 }
 
 protocol ComposerObserver{

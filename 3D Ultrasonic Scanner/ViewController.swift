@@ -15,6 +15,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
+    @IBOutlet weak var composeButton: UIBarButtonItem!
     
     // Controllers
     private var alertController: UIAlertController?
@@ -103,8 +104,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     @IBAction func capture(_ sender: Any) {
         Capturer.shared?.trigger()
     }
-    @IBAction func preview(_ sender: Any) {
-        self.composer?.start()
+    @IBAction func compose(_ sender: Any) {
+        switch composer?.composeState {
+        case .Ready:
+            composer?.startCompose()
+        default:
+            composer?.stopCompose()
+        }
     }
     
     // MARK: - ARSCNViewDelegate
@@ -153,6 +159,19 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             
         }
     }
+    
+    func composer(_ composer: ComposeController, stateChanged: ComposeState) {
+        switch stateChanged {
+            case .Composing:
+                composeButton.image = UIImage(systemName: "stop.fill")
+                break
+            case .Ready:
+                composeButton.image = UIImage(systemName: "play.fill")
+                break
+            case .HoleFilling: break
+        }
+    }
+    
     
     // MARK: - Setting Delegate
     func probeSourceChanged(source: ProbeSource, folder: URL?) {

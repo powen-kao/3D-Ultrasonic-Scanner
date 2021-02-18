@@ -41,4 +41,5 @@ protocol ARPLayerInterface {
 
 protocol ARPlayerDelegate {
     func player(_ player: ARPlayer, new frame: ARFrameModel)
+    func finished(_ player: ARPlayer)
 }

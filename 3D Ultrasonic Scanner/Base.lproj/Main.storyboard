@@ -27,9 +27,9 @@
                                         </constraints>
                                         <items>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
-                                            <barButtonItem title="Preview" image="play.circle" catalog="system" id="mgB-iB-cG2">
+                                            <barButtonItem title="Preview" image="play.fill" catalog="system" id="mgB-iB-cG2">
                                                 <connections>
-                                                    <action selector="preview:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
+                                                    <action selector="compose:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem title="Item" image="gearshape.fill" catalog="system" id="Ovb-Zg-oFW" userLabel="Setting">
@@ -111,6 +111,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" id="YwM-KR-5Xs"/>
                     <connections>
+                        <outlet property="composeButton" destination="mgB-iB-cG2" id="nNA-we-te2"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                         <outlet property="scnView" destination="86V-wZ-on6" id="DY8-KI-Q0i"/>
                     </connections>
@@ -340,7 +341,7 @@
     </scenes>
     <resources>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
-        <image name="play.circle" catalog="system" width="128" height="121"/>
+        <image name="play.fill" catalog="system" width="116" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

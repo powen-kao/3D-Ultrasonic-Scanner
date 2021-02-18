@@ -84,6 +84,7 @@ typealias DisplayLinkableProbe = DisplayLinkable
 
 protocol ProbeDelegate {
     func probe(_ probe: Probe, new frame: UFrameProvider)
+    func finished(_ probe: Probe)
 }
 
 
