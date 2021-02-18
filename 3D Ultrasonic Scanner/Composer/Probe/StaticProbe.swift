@@ -8,20 +8,30 @@
 import Foundation
 import AVFoundation
 import UIKit
+import os
 
 class StaticProbe: Probe {
     
-    private let image: CVPixelBuffer?
     private(set) var file: URL?
-    
+    private var image: UIImage?
+    private var pixelBuffer: CVPixelBuffer?
+
     init(file: URL) {
         self.file = file
-        self.image = UIImage(contentsOfFile: file.absoluteString)?.toCVPixelBuffer()
         super.init()
+
+        guard let _data = try? Data(contentsOf: file) else {
+            os_log("[File not found] \(file)")
+            return
+        }
+        self.image = UIImage(data: _data)
+        self.pixelBuffer = self.image?.toCVPixelBuffer()
     }
+    
     override func open() -> Bool {
-        return true
+        return pixelBuffer != nil
     }
+    
     override func close() {
         
     }
@@ -42,7 +52,7 @@ class StaticProbe: Probe {
         self.displayLink?.invalidate()
     }
     @objc func displayLinkStep(displaylink: CADisplayLink) {
-        guard let _image = image else {
+        guard let _image = pixelBuffer else {
             return
         }
         delegate?.probe(self, new: UFrameModel(buffer: _image))

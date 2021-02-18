@@ -17,7 +17,7 @@ enum BufferIndices {
     kGridPoint,
     kVoxelInfo,
     kTexture,
-    kDebugInfo
+    kPreviewFrameInfo
 };
 
 typedef enum State{

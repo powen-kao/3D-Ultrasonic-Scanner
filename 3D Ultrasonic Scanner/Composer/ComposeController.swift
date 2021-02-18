@@ -44,6 +44,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
     
     // current infos
     private var currentARFrame: ARFrame?
+    private var currentPixelBuffer: CVPixelBuffer?
     private var viewportSize = CGSize()
     private let voxelNode = SCNNode()
     private let imageVoxelNode = SCNNode()
@@ -180,30 +181,34 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         os_log(.info, "Probe opened success")
     }
     
-//    func loadImage(image: UIImage) {
-//        self.imagePixelBuffer = image.toCVPixelBuffer()
-//    }
-    
     func testRender() {
         guard let _buffer = imagePixelBuffer else {
             return
         }
-        renderer?.render(frame: arSession.currentFrame!, capturedImage: _buffer)
+        renderer?.unproject(frame: arSession.currentFrame!, capturedImage: _buffer)
     }
     
     // MARK: - ARSessionDelegate
-    
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         self.currentARFrame = frame
         self.delegate?.composer?(self, didUpdate: frame)
+        
+        guard let _frame = currentARFrame,
+              let _pixelBuffer = currentPixelBuffer else {
+            return
+        }
+        // preview update is synced with ARFrame update
+        renderer?.renderPreview(frame: _frame, capturedImage: _pixelBuffer)
     }
     
     // MARK: - Probe Streamer
     func probe(_ probe: Probe, new frame: UFrameProvider) {
+        currentPixelBuffer = frame.pixelBuffer
+
         guard let _frame = self.currentARFrame else{
             return
         }
-        renderer?.render(frame: _frame, capturedImage: frame.pixelBuffer)
+        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
     }
     
     // MARK: - MTKViewDelegate
@@ -222,7 +227,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
                 return
             }
             captureScope?.begin()
-            renderer?.render(frame: _frame, capturedImage: _buffer)
+//            renderer?.unproject(frame: _frame, capturedImage: _buffer)
             if (recorderState == .Recording){
                 recorder.append(frame: _frame)
             }

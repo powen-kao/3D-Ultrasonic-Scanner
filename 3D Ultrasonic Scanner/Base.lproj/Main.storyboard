@@ -230,7 +230,7 @@
                                                 <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gdx-uf-eje">
                                                     <rect key="frame" x="0.0" y="0.0" width="388" height="50"/>
                                                     <subviews>
-                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="V8l-af-Azx">
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" restorationIdentifier="sourceSegmentRID" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="V8l-af-Azx">
                                                             <rect key="frame" x="0.0" y="0.0" width="388" height="51"/>
                                                             <segments>
                                                                 <segment title="Streaming"/>
