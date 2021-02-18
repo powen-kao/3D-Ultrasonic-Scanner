@@ -19,7 +19,7 @@ import os
  The frame composition is ultrasound-image-driven rather than ARFrame.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate{
+class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate{
     
     // delegate
     var delegate: ComposerDelegate?
@@ -63,7 +63,7 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
     private var captureScope: MTLCaptureScope?
     private var shouldCapture = false;
 
-    init(arSession: ARSession, destination: RenderDestinationProvider, scnView: SCNView) {
+    init(arSession: ARSession, scnView: SCNView) {
         self.arSession = arSession
         self.scnView = scnView
         self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -78,31 +78,18 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         }
         self.device = _device
         
+        // Create renderer with device
+        renderer = Renderer(metalDevice: device!)
+        
         // Capturer for GPU tracing
         captureScope = MTLCaptureManager.shared().makeCaptureScope(device: device!)
         captureScope?.label = String.init(describing: self)
 
-
-        arSession.delegate = self
-        
-        // Set the view to use the default device
-        if let view = destination as? MTKView {
-            view.device = device
-            
-            view.backgroundColor = UIColor.clear
-            // we need this to enable depth test
-            view.depthStencilPixelFormat = .depth32Float
-            view.contentScaleFactor = 1
-            view.delegate = self
-            
-            // Configure the renderer to draw to the view
-            renderer = Renderer(metalDevice: device!, renderDestination: view)
-            renderer?.delegate = self
-            renderer?.drawRectResized(size: view.bounds.size)
-            self.destination = view
-        }
-        
         // Rest of the settings
+        
+        // Set delegate
+        arSession.delegate = self
+        renderer?.delegate = self
 
         // Add geometries into SCNScene
         let scene = scnView.scene!
@@ -120,6 +107,9 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
         recorderState = .Ready
+        
+
+
 
     }
     
@@ -214,29 +204,6 @@ class ComposeController: NSObject, ARSessionDelegate, MTKViewDelegate, ProbeDele
     // MARK: - MTKViewDelegate
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         print("will resize")
-    }
-    
-    func draw(in view: MTKView) {
-        // TODO: add offset between camera and probe
-        guard let _frame = self.currentARFrame else {
-            return
-        }
-        
-        if (imagePixelBuffer != nil) {
-            guard let _buffer = imagePixelBuffer else{
-                return
-            }
-            captureScope?.begin()
-//            renderer?.unproject(frame: _frame, capturedImage: _buffer)
-            if (recorderState == .Recording){
-                recorder.append(frame: _frame)
-            }
-            captureScope?.end()
-            if (self.shouldCapture){
-                self.shouldCapture = false
-                startCapture()
-            }
-        }
     }
     
     func postProcess() {

@@ -14,7 +14,6 @@ import AVKit
 class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
-    @IBOutlet weak var renderView: MTKView!
     @IBOutlet weak var scnView: SCNView!
     
     // Controllers
@@ -47,7 +46,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         self.probeNode = pointCloudScene.rootNode.childNode(withName: "probe", recursively: true)
 
         // Create composer
-        self.composer = ComposeController(arSession: sceneView.session, destination: renderView!, scnView: scnView)
+        self.composer = ComposeController(arSession: sceneView.session, scnView: scnView)
         self.composer?.delegate = self
         self.composerInfo = composer
                 

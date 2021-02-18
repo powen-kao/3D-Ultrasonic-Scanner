@@ -11,9 +11,7 @@ import Metal
 import MetalKit
 
 
-class Renderer {
-    private let renderDestination: RenderDestinationProvider
-    
+class Renderer {    
     // To expose
     private(set) var voxelGeometry: SCNGeometry?
     private(set) var imageVoxelGeometry: SCNGeometry?
@@ -105,8 +103,7 @@ class Renderer {
         case Processing
     }
 
-    init(metalDevice: MTLDevice, renderDestination: RenderDestinationProvider) {
-        self.renderDestination = renderDestination
+    init(metalDevice: MTLDevice) {
         self.device = metalDevice
         self.library = device.makeDefaultLibrary()!
         self.commandQueue = device.makeCommandQueue()!
@@ -529,18 +526,5 @@ extension Renderer{
         self.voxelInfoBuffer[0].inversedTransform = _arFrame.camera.transform.inverse
         self.voxelInfoBuffer[0].state = kVReady
     }
-}
-
-// MARK: - RenderDestinationProvider
-
-protocol RenderDestinationProvider {
-    var currentRenderPassDescriptor: MTLRenderPassDescriptor? { get }
-    var currentDrawable: CAMetalDrawable? { get }
-    var colorPixelFormat: MTLPixelFormat { get set }
-    var depthStencilPixelFormat: MTLPixelFormat { get set }
-    var sampleCount: Int { get set }
-}
-extension MTKView: RenderDestinationProvider {
-    
 }
 

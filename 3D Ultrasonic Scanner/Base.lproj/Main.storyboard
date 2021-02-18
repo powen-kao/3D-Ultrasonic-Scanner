@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,11 +17,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Gbc-bZ-Xoo">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Gbc-bZ-Xoo">
                                 <rect key="frame" x="0.0" y="44" width="428" height="799"/>
                                 <subviews>
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="top" translatesAutoresizingMaskIntoConstraints="NO" id="fRK-ID-axd" userLabel="Top Toolbar">
-                                        <rect key="frame" x="0.0" y="0.0" width="428" height="49"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="428" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="Mur-1g-nIa"/>
+                                        </constraints>
                                         <items>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
                                             <barButtonItem title="Preview" image="play.circle" catalog="system" id="mgB-iB-cG2">
@@ -38,35 +42,27 @@
                                         </items>
                                     </toolbar>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ygC-cE-jfy" userLabel="Render Stack View">
-                                        <rect key="frame" x="0.0" y="49" width="428" height="706"/>
+                                        <rect key="frame" x="0.0" y="40" width="428" height="719"/>
                                         <subviews>
-                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="F4z-Mj-udL">
-                                                <rect key="frame" x="0.0" y="0.0" width="428" height="706"/>
-                                                <subviews>
-                                                    <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
-                                                        <rect key="frame" x="0.0" y="0.0" width="428" height="235.33333333333334"/>
-                                                        <connections>
-                                                            <outlet property="delegate" destination="BV1-FR-VrT" id="Vp5-E4-QCS"/>
-                                                        </connections>
-                                                    </arscnView>
-                                                    <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="YNl-sr-DLp">
-                                                        <rect key="frame" x="0.0" y="235.33333333333331" width="428" height="235.33333333333331"/>
-                                                        <color key="clearColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    </mtkView>
-                                                    <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
-                                                        <rect key="frame" x="0.0" y="470.66666666666657" width="428" height="235.33333333333331"/>
-                                                    </sceneKitView>
-                                                </subviews>
-                                            </stackView>
+                                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
+                                                <rect key="frame" x="0.0" y="0.0" width="428" height="200"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="200" id="6se-YV-kyJ"/>
+                                                </constraints>
+                                                <connections>
+                                                    <outlet property="delegate" destination="BV1-FR-VrT" id="Vp5-E4-QCS"/>
+                                                </connections>
+                                            </arscnView>
+                                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" sceneName="ship.scn" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="86V-wZ-on6">
+                                                <rect key="frame" x="0.0" y="200" width="428" height="519"/>
+                                            </sceneKitView>
                                         </subviews>
-                                        <constraints>
-                                            <constraint firstItem="F4z-Mj-udL" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="top" id="StW-9Z-hYt"/>
-                                            <constraint firstItem="F4z-Mj-udL" firstAttribute="leading" secondItem="ygC-cE-jfy" secondAttribute="leading" id="ro6-92-IXK"/>
-                                            <constraint firstAttribute="trailing" secondItem="F4z-Mj-udL" secondAttribute="trailing" id="xjX-F5-iUq"/>
-                                        </constraints>
                                     </stackView>
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="Dc1-nP-s02" userLabel="Bottom Toolbar">
-                                        <rect key="frame" x="0.0" y="755" width="428" height="44"/>
+                                        <rect key="frame" x="0.0" y="759" width="428" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="Cj2-YY-HzT"/>
+                                        </constraints>
                                         <items>
                                             <barButtonItem title="Import" id="3uI-QA-edN">
                                                 <connections>
@@ -98,6 +94,10 @@
                                         </connections>
                                     </toolbar>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="Dc1-nP-s02" firstAttribute="top" secondItem="ygC-cE-jfy" secondAttribute="bottom" id="9tU-fG-mz9"/>
+                                    <constraint firstItem="ygC-cE-jfy" firstAttribute="top" secondItem="fRK-ID-axd" secondAttribute="bottom" id="FYQ-IW-2Mm"/>
+                                </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
@@ -111,7 +111,6 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" id="YwM-KR-5Xs"/>
                     <connections>
-                        <outlet property="renderView" destination="YNl-sr-DLp" id="ChL-9W-ucm"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                         <outlet property="scnView" destination="86V-wZ-on6" id="DY8-KI-Q0i"/>
                     </connections>
