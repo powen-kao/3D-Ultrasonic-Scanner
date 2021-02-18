@@ -107,9 +107,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
         recorderState = .Ready
-        
-
-
 
     }
     
@@ -178,34 +175,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         renderer?.unproject(frame: arSession.currentFrame!, capturedImage: _buffer)
     }
     
-    // MARK: - ARSessionDelegate
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        self.currentARFrame = frame
-        self.delegate?.composer?(self, didUpdate: frame)
-        
-        guard let _frame = currentARFrame,
-              let _pixelBuffer = currentPixelBuffer else {
-            return
-        }
-        // preview update is synced with ARFrame update
-        renderer?.renderPreview(frame: _frame, capturedImage: _pixelBuffer)
-    }
-    
-    // MARK: - Probe Streamer
-    func probe(_ probe: Probe, new frame: UFrameProvider) {
-        currentPixelBuffer = frame.pixelBuffer
-
-        guard let _frame = self.currentARFrame else{
-            return
-        }
-        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
-    }
-    
-    // MARK: - MTKViewDelegate
-    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        print("will resize")
-    }
-    
     func postProcess() {
         // fill holes
         renderer?.fillHoles()
@@ -257,8 +226,35 @@ extension ComposeController{
         }
     }
     
-    // MARK: Renderer delegate
+    // MARK: - ARSessionDelegate
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        self.currentARFrame = frame
+        self.delegate?.composer?(self, didUpdate: frame)
+        
+        guard let _frame = currentARFrame,
+              let _pixelBuffer = currentPixelBuffer else {
+            return
+        }
+        // preview update is synced with ARFrame update
+        renderer?.renderPreview(frame: _frame, capturedImage: _pixelBuffer)
+    }
     
+    // MARK: - Probe Streamer
+    func probe(_ probe: Probe, new frame: UFrameProvider) {
+        currentPixelBuffer = frame.pixelBuffer
+
+        guard let _frame = self.currentARFrame else{
+            return
+        }
+        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
+    }
+    
+    // MARK: - MTKViewDelegate
+    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        print("will resize")
+    }
+    
+    // MARK: Renderer delegate
     func renderer(_ renderer: Renderer, voxelGeometryUpdate voxelGeometry: SCNGeometry) {
         voxelNode.geometry = voxelGeometry
     }
