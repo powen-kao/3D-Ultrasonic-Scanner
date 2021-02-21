@@ -291,7 +291,10 @@ extension ComposeController{
         guard let _frame = self.currentARFrame else{
             return
         }
-        renderer?.unproject(frame: _frame, image: frame.pixelBuffer)
+        
+        if (composeState == .Composing){
+            renderer?.unproject(frame: _frame, image: frame.pixelBuffer)
+        }
     }
     
     func finished(_ probe: Probe) {
