@@ -30,6 +30,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             if composeState == .Ready{
                 self.arPlayer?.stop()
                 self.probe?.stop()
+                self.currentARFrame = nil
+                self.currentPixelBuffer = nil
             }
             delegate?.composer?(self, stateChanged: composeState)
         }
@@ -213,7 +215,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         probe?.start()
         arPlayer?.start()
 
-        composeState = .Composing
+        composeState = .WaitForFirstFrame
     }
     
     func stopCompose() {
@@ -307,7 +309,15 @@ extension ComposeController{
         guard let _pixelBuffer = currentPixelBuffer else {
             return
         }
-        renderer?.renderPreview(frame: frame, image: _pixelBuffer)
+        
+        switch composeState {
+            case .WaitForFirstFrame:
+                restOrigin()
+                composeState = .Composing
+            case .Composing:
+                renderer?.renderPreview(frame: frame, image: _pixelBuffer)
+            default: break
+        }
     }
     
     func finished(_ player: ARPlayer) {
@@ -342,6 +352,7 @@ enum ARRecorderState {
 
 @objc enum ComposeState: Int {
     case Ready
+    case WaitForFirstFrame  // waiting for first frame to take as reference frame
     case Composing
     case HoleFilling
 }

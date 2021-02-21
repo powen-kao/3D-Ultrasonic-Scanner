@@ -168,7 +168,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             case .Ready:
                 composeButton.image = UIImage(systemName: "play.fill")
                 break
-            case .HoleFilling: break
+            default: break
         }
     }
     
