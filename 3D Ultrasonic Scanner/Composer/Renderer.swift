@@ -51,31 +51,10 @@ class Renderer {
     private var voxelStpeSize = 0.00027195 // meter per voxel step
     private var voxelOrigin: Float3?
     
-    // ARFrame and CVPixelBuffer
-    private var currentARFrame: ARFrameModel?
-    private var currentCVPixelBuffer: CVPixelBuffer?
-    private var imageWidth: Int{
-        get{
-            guard let _buffer = currentCVPixelBuffer else {
-                return 0
-            }
-            return CVPixelBufferGetWidth(_buffer)
-        }
-    }
-    private var imageHeight: Int{
-        get{
-            guard let _buffer = currentCVPixelBuffer else {
-                return 0
-            }
-            return CVPixelBufferGetHeight(_buffer)
-        }
-    }
-    private var imagePixelCount: Int {imageWidth * imageHeight}
-    
     // Buffers
     private var voxelBuffer: MetalBuffer<Voxel>?
     private var voxelCopyBuffer: MetalBuffer<Voxel>?
-    private var imageVoxelBuffer: MetalBuffer<Voxel>?
+    private var previewVoxelBuffer: MetalBuffer<Voxel>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
     private var voxelInfoBuffer: MetalBuffer<VoxelInfo> // can be modified internally
     
@@ -135,19 +114,10 @@ class Renderer {
         }
     }
     
-    func prepareForShader(){
-        
-        checkPreviewBuffer()
-        checkVoxelBuffer()
-        
-        // Insert frame info
-        frameInfoBuffer.assign(makeDefaultFrameInfo(frame: nil, image: nil))
-    }
-    
     /**
     ### Convert captured image into 3D points clouds using transform from frame
      */
-    func unproject (frame: ARFrameModel, capturedImage: CVPixelBuffer){
+    func unproject (frame: ARFrameModel, image: CVPixelBuffer){
                 
         guard let _commandBuffer = commandQueue.makeCommandBuffer(),
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
@@ -159,12 +129,12 @@ class Renderer {
         // wait for Semaphore
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
         
-        // Update the current frame and buffer
-        currentARFrame = frame
-        currentCVPixelBuffer = capturedImage
-        
         // prepare for buffers and information for shader
-        prepareForShader()
+        checkPreviewBuffer(image: image)
+        checkVoxelBuffer()
+        
+        // Insert frame info
+        frameInfoBuffer.assign(makeDefaultFrameInfo(frame: frame, image: image))
         
         // MARK: debug info printing for unprojection
         var kvPairs = [String: Any]()
@@ -175,7 +145,7 @@ class Renderer {
         InfoViewController.shared?.frameInfoText = "\(Tools.pairsToString(items: kvPairs))"
         
         
-        imageTexture = makeTexture(fromPixelBuffer: capturedImage, pixelFormat: .bgra8Unorm, planeIndex: 0)!
+        imageTexture = makeTexture(fromPixelBuffer: image, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
         
         _commandBuffer.addCompletedHandler { [self] commandBuffer in
@@ -219,10 +189,10 @@ class Renderer {
             return
         }
         
-        if (checkNeedUpdate(buffer: imageVoxelBuffer, idealCount: image.pixelCount())){
-            imageVoxelBuffer = .init(device: device, count: image.pixelCount(), index: kImageVoxel.rawValue)
+        if (checkNeedUpdate(buffer: previewVoxelBuffer, idealCount: image.pixelCount())){
+            previewVoxelBuffer = .init(device: device, count: image.pixelCount(), index: kImageVoxel.rawValue)
             
-            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: imageVoxelBuffer!)
+            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: previewVoxelBuffer!)
             delegate?.renderer(self, imageGeometryUpdate: imageVoxelGeometry!)
             
             setARFrameAsReference(frame: frame)
@@ -250,7 +220,7 @@ class Renderer {
 
         
         _commandEncoder.setComputePipelineState(previewPipelineState)
-        _commandEncoder.setBuffer(imageVoxelBuffer!)
+        _commandEncoder.setBuffer(previewVoxelBuffer!)
         _commandEncoder.setBuffer(_previewFrameInfoBuffer)
         _commandEncoder.setBuffer(voxelInfoBuffer)
         _commandEncoder.setTexture(CVMetalTextureGetTexture(_imageTexture), index: Int(kPreviewTexture.rawValue))
@@ -405,22 +375,17 @@ private extension Renderer {
         return texture
     }
     
-    private func makeDefaultFrameInfo(frame: ARFrameModel?, image: CVPixelBuffer?) -> FrameInfo? {
-        
-        guard let _frame = (frame ?? currentARFrame),
-              let _image = (image ?? currentCVPixelBuffer) else {
-            return nil
-        }
+    private func makeDefaultFrameInfo(frame: ARFrameModel, image: CVPixelBuffer) -> FrameInfo? {
         
         // Insert frame info
         var frameInfo = FrameInfo()
-        let camera = _frame.camera
+        let camera = frame.camera
         frameInfo.cameraTransform = camera.transform
-        frameInfo.imageWidth = Int32(_image.width())
-        frameInfo.imageHeight = Int32(_image.height())
+        frameInfo.imageWidth = Int32(image.width())
+        frameInfo.imageHeight = Int32(image.height())
         frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
                                                              [0, 3677, 0],
-                                                             [Float(_image.width())/2.0, Float(_image.height())/2.0, 1]))
+                                                             [Float(image.width())/2.0, Float(image.height())/2.0, 1]))
         // transform that convert color to black and white
         frameInfo.colorSpaceTransform = simd_float4x4.init([0.333, 0.333, 0.333, 1],
                                                            [0.333, 0.333, 0.333, 1],
@@ -489,13 +454,13 @@ private extension Renderer {
         }
     }
     
-    func checkPreviewBuffer() {
-        if imageVoxelBuffer == nil || imageVoxelBuffer?.count != imagePixelCount{
-            imageVoxelBuffer = nil // dealloc
-            imageVoxelBuffer = .init(device: device, count: imagePixelCount, index: kImageVoxel.rawValue)
+    func checkPreviewBuffer(image: CVPixelBuffer) {
+        if previewVoxelBuffer == nil || previewVoxelBuffer?.count != image.pixelCount(){
+            previewVoxelBuffer = nil // dealloc
+            previewVoxelBuffer = .init(device: device, count: image.pixelCount(), index: kImageVoxel.rawValue)
             
             // update geometry
-            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: imageVoxelBuffer!)
+            self.imageVoxelGeometry = makeVoxelSCNGeometry(buffer: previewVoxelBuffer!)
             delegate?.renderer(self, imageGeometryUpdate: imageVoxelGeometry!)
         }
     }

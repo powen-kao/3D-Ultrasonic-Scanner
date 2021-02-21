@@ -289,7 +289,7 @@ extension ComposeController{
         guard let _frame = self.currentARFrame else{
             return
         }
-        renderer?.unproject(frame: _frame, capturedImage: frame.pixelBuffer)
+        renderer?.unproject(frame: _frame, image: frame.pixelBuffer)
     }
     
     func finished(_ probe: Probe) {
@@ -298,6 +298,8 @@ extension ComposeController{
     
     // MARK: ARPlayer delegate
     func player(_ player: ARPlayer, new frame: ARFrameModel) {
+        currentARFrame = frame
+        
         if (recorderState == .Recording){
             recorder.append(frame: frame)
         }
