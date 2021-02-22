@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RecorderMetaModel: Codable, Equatable {
+struct ARMetaModel: Codable, Equatable {
     var begin: TimeInterval = TimeInterval(0)
     var frameRate: Float = 0
     var duration: TimeInterval = 0// seconds

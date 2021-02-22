@@ -150,7 +150,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
                 }
                 // Setup probe
                 // TODO: use the fake probe now, but replace with real probe streamer in the future
-                self.probe = FakeProbe(file: _file)
+                self.probe = RecorderProbe(file: _file)
 
             case .Image:
                 guard let _file = folder?.appendingPathComponent("image.jpg") else {
@@ -187,7 +187,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             case .RealtimeAR:
                 arPlayer = RealtimeARPlayer(session: arSession)
             case .RecordedAR:
-                arPlayer = FakeARPlayer(folder: recordingURL)
+                arPlayer = RecordedARPlayer(folder: recordingURL)
                 break
         }
         

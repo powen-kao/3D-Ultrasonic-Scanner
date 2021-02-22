@@ -11,7 +11,7 @@ import ARKit
 import UIKit
 import os
 
-class ARRecorder: ARRecorderBase{
+class ARRecorder: NSObject{
     
     var dataSource: ARRecoderDataSource?
     var delegate: ARRecorderDelegate?
@@ -22,7 +22,7 @@ class ARRecorder: ARRecorderBase{
     private(set) var buffer = [ARFrameModel]()
     
     private var metaURL: URL?
-    private(set) var filemeta: RecorderMetaModel?
+    private(set) var filemeta: ARMetaModel?
     
     var bufferFullness: Float {
         return Float(buffer.count) / Float(defaultEstimateSize)
@@ -39,7 +39,7 @@ class ARRecorder: ARRecorderBase{
     
 
     func open(folder: URL, size: Int?){
-        filemeta = RecorderMetaModel(begin: Date().timeIntervalSince1970)
+        filemeta = ARMetaModel(begin: Date().timeIntervalSince1970)
         filemeta?.frameRate = 60 // default replay framerate
         
         // create folder if doesn't exist

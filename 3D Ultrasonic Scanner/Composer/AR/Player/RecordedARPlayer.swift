@@ -10,7 +10,7 @@ import CoreMedia
 import ARKit
 import os
 
-class FakeARPlayer: ARPlayer, DisplayLinkable {
+class RecordedARPlayer: ARPlayer, DisplayLinkable {
         
     private(set) var displayLink: CADisplayLink?
     private(set) var framerate: Float = 60
@@ -19,7 +19,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
     private(set) var buffer = [ARFrameModel]()
     
     private var metaURL: URL?
-    private(set) var filemeta: RecorderMetaModel?
+    private(set) var filemeta: ARMetaModel?
     
     private let decoder = JSONDecoder()
     
@@ -36,7 +36,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
         let _data: Data
         do {
             _data = try Data(contentsOf: fileURL!)
-            filemeta = try? decoder.decode(RecorderMetaModel.self, from: try Data(contentsOf: metaURL!))
+            filemeta = try? decoder.decode(ARMetaModel.self, from: try Data(contentsOf: metaURL!))
         } catch {
             print(error)
             return false

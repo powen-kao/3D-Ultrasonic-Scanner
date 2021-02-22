@@ -11,7 +11,7 @@ import AVFoundation
 import OSLog
 
 /// Fake probe tha stream from a file instead of real-time video from scanner
-class FakeProbe: Probe, AVPlayerItemOutputPullDelegate{
+class RecorderProbe: Probe, AVPlayerItemOutputPullDelegate{
     
     // Assets
     private(set) var asset: AVAsset?
