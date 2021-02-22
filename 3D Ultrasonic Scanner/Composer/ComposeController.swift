@@ -128,7 +128,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // Open recording file
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
-//        recorderState = .Ready
 
     }
     
@@ -368,7 +367,6 @@ extension ComposeController{
 }
 
 @objc enum ARRecorderState: Int {
-//    case Init
     case Ready
     case Recording
     case Busy // writing or reading files

@@ -223,11 +223,6 @@ extension ViewController{
                 })
             )
         }
-//        alertController.addAction(
-//            UIAlertAction(title: "Replay", style: .default, handler: {_ in
-//                self.composer?.replay()
-//            })
-//        )
         alertController.addAction(
             UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         )
