@@ -90,12 +90,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     init(arSession: ARSession, scnView: SCNView) {
         self.arSession = arSession
         self.scnView = scnView
-        self.recordingURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Recordings") // default file path
+        self.recordingURL = GS.shared.sourceFolder
         super.init()
-        
-//        switchARSource(source: arSource)
-//        switchProbeSource(source: probeSource, folder: nil)
         
         // Get default device
         guard let _device = MTLCreateSystemDefaultDevice() else {
@@ -359,14 +355,14 @@ extension ComposeController{
     }
 }
 
-enum ProbeSource: Int {
+@objc enum ProbeSource: Int {
     // keep the same order as in storyboard
     case Streaming
     case Video
     case Image
 }
 
-enum ARSource: Int {
+@objc enum ARSource: Int {
     case RealtimeAR
     case RecordedAR
 }

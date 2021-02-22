@@ -9,56 +9,41 @@ import Foundation
 import UIKit
 
 class SettingViewController: UITableViewController, UIDocumentPickerDelegate {
-    
-    var delegate: SettingDelegate?
+        
+    var selectedFolder: URL?
+    let setting = GS.shared
     
     @IBOutlet weak var probeSourceSegment: UISegmentedControl!
     @IBOutlet weak var arSourceSegment: UISegmentedControl!
-    
-    var currentProbeSource: ProbeSource{
-        ProbeSource.init(rawValue: probeSourceSegment.selectedSegmentIndex)!
-    }
-
-    var currentARSource: ARSource{
-        ARSource.init(rawValue: arSourceSegment.selectedSegmentIndex)!
-    }
 
     override func viewDidLoad() {
-    
+        updateUI()
     }
     
     @IBAction func arSourceChanged(_ sender: Any) {
-        delegate?.arSourceChanged(source: currentARSource)
-//        switch currentARSource {
-//        case .RealtimeAR: break
-//        case .RecordedAR: break
-//        }
+        setting.arSource = ARSource.init(rawValue: arSourceSegment.selectedSegmentIndex)!
     }
     
-    @IBAction func sourceChanged(_ sender: Any) {
-        switch currentProbeSource {
+    @IBAction func probeSourceChanged(_ sender: Any) {
+        setting.probeSource = ProbeSource.init(rawValue: probeSourceSegment.selectedSegmentIndex)!
+        switch setting.probeSource {
             case .Video, .Image:
                 let folderPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
                 folderPicker.delegate = self
                 present(folderPicker, animated: true, completion: nil)
-                
-                // call delegate on folder selected
-                
                 break
-            
             case .Streaming:
-                delegate?.probeSourceChanged(source: currentProbeSource, folder: nil)
+                selectedFolder = nil
                 break
         }
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        delegate?.probeSourceChanged(source: currentProbeSource, folder: urls[0])
+        selectedFolder = urls[0]
     }
-}
-
-
-protocol SettingDelegate {
-    func probeSourceChanged(source: ProbeSource, folder: URL?)
-    func arSourceChanged(source: ARSource)
+    
+    private func updateUI() {
+        probeSourceSegment.selectedSegmentIndex = setting.probeSource.rawValue
+        arSourceSegment.selectedSegmentIndex = setting.arSource.rawValue
+    }
 }

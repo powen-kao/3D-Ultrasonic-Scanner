@@ -11,7 +11,7 @@ import ARKit
 import MetalKit
 import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
@@ -24,6 +24,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     // Scene Objects
     private var probeNode: SCNNode?
+    
+    var observers: [Any?]?
+
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,6 +55,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
         // Set the scene to the view
         sceneView.scene = scene
+        
+        // Add observer
+        self.addObservers()
 
     }
     
@@ -63,17 +69,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
         // Run the view's session
         sceneView.session.run(configuration)
-        
 
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "sInfo"{
 //            let dst = segue.destination as! InfoViewController
-        }
-        if segue.identifier == "sSetting"{
-            let dst = segue.destination as! SettingViewController
-            dst.delegate = self
         }
     }
     
@@ -194,17 +195,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
     }
     
-    // MARK: - Setting Delegate
-    func probeSourceChanged(source: ProbeSource, folder: URL?) {
-        composer?.switchProbeSource(source: source, folder: folder)
-        composer?.startCompose()
-    }
-    func arSourceChanged(source: ARSource) {
-        composer?.switchARSource(source: source)
-        composer?.startCompose()
-    }
-    
-    
 }
 
 extension ViewController{
@@ -241,5 +231,39 @@ extension ViewController{
         alertController.addAction(
             UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         )
+    }
+    
+    
+    // MARK: Observers
+    private func addObservers() {
+        
+        let _setting = GS.shared
+        
+        let probeSourceObserver = _setting.observe(\.probeSource, changeHandler: { [self] setting, value in
+            if setting.probeSource == .Streaming{
+                // other source needs to wait for folder information
+                composer?.switchProbeSource(source: setting.probeSource, folder: nil)
+                composer?.startCompose()
+            }
+        })
+        
+        let sourceObserver = _setting.observe(\.sourceFolder, changeHandler: { [self] setting, value in
+            composer?.recordingURL = setting.sourceFolder
+            switch setting.probeSource {
+                case .Image, .Video:
+                        composer?.switchProbeSource(source: setting.probeSource, folder: setting.sourceFolder)
+                        composer?.startCompose()
+                    break
+                default: break
+            }
+        })
+        
+        let arSourceObserver = _setting.observe(\.arSource, changeHandler: { [self] setting, value in
+            // other source needs to wait for folder information
+            composer?.switchARSource(source: setting.arSource)
+            composer?.startCompose()
+        })
+        
+        observers = [probeSourceObserver, sourceObserver, arSourceObserver]
     }
 }

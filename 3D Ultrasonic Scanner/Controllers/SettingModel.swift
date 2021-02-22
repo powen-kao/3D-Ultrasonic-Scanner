@@ -8,53 +8,70 @@
 import Foundation
 import UIKit
 
-//
-//class GlobalSetting {
-//    static let shared = GlobalSetting()
-//    
-//    var settings: [Setting: SettingContext] = [
-//        .UseFakeProbe: CheckSettingContext(title: "Use Fake Probe", subtitle: "Read from file instead of streaming from probe", identifier: .CheckRowType, checked: true),
-//        .FakeProbeFile: ActionSettingContext(enabled: true, title: "Import", subtitle: "Select the file to use as fake source", identifier: .CheckRowType, function:{ sender ,tableview, indexPath in
-//    }, image: UIImage(systemName: "folder.circle.fill")!)
-//    ]
-//    
-//}
-//
-//
-//enum Setting: Int {
-//    case UseFakeProbe
-//    case FakeProbeFile
-//}
-//
-//
-//struct CheckSettingContext: SettingContext {
-//    var enabled: Bool = true
-//    var title: String
-//    var subtitle: String
-//    var identifier: Identifier
-//    
-//    // checked
-//    var checked: Bool = false
-//}
-//
-//struct ActionSettingContext: SettingContext {
-//    var enabled: Bool = true
-//    var title: String
-//    var subtitle: String
-//    var identifier: Identifier
-//    
-//    
-//    // actions
-//    var function: (_ sender: SettingViewController ,_ tableView: UITableView, _ indexPath: IndexPath) -> Void
-//    var image: UIImage
-//}
-//
-//
-//protocol SettingContext{
-//    var title: String { get }
-//    var subtitle: String { get }
-//    var identifier: Identifier { get }
-//    var enabled: Bool {set get}
-//    
-//    typealias Identifier = SettingViewController.Identifier
-//}
+
+public enum Setting: String {
+    case ProbeSorceKey
+    case ARSourceKey
+    case SourceFolderKey
+}
+
+
+/// Global setting
+class GS: NSObject {
+    static let shared = GS()
+    
+    @objc dynamic
+    var probeSource: ProbeSource{
+        get{
+            getValue(for: .ProbeSorceKey)
+        }
+        set{
+            setValue(value: newValue.rawValue , for: .ProbeSorceKey)
+        }
+    }
+    
+    @objc dynamic
+    var arSource: ARSource{
+        get{
+            getValue(for: .ARSourceKey)
+        }
+        set{
+            setValue(value: newValue.rawValue , for: .ARSourceKey)
+        }
+    }
+    
+    @objc dynamic
+    var sourceFolder: URL{
+        get {
+            getUrl(for: .SourceFolderKey)! // TODO: consider the case that default folder is not given
+        }
+        set{
+            setUrl(url: newValue, for: .SourceFolderKey)
+        }
+    }
+    
+    override init() {
+        UserDefaults.standard.register(defaults: [Setting.ProbeSorceKey.rawValue: ProbeSource.Streaming.rawValue,
+                                                  Setting.ARSourceKey.rawValue: ARSource.RealtimeAR.rawValue, Setting.SourceFolderKey.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                                                    .appendingPathComponent("Recordings") // default file path
+                                                ])
+    }
+    
+
+    
+    func getValue<T: RawRepresentable>(for key: Setting) -> T {
+        T.init(rawValue: UserDefaults.standard.value(forKey: key.rawValue) as! T.RawValue)!
+    }
+    func setValue(value: Any, for key: Setting) {
+        UserDefaults.standard.setValue(value, forKey: key.rawValue)
+    }
+    
+    func getUrl(for key: Setting) -> URL? {
+        UserDefaults.standard.url(forKey: key.rawValue) ?? nil
+    }
+    func setUrl(url: URL?, for key: Setting) {
+        UserDefaults.standard.set(url, forKey: key.rawValue)
+    }
+    
+}
+
