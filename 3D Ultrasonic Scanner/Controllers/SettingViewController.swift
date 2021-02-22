@@ -15,7 +15,8 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate {
     
     @IBOutlet weak var probeSourceSegment: UISegmentedControl!
     @IBOutlet weak var arSourceSegment: UISegmentedControl!
-
+    @IBOutlet weak var folderPathLabel: UILabel!
+    
     override func viewDidLoad() {
         updateUI()
     }
@@ -26,24 +27,21 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate {
     
     @IBAction func probeSourceChanged(_ sender: Any) {
         setting.probeSource = ProbeSource.init(rawValue: probeSourceSegment.selectedSegmentIndex)!
-        switch setting.probeSource {
-            case .Video, .Image:
-                let folderPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
-                folderPicker.delegate = self
-                present(folderPicker, animated: true, completion: nil)
-                break
-            case .Streaming:
-                selectedFolder = nil
-                break
-        }
+    }
+    @IBAction func selectFolder(_ sender: Any) {
+        let folderPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
+        folderPicker.delegate = self
+        present(folderPicker, animated: true, completion: nil)
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        selectedFolder = urls[0]
+        setting.sourceFolder = urls[0]
+        updateUI()
     }
     
     private func updateUI() {
         probeSourceSegment.selectedSegmentIndex = setting.probeSource.rawValue
         arSourceSegment.selectedSegmentIndex = setting.arSource.rawValue
+        folderPathLabel.text = setting.sourceFolder.absoluteString
     }
 }

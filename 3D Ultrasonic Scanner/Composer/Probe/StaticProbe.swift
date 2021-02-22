@@ -15,15 +15,17 @@ class StaticProbe: Probe {
     private(set) var file: URL?
     private var image: UIImage?
     private var pixelBuffer: CVPixelBuffer?
-
-    init(file: URL) {
+    
+    init?(file: URL) {
         self.file = file
+
         super.init()
 
         guard let _data = try? Data(contentsOf: file) else {
             os_log("[File not found] \(file)")
-            return
+            return nil
         }
+        self.isFileBased = true
         self.image = UIImage(data: _data)
         self.pixelBuffer = self.image?.toCVPixelBuffer()
     }

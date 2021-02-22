@@ -27,7 +27,16 @@ class RecordedARPlayer: ARPlayer, DisplayLinkable {
     private var startTime: CFTimeInterval?
     private var lastIndex: Int = -1
     
-    init(folder: URL) {
+    init? (folder: URL) {
+        // TODO: check why folder check failed
+//        guard FileManager.default.fileExists(atPath: folder.absoluteString) else {
+//            os_log(.debug, "folder \(folder) doesn't exist")
+//            return nil
+//        }
+        super.init()
+        
+        self.isFileBased = true
+        
         self.fileURL = RecordFiles.getURL(at: folder, with: .ARFrameData)
         self.metaURL = RecordFiles.getURL(at: folder, with: .RecorderMeta)
     }

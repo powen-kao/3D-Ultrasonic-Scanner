@@ -21,6 +21,7 @@ class Probe: NSObject, ProbeInterface, DisplayLinkableProbe{
                  kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA]
     
     var delegate: ProbeDelegate? = nil
+    var isFileBased: Bool = false // need to be explictly assigned when subclassing
 
         
     func open() -> Bool{
@@ -61,6 +62,8 @@ extension Probe{
 protocol ProbeInterface {
 
     var delegate: ProbeDelegate? { get set }
+    
+    var isFileBased: Bool { get }
     
     func open() -> Bool
     func close()

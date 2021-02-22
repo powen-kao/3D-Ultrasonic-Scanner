@@ -126,39 +126,40 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         cameraNode?.constraints = [SCNLookAtConstraint(target: voxelNode)]
         
         // Open recording file
-        recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
 
     }
     
     /// Switch between different source. The folder parameter is only used in Static and Recording source
-    func switchProbeSource(source: ProbeSource, folder: URL?){
+    func switchProbeSource(source: ProbeSource){
         self.probeSource = source
+        
+        guard let _path = URL(string: recordingURL.absoluteString) else {
+            os_log(.debug, "Probe load failed due to invalid path")
+            return
+        }
 
         composeState = .Idle
         
         switch source {
             case .Video:
-                guard let _file = folder?.appendingPathComponent("video.mov") else {
-                    os_log(.debug, "Recording Probe load failed due to invalid path")
-                    return
-                }
                 // Setup probe
                 // TODO: use the fake probe now, but replace with real probe streamer in the future
-                self.probe = RecorderProbe(file: _file)
+                self.probe = RecorderProbe(file: _path.appendingPathComponent("video.mov"))
 
             case .Image:
-                guard let _file = folder?.appendingPathComponent("image.jpg") else {
-                    os_log(.debug, "Static Probe load failed due to invalid path")
-                    return
-                }
-                self.probe = StaticProbe(file: _file)
+                self.probe = StaticProbe(file: _path.appendingPathComponent("image.jpg"))
 
                 break
             case .Streaming:
                 // TODO: implement real-time streaming
                 self.probe = StreamingProbe()
                 break
+        }
+        
+        guard self.probe != nil else {
+            os_log(.debug, "Probe init failed")
+            return
         }
         
         os_log(.info, "Probe loaded from source : \(String(reflecting: source))")
@@ -184,6 +185,10 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             case .RecordedAR:
                 arPlayer = RecordedARPlayer(folder: recordingURL)
                 break
+        }
+        guard arPlayer != nil else {
+            os_log("AR player init failed")
+            return
         }
         
         guard arPlayer!.open() else {
@@ -228,10 +233,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     }
     
     func stopCompose() {
-        probe?.stop()
-        arPlayer?.stop()
-        clear()
-        
         composeState = .Idle
     }
 }
@@ -252,6 +253,14 @@ extension ComposeController{
     private func recorderURLChangedHandler() {
         // Open file for recorder
         recorder.open(folder: recordingURL, size: nil)
+        
+        if probe != nil && probe!.isFileBased {
+            switchProbeSource(source: probeSource)
+        }
+
+        if arPlayer != nil && arPlayer!.isFileBased{
+            switchARSource(source: arSource)
+        }
     }
     
     // public functions

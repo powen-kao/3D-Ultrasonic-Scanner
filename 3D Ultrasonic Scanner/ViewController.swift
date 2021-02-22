@@ -235,30 +235,19 @@ extension ViewController{
         let _setting = GS.shared
         
         let probeSourceObserver = _setting.observe(\.probeSource, changeHandler: { [self] setting, value in
-            if setting.probeSource == .Streaming{
-                // other source needs to wait for folder information
-                composer?.switchProbeSource(source: setting.probeSource, folder: nil)
-                composer?.startCompose()
-            }
-        })
-        
-        let sourceObserver = _setting.observe(\.sourceFolder, changeHandler: { [self] setting, value in
-            composer?.recordingURL = setting.sourceFolder
-            switch setting.probeSource {
-                case .Image, .Video:
-                        composer?.switchProbeSource(source: setting.probeSource, folder: setting.sourceFolder)
-                        composer?.startCompose()
-                    break
-                default: break
-            }
+            composer?.switchProbeSource(source: setting.probeSource)
+            composer?.startCompose()
         })
         
         let arSourceObserver = _setting.observe(\.arSource, changeHandler: { [self] setting, value in
-            // other source needs to wait for folder information
             composer?.switchARSource(source: setting.arSource)
             composer?.startCompose()
         })
         
-        observers = [probeSourceObserver, sourceObserver, arSourceObserver]
+        let sourceFolderObserver = _setting.observe(\.sourceFolder, changeHandler: { [self] setting, value in
+            composer?.recordingURL = setting.sourceFolder
+        })
+        
+        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver]
     }
 }

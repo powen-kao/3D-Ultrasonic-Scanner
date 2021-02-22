@@ -31,10 +31,17 @@ class RecorderProbe: Probe, AVPlayerItemOutputPullDelegate{
         }
     }
     
-    init(file: URL) {
+    init? (file: URL) {
         self.file = file
         self.asset = AVAsset(url: file)
         super.init()
+        
+        guard asset!.isReadable else {
+            return nil
+        }
+        
+        self.isFileBased = true
+
         
         // extract video information
         let videoTrack = self.asset?.tracks(withMediaType: .video)[0]

@@ -7,9 +7,10 @@
 
 import Foundation
 import ARKit
-class ARPlayer: NSObject ,ARPLayerInterface {
+class ARPlayer: NSObject ,ARPlayerInterface {
     
     var delegate: ARPlayerDelegate?
+    var isFileBased: Bool = false // need to be explictly assigned when subclassing
 
     func open() -> Bool{
         return false
@@ -28,7 +29,9 @@ class ARPlayer: NSObject ,ARPLayerInterface {
     
 }
 
-protocol ARPLayerInterface {
+protocol ARPlayerInterface {
+    
+    var isFileBased: Bool { get }
     
     func open() -> Bool
     func start()
