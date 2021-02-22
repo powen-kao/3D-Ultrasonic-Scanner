@@ -26,6 +26,11 @@ typedef enum State{
     kVReady
 } VoxelInfoState;
 
+typedef enum Mode{
+    kPD_DrawAll,
+    kPD_TransparentBlack
+} PreviewDrawMode;
+
 struct FrameInfo {
     // 'u' represent 'ultrasound'
     matrix_float4x4 viewProjectionMatrix;
@@ -37,6 +42,8 @@ struct FrameInfo {
     matrix_float4x4 colorSpaceTransform;
     matrix_float4x4 flipY;
     
+    // Draw info
+    PreviewDrawMode mode;
 
     simd_float2 cameraResolution;
     int imageWidth;

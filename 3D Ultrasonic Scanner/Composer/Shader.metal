@@ -133,6 +133,16 @@ kernel void renderPreview(uint2 grid_pos [[thread_position_in_grid]],
     
     float4 color = uImageTexture.sample(colorSampler, float2(float(grid_pos.x)/fInfo.imageWidth, float(grid_pos.y)/fInfo.imageHeight));
     
+    switch (fInfo.mode){
+        case kPD_DrawAll:
+            break;
+        case kPD_TransparentBlack:
+            if (dot(color, float4(1, 1, 1, 0)) == 0){
+                color.a = 0;
+            }
+            break;
+    }
+    
     // convert image pixel into image voxel
     imgVoxel[vertexID].position = localPosition.xyz;
     imgVoxel[vertexID].color = color;

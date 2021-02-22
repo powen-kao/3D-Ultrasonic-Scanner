@@ -182,7 +182,7 @@ class Renderer {
     }
     
     /// Render image preview
-    func renderPreview(frame: ARFrameModel, image: CVPixelBuffer){
+    func renderPreview(frame: ARFrameModel, image: CVPixelBuffer, mode: PreviewDrawMode){
         
         guard let _commandBuffer = commandQueue.makeCommandBuffer(),
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
@@ -201,9 +201,9 @@ class Renderer {
         // create FrameInfoBuffer from real-time AR frame (preview)
         let _previewFrameInfoBuffer = MetalBuffer<FrameInfo>.init(device: device, count: 1, index: kPreviewFrameInfo.rawValue)
     
-        
         // create infomation for shader
-        let _frameInfo = makeDefaultFrameInfo(frame: frame, image: image)!
+        var _frameInfo = makeDefaultFrameInfo(frame: frame, image: image)!
+        _frameInfo.mode = mode
         _previewFrameInfoBuffer.assign(_frameInfo)
         
         let _imageTexture = makeTexture(fromPixelBuffer: image, pixelFormat: .bgra8Unorm, planeIndex: 0)!

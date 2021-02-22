@@ -333,7 +333,11 @@ extension ComposeController{
                 restOrigin()
                 composeState = .Ready
             case .Ready:
-                renderer?.renderPreview(frame: frame, image: _pixelBuffer)
+                if probeSource == .Streaming {
+                    renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_TransparentBlack)
+                } else{
+                    renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_DrawAll)
+                }
             default: break
         }
     }
