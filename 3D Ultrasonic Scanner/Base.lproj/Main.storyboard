@@ -32,6 +32,11 @@
                                                     <action selector="compose:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
                                                 </connections>
                                             </barButtonItem>
+                                            <barButtonItem title="Item" image="record.circle" catalog="system" id="ee1-a6-zVJ">
+                                                <connections>
+                                                    <action selector="record:" destination="BV1-FR-VrT" id="Uor-5n-zqX"/>
+                                                </connections>
+                                            </barButtonItem>
                                             <barButtonItem title="Item" image="gearshape.fill" catalog="system" id="Ovb-Zg-oFW" userLabel="Setting">
                                                 <connections>
                                                     <segue destination="bov-0D-poQ" kind="popoverPresentation" identifier="sSetting" popoverAnchorBarButtonItem="Ovb-Zg-oFW" id="tpM-Xd-w2D">
@@ -112,6 +117,7 @@
                     <tabBarItem key="tabBarItem" title="Item" id="YwM-KR-5Xs"/>
                     <connections>
                         <outlet property="composeButton" destination="mgB-iB-cG2" id="nNA-we-te2"/>
+                        <outlet property="recordButton" destination="ee1-a6-zVJ" id="5F8-cK-1CJ"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                         <outlet property="scnView" destination="86V-wZ-on6" id="DY8-KI-Q0i"/>
                     </connections>
@@ -342,6 +348,7 @@
     <resources>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="play.fill" catalog="system" width="116" height="128"/>
+        <image name="record.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

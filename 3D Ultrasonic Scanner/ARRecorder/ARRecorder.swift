@@ -9,6 +9,7 @@
 import Foundation
 import ARKit
 import UIKit
+import os
 
 class ARRecorder: ARRecorderBase{
     
@@ -85,6 +86,8 @@ class ARRecorder: ARRecorderBase{
     func save(completeHandler: SaveCompleteHandler?) {
         
         guard buffer.count > 0 else {
+            completeHandler?(self, false)
+            os_log(.debug, "nothing to save in ARRecorder")
             return // nothing to save
         }
         
@@ -108,10 +111,12 @@ class ARRecorder: ARRecorderBase{
                 completeHandler?(self, false)
                 print(error)
             }
-            completeHandler?(self, true)
+            
+            DispatchQueue.main.async {
+                completeHandler?(self, true)
+            }
         }
     }
-    
 }
 
 extension ARRecorder{

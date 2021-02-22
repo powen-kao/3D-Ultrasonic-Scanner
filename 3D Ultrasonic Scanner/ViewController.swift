@@ -16,11 +16,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
     @IBOutlet weak var composeButton: UIBarButtonItem!
+    @IBOutlet weak var recordButton: UIBarButtonItem!
     
     // Controllers
     private var alertController: UIAlertController?
     private var composer: ComposeController?
-    private var composerInfo: ComposerInfoProvider?
     
     // Scene Objects
     private var probeNode: SCNNode?
@@ -49,8 +49,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         // Create composer
         self.composer = ComposeController(arSession: sceneView.session, scnView: scnView)
         self.composer?.delegate = self
-        self.composerInfo = composer
-                
 
         // Set the scene to the view
         sceneView.scene = scene
@@ -86,6 +84,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         sceneView.session.pause()
         
     }
+
     @IBAction func action(_ sender: Any) {
         let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
         makeAlertActions(alertController: alertSheet)
@@ -106,10 +105,22 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     }
     @IBAction func compose(_ sender: Any) {
         switch composer?.composeState {
-        case .Ready:
+        case .Idle:
             composer?.startCompose()
         default:
             composer?.stopCompose()
+        }
+    }
+    
+    @IBAction func record(_ sender: Any) {
+        switch composer?.recorderState {
+        case .Ready:
+            composer?.startRecording()
+            break
+        case .Recording:
+            composer?.stopRecording()
+            break
+        default: break
         }
     }
     
@@ -162,23 +173,35 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     func composer(_ composer: ComposeController, stateChanged: ComposeState) {
         switch stateChanged {
-            case .Composing:
+            case .Ready:
                 composeButton.image = UIImage(systemName: "stop.fill")
                 break
-            case .Ready:
+            case .Idle:
                 composeButton.image = UIImage(systemName: "play.fill")
                 break
             default: break
         }
     }
     
+    func recordingState(_ composer: ComposeController, changeTo state: ARRecorderState) {
+        switch state {
+        case .Ready:
+            recordButton.image = UIImage(systemName: "record.circle")
+            break
+        default:
+            recordButton.image = UIImage(systemName: "stop.circle")
+            break
+        }
+    }
     
     // MARK: - Setting Delegate
     func probeSourceChanged(source: ProbeSource, folder: URL?) {
         composer?.switchProbeSource(source: source, folder: folder)
+        composer?.startCompose()
     }
     func arSourceChanged(source: ARSource) {
         composer?.switchARSource(source: source)
+        composer?.startCompose()
     }
     
     

@@ -25,15 +25,18 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     var delegate: ComposerDelegate?
     private(set) var probeSource: ProbeSource = .Streaming // TODO: read from setting
     private(set) var arSource: ARSource = .RealtimeAR
-    private(set) var composeState: ComposeState = .Ready {
+    private(set) var composeState: ComposeState = .Idle {
+        willSet (newState){
+            if composeState != newState {
+                delegate?.composer?(self, stateChanged: newState)
+            }
+        }
         didSet{
-            if composeState == .Ready{
+            if composeState == .Idle {
                 self.arPlayer?.stop()
                 self.probe?.stop()
-                self.currentARFrame = nil
-                self.currentPixelBuffer = nil
+                clear()
             }
-            delegate?.composer?(self, stateChanged: composeState)
         }
     }
 
@@ -42,7 +45,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     // Data sources
     private let arSession: ARSession
     private(set) var probe: Probe?
-    private var imagePixelBuffer: CVPixelBuffer?
     
     // device
     private var device: MTLDevice?
@@ -62,10 +64,18 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     private var viewportSize = CGSize()
     private let voxelNode = SCNNode()
     private let imageVoxelNode = SCNNode()
+
     
     // Recorder and Player
     internal let recorder: ARRecorder = ARRecorder()
-    internal var recorderState: ARRecorderState = .Init
+    internal var recorderState: ARRecorderState = .Ready {
+        willSet(newState){
+            if newState != recorderState{
+                delegate?.recordingState?(self, changeTo: newState)
+            }
+        }
+    }
+
     var recordingURL: URL{
         didSet{
             recorderURLChangedHandler()
@@ -84,8 +94,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             .appendingPathComponent("Recordings") // default file path
         super.init()
         
-        switchARSource(source: arSource)
-        switchProbeSource(source: probeSource, folder: nil)
+//        switchARSource(source: arSource)
+//        switchProbeSource(source: probeSource, folder: nil)
         
         // Get default device
         guard let _device = MTLCreateSystemDefaultDevice() else {
@@ -102,6 +112,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         captureScope?.label = String.init(describing: self)
 
         // Rest of the settings
+        
         
         // Set delegate
         renderer?.delegate = self
@@ -121,29 +132,15 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // Open recording file
         recorder.open(folder: recordingURL, size: nil)
         recorder.delegate = self
-        recorderState = .Ready
+//        recorderState = .Ready
 
     }
-    
-    func startRecording() {
-        recorderState = .Recording
-    }
-    
-    func stopRecording() {
-        recorderState = .Busy
-        recorder.save { [self] (recorder, success) in
-            print("[Save success: \(success)] \(recorder)")
-            recorder.clear()
-            recorderState = .Ready
-        }
-    }
-    
     
     /// Switch between different source. The folder parameter is only used in Static and Recording source
     func switchProbeSource(source: ProbeSource, folder: URL?){
         self.probeSource = source
 
-        composeState = .Ready
+        composeState = .Idle
         
         switch source {
             case .Video:
@@ -165,7 +162,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
                 break
             case .Streaming:
                 // TODO: implement real-time streaming
-                return
+                self.probe = StreamingProbe()
+                break
         }
         
         os_log(.info, "Probe loaded from source : \(String(reflecting: source))")
@@ -183,7 +181,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     func switchARSource(source: ARSource) {
         arSource = source
         
-        composeState = .Ready
+        composeState = .Idle
         
         switch source {
             case .RealtimeAR:
@@ -211,6 +209,22 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         // TODO: save file
     }
     
+    
+    func startRecording() {
+//        arPlayer?.start()
+        recorderState = .Recording
+    }
+    
+    func stopRecording() {
+//        arPlayer?.stop()
+        recorderState = .Busy
+        recorder.save { [self] (recorder, success) in
+            print("[Save success: \(success)] \(recorder)")
+            recorder.clear()
+            recorderState = .Ready
+        }
+    }
+    
     func startCompose(){
         probe?.start()
         arPlayer?.start()
@@ -221,8 +235,9 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     func stopCompose() {
         probe?.stop()
         arPlayer?.stop()
+        clear()
         
-        composeState = .Ready
+        composeState = .Idle
     }
 }
 
@@ -239,7 +254,7 @@ extension ARFrame: Comparable{
 
 extension ComposeController{
     
-    func recorderURLChangedHandler() {
+    private func recorderURLChangedHandler() {
         // Open file for recorder
         recorder.open(folder: recordingURL, size: nil)
     }
@@ -292,13 +307,13 @@ extension ComposeController{
             return
         }
         
-        if (composeState == .Composing){
+        if (composeState == .Ready){
             renderer?.unproject(frame: _frame, image: frame.pixelBuffer)
         }
     }
     
     func finished(_ probe: Probe) {
-        composeState = .Ready
+        composeState = .Idle
     }
     
     // MARK: ARPlayer delegate
@@ -316,21 +331,27 @@ extension ComposeController{
         switch composeState {
             case .WaitForFirstFrame:
                 restOrigin()
-                composeState = .Composing
-            case .Composing:
+                composeState = .Ready
+            case .Ready:
                 renderer?.renderPreview(frame: frame, image: _pixelBuffer)
             default: break
         }
     }
     
     func finished(_ player: ARPlayer) {
-        composeState = .Ready
+        composeState = .Idle
     }
     
     // MARK: Recorder delegate
     func recorder(_ recorder: ARRecorder, fullness: Float) {
         // TODO: remove later
         InfoViewController.shared?.progressBar.progress = fullness;
+    }
+    
+    private func clear(){
+        // TODO: flush images in buffer
+        self.currentARFrame = nil
+        self.currentPixelBuffer = nil
     }
 }
 
@@ -346,17 +367,17 @@ enum ARSource: Int {
     case RecordedAR
 }
 
-enum ARRecorderState {
-    case Init
+@objc enum ARRecorderState: Int {
+//    case Init
     case Ready
     case Recording
     case Busy // writing or reading files
 }
 
 @objc enum ComposeState: Int {
-    case Ready
+    case Idle
     case WaitForFirstFrame  // waiting for first frame to take as reference frame
-    case Composing
+    case Ready
     case HoleFilling
 }
 
@@ -364,6 +385,7 @@ enum ARRecorderState {
 @objc protocol ComposerDelegate {
     @objc optional func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame)
     @objc optional func composer(_ composer: ComposeController, stateChanged: ComposeState)
+    @objc optional func recordingState(_ composer: ComposeController, changeTo state: ARRecorderState)
 }
 
 protocol ComposerObserver{
