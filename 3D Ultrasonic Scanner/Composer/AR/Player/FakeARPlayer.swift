@@ -19,7 +19,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
     private(set) var buffer = [ARFrameModel]()
     
     private var metaURL: URL?
-    private(set) var filemeta: RecorderMeta?
+    private(set) var filemeta: RecorderMetaModel?
     
     private let decoder = JSONDecoder()
     
@@ -36,7 +36,7 @@ class FakeARPlayer: ARPlayer, DisplayLinkable {
         let _data: Data
         do {
             _data = try Data(contentsOf: fileURL!)
-            filemeta = try? decoder.decode(RecorderMeta.self, from: try Data(contentsOf: metaURL!))
+            filemeta = try? decoder.decode(RecorderMetaModel.self, from: try Data(contentsOf: metaURL!))
         } catch {
             print(error)
             return false

@@ -23,7 +23,7 @@ class ARReplayTest: XCTestCase {
                                  [12, 13, 14, 55])
     
     
-    let metaFile = RecorderMeta(begin: Date().timeIntervalSince1970, frameRate: 60, duration: TimeInterval(10))
+    let metaFile = RecorderMetaModel(begin: Date().timeIntervalSince1970, frameRate: 60, duration: TimeInterval(10))
     
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

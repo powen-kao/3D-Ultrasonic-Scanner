@@ -22,7 +22,7 @@ class ARRecorder: ARRecorderBase{
     private(set) var buffer = [ARFrameModel]()
     
     private var metaURL: URL?
-    private(set) var filemeta: RecorderMeta?
+    private(set) var filemeta: RecorderMetaModel?
     
     var bufferFullness: Float {
         return Float(buffer.count) / Float(defaultEstimateSize)
@@ -39,7 +39,7 @@ class ARRecorder: ARRecorderBase{
     
 
     func open(folder: URL, size: Int?){
-        filemeta = RecorderMeta(begin: Date().timeIntervalSince1970)
+        filemeta = RecorderMetaModel(begin: Date().timeIntervalSince1970)
         filemeta?.frameRate = 60 // default replay framerate
         
         // create folder if doesn't exist
