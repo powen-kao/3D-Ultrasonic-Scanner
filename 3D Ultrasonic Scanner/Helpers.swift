@@ -6,6 +6,7 @@ General Helper methods and properties
 */
 
 import ARKit
+import NIO
 
 typealias Float2 = SIMD2<Float>
 typealias Float3 = SIMD3<Float>

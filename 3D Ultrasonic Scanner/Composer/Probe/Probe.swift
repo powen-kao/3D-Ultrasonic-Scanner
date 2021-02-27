@@ -22,7 +22,6 @@ class Probe: NSObject, ProbeInterface, DisplayLinkableProbe{
     
     var delegate: ProbeDelegate? = nil
     var isFileBased: Bool = false // need to be explictly assigned when subclassing
-
         
     func open() -> Bool{
         producePreconditionError(sender: self.open)
@@ -43,7 +42,7 @@ class Probe: NSObject, ProbeInterface, DisplayLinkableProbe{
     
     // MARK: DisplayLinkableProbe
     var displayLink: CADisplayLink?
-    var framerate: Float = 60
+    var framerate: Int = UIScreen.main.maximumFramesPerSecond
 
     func makeDisplayLink(block: DisplayLinkCallback?) {
     }
@@ -75,7 +74,7 @@ protocol ProbeInterface {
 protocol DisplayLinkable {
     // Display link
     var displayLink: CADisplayLink? { get }
-    var framerate: Float { get } // framerate of source
+    var framerate: Int { get } // framerate of source
     
     func makeDisplayLink(block: DisplayLinkCallback?)
     func removeDisplayLink()
@@ -92,24 +91,27 @@ protocol ProbeDelegate {
 
 
 /**
- Ultrasonic Image Frame
+ Ultrasound Image Frame
  */
 
 class UFrameModel: UFrameProvider{
-    var timestamp: TimeInterval?
+    var itemTime: TimeInterval?
+//    var itemTime: CMTime?
     var pixelBuffer: CVPixelBuffer{
         didSet{
-            timestamp = Date().timeIntervalSince1970
+            itemTime = Date().timeIntervalSince1970
         }
     }
     
-    init(buffer: CVPixelBuffer) {
-        pixelBuffer = buffer
+    init(buffer: CVPixelBuffer, itemTime: TimeInterval? = nil) {
+        self.pixelBuffer = buffer
+        self.itemTime = itemTime
     }
 }
 
 protocol UFrameProvider{
-    var timestamp: TimeInterval? { get }
+    var itemTime: TimeInterval? { get }
+//    var itemTime: CMTime? { get }
     var pixelBuffer: CVPixelBuffer { get set }
 }
 

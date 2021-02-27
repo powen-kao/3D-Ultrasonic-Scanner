@@ -11,6 +11,7 @@ import Metal
 import MetalKit
 import ModelIO
 import SceneKit.ModelIO
+import NIO
 import os
 
 /**
@@ -39,22 +40,42 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             }
         }
     }
-
-    private var estimateDelay: Double = 0.1 // second
-        
-    // Data sources
-    private let arSession: ARSession
-    private(set) var probe: Probe?
     
-    // device
+    // Device
     private var device: MTLDevice?
+
+    // Delay between probe and AR frame
+    // TODO: remove this later when frame matching is applied
+    private var delay: Double = 0.1 // seconds
     
+    // Buffers that allows smooth streaming
+    private let bufferSize = 5  // frames
+    private var bufferDelay: Float { // seconds
+        Float(bufferSize) / Float(framerate)
+    }
+    private lazy var bufferDelayCompensationSize: Int = { [self] in
+        Int(delay / Double(framerate)) + 1
+    }()
+    private lazy var probeFrameBuffer = CircularBuffer<UFrameModel>(initialCapacity: bufferSize)
+    private lazy var arFrameBuffer = CircularBuffer<ARFrameModel>(initialCapacity: bufferSize + bufferDelayCompensationSize)
+    private var probeBufferPosition = 0
+    private var arBufferPosition = 0
+    private var baseTimestamp: TimeInterval?
+    
+    // Data sources
+    let arSession: ARSession
+    private var probe: Probe?
+    private var arPlayer: ARPlayer?
+    
+    // DisplayLink
+    var displayLink: CADisplayLink?
+    var framerate: Int = UIScreen.main.maximumFramesPerSecond  // frames per second
+        
     // Renderer
     // WARNING: do not modifiy renderer from other controllers
     private(set) var renderer: Renderer?
     
     // output
-    private var destination: MTKView?
     private var outputAssest: MDLAsset?
     private var scnView: SCNView
     
@@ -64,9 +85,8 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     private var viewportSize = CGSize()
     private let voxelNode = SCNNode()
     private let imageVoxelNode = SCNNode()
-
     
-    // Recorder and Player
+    // Recorder
     internal let recorder: ARRecorder = ARRecorder()
     internal var recorderState: ARRecorderState = .Ready {
         willSet(newState){
@@ -75,22 +95,23 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             }
         }
     }
-
-    var recordingURL: URL{
+    var recordingURL: URL?{
         didSet{
             recorderURLChangedHandler()
         }
     }
-    private var arPlayer: ARPlayer?
     
     // capturing
     private var captureScope: MTLCaptureScope?
     private var shouldCapture = false;
+    
+    // Alias
+    let setting = UserDefaults.standard
 
     init(arSession: ARSession, scnView: SCNView) {
         self.arSession = arSession
         self.scnView = scnView
-        self.recordingURL = GS.shared.sourceFolder
+        self.recordingURL = setting.sourceFolder
         super.init()
         
         // Get default device
@@ -134,9 +155,10 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     func switchProbeSource(source: ProbeSource){
         self.probeSource = source
         
-        guard let _path = URL(string: recordingURL.absoluteString) else {
-            os_log(.debug, "Probe load failed due to invalid path")
-            return
+        guard let _url = recordingURL,
+              let _path = URL(string: _url.absoluteString) else {
+                os_log(.debug, "Probe load failed due to invalid path")
+                return
         }
 
         composeState = .Idle
@@ -179,11 +201,16 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         
         composeState = .Idle
         
+        guard let _url = recordingURL else {
+            os_log(.debug, "AR Source load failed due to invalid path")
+            return
+        }
+        
         switch source {
             case .RealtimeAR:
                 arPlayer = RealtimeARPlayer(session: arSession)
             case .RecordedAR:
-                arPlayer = RecordedARPlayer(folder: recordingURL)
+                arPlayer = RecordedARPlayer(folder: _url)
                 break
         }
         guard arPlayer != nil else {
@@ -211,12 +238,10 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     
     
     func startRecording() {
-//        arPlayer?.start()
         recorderState = .Recording
     }
     
     func stopRecording() {
-//        arPlayer?.stop()
         recorderState = .Busy
         recorder.save { [self] (recorder, success) in
             print("[Save success: \(success)] \(recorder)")
@@ -228,12 +253,107 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     func startCompose(){
         probe?.start()
         arPlayer?.start()
-
+        
         composeState = .WaitForFirstFrame
+        
+        makeDisplayLink(block: nil)
     }
     
     func stopCompose() {
         composeState = .Idle
+        
+        removeDisplayLink()
+        
+        clear()
+    }
+    
+    private func compose() {
+        guard composeState == .Ready,
+              arFrameBuffer.count > 0,
+              probeFrameBuffer.count > 0 else {
+            return
+        }
+        os_log("------")
+        
+        // Stage: Drop image frames that is not possible to match
+        var uFrame: UFrameModel?
+        var itemTime: TimeInterval?
+        while probeFrameBuffer.count > 0 {
+            uFrame = probeFrameBuffer.first!
+            itemTime = uFrame?.itemTime ?? (Date().timeIntervalSince1970 - baseTimestamp!)
+            
+            guard let imageTs = probeTimestamp(itemTime: itemTime!),
+                  let arTs = arFrameBuffer.first?.timestamp else {
+                break
+            }
+            
+            if imageTs < arTs {
+                // not possible to match, so drop frame
+                let poped = probeFrameBuffer.popFirst()
+            }else{
+                break // continue to matching stage
+            }
+        }
+        
+        print("\(probeFrameBuffer.count) - \(arFrameBuffer.count)" )
+        
+        // Stage: Match frame
+        guard let _uFrame = uFrame,
+              let index = findARFrameIndex(with: _uFrame, itemTime: itemTime!) else {
+            // no image to match
+            // no match frame found
+            return
+        }
+        
+        // Stage: Send to unprojection
+        let frame = arFrameBuffer[offset: index]
+        let _index = index
+        print("A: \(_index)")
+        renderer?.unproject(frame: frame, image: _uFrame.pixelBuffer, finish: {
+            // Remove the ARFrames that are ealier than current ARFrame
+            // TODO: will this invalidate the image buffer?
+            print("B: \(_index)")
+
+        })
+        self.arFrameBuffer.removeFirst(_index)
+        self.probeFrameBuffer.removeFirst()
+  
+    }
+    
+    /// FInd the closest ARFrame that match the timestamp of Ultrasound image.
+    /// Returns the index of found image in buffer, otherwise nil is returned
+    private func findARFrameIndex(with uframe: UFrameModel, itemTime: TimeInterval) -> Int?{
+        var minDistance: Double = .greatestFiniteMagnitude
+        var index: Int? = nil
+        for (_index, _frame) in arFrameBuffer.enumerated() {
+            // TODO: check iteration starting point
+            let distance = abs(_frame.timestamp - probeTimestamp(itemTime: itemTime)!)
+            if distance < minDistance{
+                // check whether is close enough
+                minDistance = distance
+                index = _index
+            }
+        }
+        
+        if index != nil && minDistance > (1.0 / Double(framerate)){
+            // distance is larger than a frame interval
+            // then match not found
+            return index
+        }
+        
+        // frame not found
+        return nil
+        
+    }
+    
+    /// TImstamps that consider the fixed delay and time shift between probe streaming and AR frames
+    private func probeTimestamp(itemTime: TimeInterval) -> TimeInterval?{
+        // compute the timestamp based on timestamp of first ARPlayer frame
+        guard baseTimestamp != nil else {
+            return nil
+        }
+        return baseTimestamp! + TimeInterval(setting.fixedDelay) + TimeInterval(setting.timeShift) + itemTime
+        
     }
 }
 
@@ -246,13 +366,36 @@ extension ARFrame: Comparable{
     }
 }
 
+extension ComposeController: DisplayLinkable{
+    func makeDisplayLink(block: DisplayLinkCallback?) {
+        if probe != nil {
+            framerate = probe!.framerate
+        }
+        self.displayLink = CADisplayLink(target: self, selector: #selector(displayLinkStep))
+        self.displayLink?.preferredFramesPerSecond = framerate
+        self.displayLink?.add(to: .current, forMode: .default)
+    }
+    
+    func removeDisplayLink() {
+        self.displayLink?.invalidate()
+    }
+    
+    @objc
+    func displayLinkStep(){
+        compose()
+    }
+}
 
 
 extension ComposeController{
     
     private func recorderURLChangedHandler() {
+        guard let _url = recordingURL else {
+            return
+        }
+        
         // Open file for recorder
-        recorder.open(folder: recordingURL, size: nil)
+        recorder.open(folder: _url, size: nil)
         
         if probe != nil && probe!.isFileBased {
             switchProbeSource(source: probeSource)
@@ -307,12 +450,18 @@ extension ComposeController{
     func probe(_ probe: Probe, new frame: UFrameProvider) {
         currentPixelBuffer = frame.pixelBuffer
 
-        guard let _frame = self.currentARFrame else{
-            return
+        if probeFrameBuffer.capacity <= 0 {
+            os_log(.error, "Probe frame buffer is full")
         }
         
-        if (composeState == .Ready){
-            renderer?.unproject(frame: _frame, image: frame.pixelBuffer)
+        probeFrameBuffer.append(frame as! UFrameModel)
+        switch composeState {
+            case .Buffering:
+                checkReady()
+                break
+            case .Ready:
+                break
+            default: break
         }
     }
     
@@ -320,30 +469,58 @@ extension ComposeController{
         composeState = .Idle
     }
     
-    // MARK: ARPlayer delegate
+    // MARK: - ARPlayer delegate
     func player(_ player: ARPlayer, new frame: ARFrameModel) {
+
         currentARFrame = frame
+
+        if arFrameBuffer.capacity <= 0{
+            os_log(.error, "AR frame buffer is full")
+        }
+        arFrameBuffer.append(frame)
         
+        // Recorder update
         if (recorderState == .Recording){
             recorder.append(frame: frame)
         }
         
+        // Draw preview
         guard let _pixelBuffer = currentPixelBuffer else {
             return
         }
+        if probeSource == .Streaming {
+            renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_TransparentBlack)
+        } else{
+            renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_DrawAll)
+        }
         
+        // State switching
         switch composeState {
             case .WaitForFirstFrame:
                 restOrigin()
-                composeState = .Ready
-            case .Ready:
-                if probeSource == .Streaming {
-                    renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_TransparentBlack)
-                } else{
-                    renderer?.renderPreview(frame: frame, image: _pixelBuffer, mode: kPD_DrawAll)
-                }
+                baseTimestamp = frame.timestamp
+                composeState = .Buffering
+            case .Buffering:
+                checkReady()
+                break
+            case .Ready: break
+
             default: break
         }
+    }
+    
+    
+    func clearVoxel() {
+        renderer?.clearVoxelGrid()
+    }
+    
+    private func checkReady(){
+        guard arFrameBuffer.count > bufferDelayCompensationSize,
+              probeFrameBuffer.count > 1 else {
+            return
+        }
+        
+        composeState = .Ready
     }
     
     func finished(_ player: ARPlayer) {
@@ -360,6 +537,8 @@ extension ComposeController{
         // TODO: flush images in buffer
         self.currentARFrame = nil
         self.currentPixelBuffer = nil
+        self.arFrameBuffer.removeAll()
+        self.probeFrameBuffer.removeAll()
     }
 }
 
@@ -384,6 +563,7 @@ extension ComposeController{
 @objc enum ComposeState: Int {
     case Idle
     case WaitForFirstFrame  // waiting for first frame to take as reference frame
+    case Buffering
     case Ready
     case HoleFilling
 }

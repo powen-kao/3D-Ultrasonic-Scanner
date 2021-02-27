@@ -23,12 +23,7 @@ class RecorderProbe: Probe, AVPlayerItemOutputPullDelegate{
 
     
     var frameInterval: TimeInterval {
-        TimeInterval(1 / framerate)
-    }
-    var playbackRate: Float = 1.0 {
-        didSet{
-            displayLink?.preferredFramesPerSecond = Int(playbackRate * Float(framerate))
-        }
+        TimeInterval(1 / Double(framerate))
     }
     
     init? (file: URL) {
@@ -41,12 +36,11 @@ class RecorderProbe: Probe, AVPlayerItemOutputPullDelegate{
         }
         
         self.isFileBased = true
-
         
         // extract video information
         let videoTrack = self.asset?.tracks(withMediaType: .video)[0]
-        self.framerate = videoTrack!.nominalFrameRate
-        
+        self.framerate = Int(videoTrack!.nominalFrameRate)
+
         os_log(.info, "read vidoe file with framerate at \(self.framerate)")
     }
     
@@ -105,7 +99,7 @@ class RecorderProbe: Probe, AVPlayerItemOutputPullDelegate{
             guard let _buffer = _output.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil) else {
                 return
             }
-            delegate?.probe(self, new: UFrameModel(buffer: _buffer))
+            delegate?.probe(self, new: UFrameModel(buffer: _buffer, itemTime: TimeInterval(time.seconds)))
         }
     }
     

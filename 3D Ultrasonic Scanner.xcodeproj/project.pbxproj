@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E3101A6F25E9E4C80096F122 /* NIO in Frameworks */ = {isa = PBXBuildFile; productRef = E3101A6E25E9E4C80096F122 /* NIO */; };
 		E31DC31225E38B6100258103 /* StreamingProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E31DC31125E38B6100258103 /* StreamingProbe.swift */; };
 		E328868025DE5F96000E0404 /* RecordedARPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E328867F25DE5F96000E0404 /* RecordedARPlayer.swift */; };
 		E328868525DE611A000E0404 /* RealtimeARPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E328868425DE611A000E0404 /* RealtimeARPlayer.swift */; };
@@ -104,6 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3101A6F25E9E4C80096F122 /* NIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +283,9 @@
 			dependencies = (
 			);
 			name = UltrasoundScanner;
+			packageProductDependencies = (
+				E3101A6E25E9E4C80096F122 /* NIO */,
+			);
 			productName = "3D Ultrasonic Scanner";
 			productReference = FA19B39F25A3030C00272051 /* UltrasoundScanner.app */;
 			productType = "com.apple.product-type.application";
@@ -352,6 +357,9 @@
 				Base,
 			);
 			mainGroup = FA19B39625A3030C00272051;
+			packageReferences = (
+				E3101A6D25E9E4C80096F122 /* XCRemoteSwiftPackageReference "swift-nio" */,
+			);
 			productRefGroup = FA19B3A025A3030C00272051 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -755,6 +763,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E3101A6D25E9E4C80096F122 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.26.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E3101A6E25E9E4C80096F122 /* NIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3101A6D25E9E4C80096F122 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIO;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FA19B39725A3030C00272051 /* Project object */;
 }

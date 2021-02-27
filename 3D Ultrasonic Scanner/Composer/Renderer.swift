@@ -117,7 +117,7 @@ class Renderer {
     /**
     ### Convert captured image into 3D points clouds using transform from frame
      */
-    func unproject (frame: ARFrameModel, image: CVPixelBuffer){
+    func unproject (frame: ARFrameModel, image: CVPixelBuffer, finish: RenderCompleteCallback?){
                 
         guard let _commandBuffer = commandQueue.makeCommandBuffer(),
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
@@ -156,10 +156,12 @@ class Renderer {
             
             inFlightSemaphore.signal()
             
-            DispatchQueue.main.sync { [self] in
-//                InfoViewController.shared?.frameInfoText = "GPU processing time: \((commandBuffer.gpuEndTime-commandBuffer.gpuStartTime)*1000) ms";
-                // # WARNING: the message is not sychronous
-            }
+            finish?()
+            // TODO: clean up
+//            DispatchQueue.main.sync { [self] in
+////                InfoViewController.shared?.frameInfoText = "GPU processing time: \((commandBuffer.gpuEndTime-commandBuffer.gpuStartTime)*1000) ms";
+//                // # WARNING: the message is not sychronous
+//            }
         }
         
         // TODO: replace frameInfo, ARFrame, gridBuffer with matching result
@@ -275,7 +277,10 @@ class Renderer {
         viewportSize = size
     }
     
-
+    func clearVoxelGrid() {
+        voxelBuffer = nil
+        checkVoxelBuffer()
+    }
 }
 
 private extension Renderer {
@@ -355,6 +360,7 @@ private extension Renderer {
                                                     Float(z) * Float(voxelStpeSize), 1)
                     let globePosition = localPosition * voxelInfo.transform
                     self.voxelBuffer![index].position = simd_float3(globePosition.x, globePosition.y, globePosition.z)
+                    self.voxelBuffer![index].color = simd_float4(repeating: 0)
 //                    self.voxelBuffer![index].color = simd_float4(Float(x)/100.0, Float(y)/100.0, Float(z)/100.0, 1.0)
                 }
             }
@@ -489,3 +495,4 @@ extension Renderer{
     }
 }
 
+typealias RenderCompleteCallback = ()->()

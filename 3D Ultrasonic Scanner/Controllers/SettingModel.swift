@@ -9,69 +9,80 @@ import Foundation
 import UIKit
 
 
+/// Global setting
 public enum Setting: String {
-    case ProbeSorceKey
-    case ARSourceKey
-    case SourceFolderKey
+    case sKeyProbeSorce
+    case sKeyARSource
+    case sKeySourceFolder
+    
+    case sKeyTimeShift
+    case sKeyFixedDelay
 }
 
-
-/// Global setting
-class GS: NSObject {
-    static let shared = GS()
+extension UserDefaults{
+    
+    func value<T: RawRepresentable>(for key: Setting) -> T {
+        T.init(rawValue: UserDefaults.standard.value(forKey: key.rawValue) as! T.RawValue)!
+    }
+    func set(_ value: Any, for key: Setting) {
+        UserDefaults.standard.setValue(value, forKey: key.rawValue)
+    }
     
     @objc dynamic
     var probeSource: ProbeSource{
         get{
-            getValue(for: .ProbeSorceKey)
+            value(for: Setting.sKeyProbeSorce)
         }
         set{
-            setValue(value: newValue.rawValue , for: .ProbeSorceKey)
+            set(newValue.rawValue, for: Setting.sKeyProbeSorce)
         }
     }
     
     @objc dynamic
     var arSource: ARSource{
         get{
-            getValue(for: .ARSourceKey)
+            value(for: Setting.sKeyARSource)
         }
         set{
-            setValue(value: newValue.rawValue , for: .ARSourceKey)
+            set(newValue.rawValue, for: Setting.sKeyARSource)
         }
     }
     
     @objc dynamic
-    var sourceFolder: URL{
+    var sourceFolder: URL?{
         get {
-            getUrl(for: .SourceFolderKey)! // TODO: consider the case that default folder is not given
+            guard let data = data(forKey: Setting.sKeySourceFolder.rawValue) else {
+                return nil
+            }
+            var stale = false
+            return try? URL.init(resolvingBookmarkData: data, bookmarkDataIsStale: &stale)
         }
         set{
-            setUrl(url: newValue, for: .SourceFolderKey)
+            guard newValue != nil else {
+                return
+            }
+            set(try? newValue!.bookmarkData(), forKey: Setting.sKeySourceFolder.rawValue)
         }
     }
     
-    override init() {
-        UserDefaults.standard.register(defaults: [Setting.ProbeSorceKey.rawValue: ProbeSource.Streaming.rawValue,
-                                                  Setting.ARSourceKey.rawValue: ARSource.RealtimeAR.rawValue, Setting.SourceFolderKey.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                                                    .appendingPathComponent("Recordings") // default file path
-                                                ])
+    @objc dynamic
+    var timeShift: Float{
+        get{
+            value(forKey: Setting.sKeyTimeShift.rawValue) as! Float
+        }
+        set{
+            set(newValue, forKey: Setting.sKeyTimeShift.rawValue)
+        }
     }
     
-
-    
-    func getValue<T: RawRepresentable>(for key: Setting) -> T {
-        T.init(rawValue: UserDefaults.standard.value(forKey: key.rawValue) as! T.RawValue)!
-    }
-    func setValue(value: Any, for key: Setting) {
-        UserDefaults.standard.setValue(value, forKey: key.rawValue)
-    }
-    
-    func getUrl(for key: Setting) -> URL? {
-        UserDefaults.standard.url(forKey: key.rawValue) ?? nil
-    }
-    func setUrl(url: URL?, for key: Setting) {
-        UserDefaults.standard.set(url, forKey: key.rawValue)
+    @objc dynamic
+    var fixedDelay: Float{
+        get{
+            value(forKey: Setting.sKeyFixedDelay.rawValue) as! Float
+        }
+        set{
+            set(newValue, forKey: Setting.sKeyFixedDelay.rawValue)
+        }
     }
     
 }
-

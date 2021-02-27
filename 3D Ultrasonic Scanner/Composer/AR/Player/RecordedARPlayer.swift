@@ -13,7 +13,7 @@ import os
 class RecordedARPlayer: ARPlayer, DisplayLinkable {
         
     private(set) var displayLink: CADisplayLink?
-    private(set) var framerate: Float = 60
+    private(set) var framerate: Int = UIScreen.main.maximumFramesPerSecond
     
     private var fileURL: URL?
     private(set) var buffer = [ARFrameModel]()
@@ -60,6 +60,7 @@ class RecordedARPlayer: ARPlayer, DisplayLinkable {
         buffer = _data.withUnsafeBytes { (_buffer: UnsafeRawBufferPointer) -> Array<ARFrameModel> in
             Array(_buffer.bindMemory(to: ARFrameModel.self))
         }
+                
         return true
     }
     

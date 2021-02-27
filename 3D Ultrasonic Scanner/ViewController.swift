@@ -11,7 +11,7 @@ import ARKit
 import MetalKit
 import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
@@ -76,6 +76,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         if segue.identifier == "sInfo"{
 //            let dst = segue.destination as! InfoViewController
         }
+        
+        if segue.identifier == "sSetting"{
+            let dst = segue.destination as! SettingViewController
+            dst.delegate = self
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,7 +129,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         default: break
         }
     }
-    
+
     // MARK: - ARSCNViewDelegate
     
 /*
@@ -135,6 +140,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         return node
     }
 */
+    // MARK: - SettingViewDelegate
+    func clearVoxelClicked() {
+        composer?.clearVoxel()
+    }
+    
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
@@ -232,21 +242,26 @@ extension ViewController{
     // MARK: Observers
     private func addObservers() {
         
-        let _setting = GS.shared
+        let _setting = UserDefaults.standard
         
-        let probeSourceObserver = _setting.observe(\.probeSource, changeHandler: { [self] setting, value in
+        let sourceFolderObserver = _setting.observe(\.sourceFolder, options: [.initial, .new], changeHandler: { [self] setting, value in
+            guard let _sourceFolder = setting.sourceFolder else {
+                return
+            }
+            composer?.recordingURL = _sourceFolder
+        })
+        
+        let probeSourceObserver = _setting.observe(\.probeSource, options: [.initial, .new]  ,changeHandler: { [self] setting, value in
             composer?.switchProbeSource(source: setting.probeSource)
             composer?.startCompose()
         })
         
-        let arSourceObserver = _setting.observe(\.arSource, changeHandler: { [self] setting, value in
+        let arSourceObserver = _setting.observe(\.arSource, options: [.initial, .new], changeHandler: { [self] setting, value in
             composer?.switchARSource(source: setting.arSource)
             composer?.startCompose()
         })
         
-        let sourceFolderObserver = _setting.observe(\.sourceFolder, changeHandler: { [self] setting, value in
-            composer?.recordingURL = setting.sourceFolder
-        })
+
         
         observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver]
     }
