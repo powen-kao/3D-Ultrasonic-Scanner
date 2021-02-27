@@ -58,8 +58,6 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     }()
     private lazy var probeFrameBuffer = CircularBuffer<UFrameModel>(initialCapacity: bufferSize)
     private lazy var arFrameBuffer = CircularBuffer<ARFrameModel>(initialCapacity: bufferSize + bufferDelayCompensationSize)
-    private var probeBufferPosition = 0
-    private var arBufferPosition = 0
     private var baseTimestamp: TimeInterval?
     
     // Data sources
@@ -268,34 +266,36 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     }
     
     private func compose() {
+        // TODO: cleanup print
         guard composeState == .Ready,
               arFrameBuffer.count > 0,
               probeFrameBuffer.count > 0 else {
             return
         }
-        os_log("------")
+//        os_log("------")
         
         // Stage: Drop image frames that is not possible to match
         var uFrame: UFrameModel?
         var itemTime: TimeInterval?
         while probeFrameBuffer.count > 0 {
-            uFrame = probeFrameBuffer.first!
+            uFrame = probeFrameBuffer.first
             itemTime = uFrame?.itemTime ?? (Date().timeIntervalSince1970 - baseTimestamp!)
             
             guard let imageTs = probeTimestamp(itemTime: itemTime!),
                   let arTs = arFrameBuffer.first?.timestamp else {
                 break
             }
-            
+//            print("\(imageTs) - \(arTs)" )
+
             if imageTs < arTs {
                 // not possible to match, so drop frame
-                let poped = probeFrameBuffer.popFirst()
+                probeFrameBuffer.removeFirst()
             }else{
                 break // continue to matching stage
             }
         }
         
-        print("\(probeFrameBuffer.count) - \(arFrameBuffer.count)" )
+//        print("\(probeFrameBuffer.count) - \(arFrameBuffer.count)" )
         
         // Stage: Match frame
         guard let _uFrame = uFrame,
@@ -307,16 +307,19 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         
         // Stage: Send to unprojection
         let frame = arFrameBuffer[offset: index]
-        let _index = index
-        print("A: \(_index)")
+        
         renderer?.unproject(frame: frame, image: _uFrame.pixelBuffer, finish: {
             // Remove the ARFrames that are ealier than current ARFrame
             // TODO: will this invalidate the image buffer?
-            print("B: \(_index)")
-
         })
-        self.arFrameBuffer.removeFirst(_index)
-        self.probeFrameBuffer.removeFirst()
+        
+        if arFrameBuffer.count > index{
+            self.arFrameBuffer.removeFirst(index)
+        }
+        
+        if probeFrameBuffer.count > 0 {
+            self.probeFrameBuffer.removeFirst()
+        }
   
     }
     
@@ -332,10 +335,14 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
                 // check whether is close enough
                 minDistance = distance
                 index = _index
+            } else{
+                // the distance should be decreasing and then increase again.
+                // therefore we break right after we relize that the current distance is larger than minimun distance which indicate that we are on the up hill of the curve
+                break
             }
         }
         
-        if index != nil && minDistance > (1.0 / Double(framerate)){
+        if index != nil && minDistance < (1.0 / Double(framerate)){
             // distance is larger than a frame interval
             // then match not found
             return index
