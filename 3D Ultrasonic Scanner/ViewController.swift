@@ -45,6 +45,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         scnView.scene = pointCloudScene
         scnView.debugOptions = [.showBoundingBoxes, .showCameras, .showWorldOrigin, .showFeaturePoints]
         scnView.rendersContinuously = true
+        scnView.showsStatistics = true
         
         // Get nodes
         self.probeNode = pointCloudScene.rootNode.childNode(withName: "probe", recursively: true)

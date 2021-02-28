@@ -278,8 +278,9 @@ class Renderer {
     }
     
     func clearVoxelGrid() {
-        voxelBuffer = nil
-        checkVoxelBuffer()
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.makeVoxelGrid()
+        }
     }
 }
 
