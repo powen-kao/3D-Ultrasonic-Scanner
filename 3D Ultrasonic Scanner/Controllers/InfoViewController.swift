@@ -14,6 +14,7 @@ class InfoViewController: UIViewController{
     
     @IBOutlet weak var frameInfoTextView: UITextView!
     @IBOutlet weak var voxelInfoTextView: UITextView!
+    @IBOutlet weak var progressBar: UIProgressView!
     
     var frameInfoText: String = ""{
         didSet{

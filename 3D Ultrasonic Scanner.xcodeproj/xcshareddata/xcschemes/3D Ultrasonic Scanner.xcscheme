@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FA19B39E25A3030C00272051"
-               BuildableName = "3D Ultrasonic Scanner.app"
-               BlueprintName = "3D Ultrasonic Scanner"
+               BuildableName = "UltrasoundScanner.app"
+               BlueprintName = "UltrasoundScanner"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -37,6 +37,17 @@
                BlueprintName = "3D Ultrasonic ScannerTests"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ARReplayTest/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests/testPerformanceExample()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">
@@ -47,6 +58,14 @@
                BlueprintName = "3D Ultrasonic ScannerUITests"
                ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ARReplayTest/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "_D_Ultrasonic_ScannerTests/testPerformanceExample()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
@@ -65,8 +84,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FA19B39E25A3030C00272051"
-            BuildableName = "3D Ultrasonic Scanner.app"
-            BlueprintName = "3D Ultrasonic Scanner"
+            BuildableName = "UltrasoundScanner.app"
+            BlueprintName = "UltrasoundScanner"
             ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -82,8 +101,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FA19B39E25A3030C00272051"
-            BuildableName = "3D Ultrasonic Scanner.app"
-            BlueprintName = "3D Ultrasonic Scanner"
+            BuildableName = "UltrasoundScanner.app"
+            BlueprintName = "UltrasoundScanner"
             ReferencedContainer = "container:3D Ultrasonic Scanner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

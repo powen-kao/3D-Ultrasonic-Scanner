@@ -6,6 +6,7 @@ General Helper methods and properties
 */
 
 import ARKit
+import NIO
 
 typealias Float2 = SIMD2<Float>
 typealias Float3 = SIMD3<Float>
@@ -34,12 +35,22 @@ extension matrix_float3x3 {
     }
 }
 
+extension CVPixelBuffer{
+    func width() -> Int {
+        CVPixelBufferGetWidth(self)
+    }
+    func height() -> Int{
+        CVPixelBufferGetHeight(self)
+    }
+    func pixelCount() -> Int {
+        width() * height()
+    }
+}
 
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {
 
-        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue,
-            kCVPixelBufferMetalCompatibilityKey: kCFBooleanTrue] as CFDictionary
+        let attrs = Probe.defaultPixelBufferAttributes as CFDictionary
         var pixelBuffer : CVPixelBuffer?
         let status = CVPixelBufferCreate(kCFAllocatorDefault, Int(self.size.width), Int(self.size.height), kCVPixelFormatType_32BGRA, attrs, &pixelBuffer)
         guard status == kCVReturnSuccess else {

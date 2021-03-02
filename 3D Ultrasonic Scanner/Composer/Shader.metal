@@ -60,7 +60,15 @@ static int vPositionToId_3d(int3 vPosition, const device VoxelInfo *vInfo){
     const auto xyArea = vInfo->size.x * vInfo->size.y;
     return xyArea * _vPosition.z + _vPosition.y * vInfo->size.x + _vPosition.x;
 }
-
+static int vPositionToId_2d(int2 vPosition, constant FrameInfo *fInfo){
+    auto _vPosition = clamp(vPosition, int2(0), int2(fInfo->imageWidth, fInfo->imageHeight) - 1);
+    if (_vPosition.x != vPosition.x ||
+        _vPosition.y != vPosition.y ){
+        return -1;
+    }
+    
+    return _vPosition.y * fInfo->imageWidth + _vPosition.x;
+}
 /*
  check whether the point is withing voxel range
  */
@@ -106,18 +114,50 @@ static bool findNearby(simd_float3 position, device VoxelInfo &vInfo, thread Nea
     return true;
 }
 
+/// Sample texture and render the preview
+
+kernel void renderPreview(uint2 grid_pos [[thread_position_in_grid]],
+                          device Voxel *imgVoxel [[buffer(kImageVoxel)]],
+                          constant FrameInfo &fInfo [[buffer(kPreviewFrameInfo)]],
+                          device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
+                          texture2d<float, access::sample> uImageTexture [[texture(kPreviewTexture)]]
+                          ){
+    
+    const int vertexID = vPositionToId_2d(int2(grid_pos), &fInfo);
+    if (vertexID < 0){
+        return;
+    }
+    
+    auto worldPosition = imageToWorld(float2(grid_pos), &vInfo, &fInfo);
+    auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
+    
+    float4 color = uImageTexture.sample(colorSampler, float2(float(grid_pos.x)/fInfo.imageWidth, float(grid_pos.y)/fInfo.imageHeight));
+    
+    switch (fInfo.mode){
+        case kPD_DrawAll:
+            break;
+        case kPD_TransparentBlack:
+            if (dot(color, float4(1, 1, 1, 0)) == 0){
+                color.a = 0;
+            }
+            break;
+    }
+    
+    // convert image pixel into image voxel
+    imgVoxel[vertexID].position = localPosition.xyz;
+    imgVoxel[vertexID].color = color;
+    
+}
+
 ///  Vertex shader that takes in a 2D grid-point and infers its 3D position in world-space, along with RGB and confidence
-vertex void unprojectVertex(uint vertexID [[vertex_id]],
+kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
                             device Voxel *voxel [[buffer(kVoxel)]],
-                            device Voxel *imgVoxel [[buffer(kImageVoxel)]],
                             constant FrameInfo &fInfo [[buffer(kFrameInfo)]],
                             device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
-                            device char *dbgInfo [[buffer(kDebugInfo)]],
-                            constant float2 *gridPoints [[buffer(kGridPoint)]],
                             texture2d<float, access::sample> uImageTexture [[texture(kTexture)]]
                             ){
-    const auto gridX = vertexID % fInfo.imageWidth;
-    const auto gridY = (int) (vertexID / fInfo.imageWidth);
+    const auto gridX = grid_pos.x;
+    const auto gridY = grid_pos.y;
     
     
     // With a 2D point and depth, we can compute its global 3D position
@@ -131,10 +171,6 @@ vertex void unprojectVertex(uint vertexID [[vertex_id]],
     
     // Prepate data
     float4 color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
-    
-    // convert image pixel into image voxel
-    imgVoxel[vertexID].position = localPosition.xyz;
-    imgVoxel[vertexID].color = color;
 
     // find near by voxels
     NearByResult result;
@@ -241,28 +277,4 @@ kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
         voxel[vertexID].color = float4(float3(sum / count), 1);
     }
     // ----- ALGORITHM END-----
-}
-
-
-vertex VoxelVertexOut voxelVertex(uint vertexID [[vertex_id]],
-                                  constant Voxel *voxel [[buffer(kVoxel)]],
-                                  constant VoxelInfo *voxelInfo [[buffer(kVoxelInfo)]]
-                                  ){
-    // TODO: safty check whether vertex id is withing buffer range
-//    const auto position = idToPosition_3d(vertexID, voxelInfo);
-
-//    auto projectedPosition = position * info.viewProjectionMatrix;
-//    projectedPosition /= projectedPosition.w;
-//    auto voxelPosisition = float3(x, y, z);
-    
-    VoxelVertexOut out;
-    out.pointSize = 5;
-    out.color = float4(voxel->color);
-    return out;
-}
-
-fragment float4 particleFragment(VoxelVertexOut in [[stage_in]],
-                                 const float2 coords [[point_coord]]) {
-    
-    return in.color;
 }

@@ -9,12 +9,14 @@ import UIKit
 import SceneKit
 import ARKit
 import MetalKit
+import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
-    @IBOutlet weak var renderView: MTKView!
     @IBOutlet weak var scnView: SCNView!
+    @IBOutlet weak var composeButton: UIBarButtonItem!
+    @IBOutlet weak var recordButton: UIBarButtonItem!
     
     // Controllers
     private var alertController: UIAlertController?
@@ -22,6 +24,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     // Scene Objects
     private var probeNode: SCNNode?
+    
+    var observers: [Any?]?
+
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,19 +45,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         scnView.scene = pointCloudScene
         scnView.debugOptions = [.showBoundingBoxes, .showCameras, .showWorldOrigin, .showFeaturePoints]
         scnView.rendersContinuously = true
+        scnView.showsStatistics = true
         
         // Get nodes
         self.probeNode = pointCloudScene.rootNode.childNode(withName: "probe", recursively: true)
 
         // Create composer
-        self.composer = ComposeController(arSession: sceneView.session, destination: renderView!, scnView: scnView)
+        self.composer = ComposeController(arSession: sceneView.session, scnView: scnView)
         self.composer?.delegate = self
-        
-        
-        sceneView.session.delegate = composer
 
         // Set the scene to the view
         sceneView.scene = scene
+        
+        // Add observer
+        self.addObservers()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,13 +70,17 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
         // Run the view's session
         sceneView.session.run(configuration)
-        
 
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "sInfo"{
 //            let dst = segue.destination as! InfoViewController
+        }
+        
+        if segue.identifier == "sSetting"{
+            let dst = segue.destination as! SettingViewController
+            dst.delegate = self
         }
     }
     
@@ -80,22 +91,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         sceneView.session.pause()
         
     }
+
     @IBAction func action(_ sender: Any) {
         let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
-        alertSheet.addAction(
-            UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
-                self.composer?.restOrigin()
-            })
-        )
-        alertSheet.addAction(
-            UIAlertAction(title: "Finish", style: .default, handler: {_ in
-                self.composer?.postProcess()
-            })
-        )
-        alertSheet.addAction(
-            UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        )
-        
+        makeAlertActions(alertController: alertSheet)
         present(alertSheet, animated: true, completion: nil)
     }
     @IBAction func selectAsset(_ sender: Any) {
@@ -111,7 +110,27 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     @IBAction func capture(_ sender: Any) {
         Capturer.shared?.trigger()
     }
+    @IBAction func compose(_ sender: Any) {
+        switch composer?.composeState {
+        case .Idle:
+            composer?.startCompose()
+        default:
+            composer?.stopCompose()
+        }
+    }
     
+    @IBAction func record(_ sender: Any) {
+        switch composer?.recorderState {
+        case .Ready:
+            composer?.startRecording()
+            break
+        case .Recording:
+            composer?.stopRecording()
+            break
+        default: break
+        }
+    }
+
     // MARK: - ARSCNViewDelegate
     
 /*
@@ -122,6 +141,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         return node
     }
 */
+    // MARK: - SettingViewDelegate
+    func clearVoxelClicked() {
+        composer?.clearVoxel()
+    }
+    
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
@@ -138,19 +162,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         
     }
     
-    // MARK: - UIImagePickerControllerDelegate
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let image = info[.originalImage] as? UIImage else{
-            print("Image retrival failed")
-            return
-        }
-        print("Image picked")
-        picker.dismiss(animated: true, completion: nil)
-        composer?.loadImage(image: image)
-    }
-    
-    // MARK: - Composer
+    // MARK: - Composer Delegate
     func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
         switch arFrame.camera.trackingState {
         case .normal:
@@ -169,5 +182,88 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             
         }
     }
+    
+    func composer(_ composer: ComposeController, stateChanged: ComposeState) {
+        switch stateChanged {
+            case .Ready:
+                composeButton.image = UIImage(systemName: "stop.fill")
+                break
+            case .Idle:
+                composeButton.image = UIImage(systemName: "play.fill")
+                break
+            default: break
+        }
+    }
+    
+    func recordingState(_ composer: ComposeController, changeTo state: ARRecorderState) {
+        switch state {
+        case .Ready:
+            recordButton.image = UIImage(systemName: "record.circle")
+            break
+        default:
+            recordButton.image = UIImage(systemName: "stop.circle")
+            break
+        }
+    }
+    
+}
 
+extension ViewController{
+    func makeAlertActions(alertController: UIAlertController) {
+        alertController.addAction(
+            UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
+                self.composer?.restOrigin()
+            })
+        )
+        alertController.addAction(
+            UIAlertAction(title: "Finish", style: .default, handler: {_ in
+                self.composer?.postProcess()
+            })
+        )
+        
+        if self.composer?.recorderState == .Ready {
+            alertController.addAction(
+                UIAlertAction(title: "Start Recording", style: .default, handler: {_ in
+                    self.composer?.startRecording()
+                })
+            )
+        } else{
+            alertController.addAction(
+                UIAlertAction(title: "Stop Recording", style: .default, handler: {_ in
+                    self.composer?.stopRecording()
+                })
+            )
+        }
+        alertController.addAction(
+            UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        )
+    }
+    
+    
+    // MARK: Observers
+    private func addObservers() {
+        
+        let _setting = UserDefaults.standard
+        
+        let sourceFolderObserver = _setting.observe(\.sourceFolder, options: [.initial, .new], changeHandler: { [self] setting, value in
+            guard let _sourceFolder = setting.sourceFolder else {
+                return
+            }
+            composer?.recordingURL = _sourceFolder
+        })
+        
+        let probeSourceObserver = _setting.observe(\.probeSource, options: [.initial, .new]  ,changeHandler: { [self] setting, value in
+            composer?.switchProbeSource(source: setting.probeSource)
+            composer?.startCompose()
+        })
+        
+        let arSourceObserver = _setting.observe(\.arSource, options: [.initial, .new], changeHandler: { [self] setting, value in
+            composer?.switchARSource(source: setting.arSource)
+            composer?.startCompose()
+        })
+        
+
+        
+        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver]
+    }
 }

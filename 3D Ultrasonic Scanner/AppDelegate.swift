@@ -15,6 +15,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        UserDefaults.standard.register(defaults: [Setting.sKeyProbeSorce.rawValue: ProbeSource.Streaming.rawValue,
+                                                  Setting.sKeyARSource.rawValue: ARSource.RealtimeAR.rawValue,
+                                                  Setting.sKeySourceFolder.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings"), // default file path
+                                                  Setting.sKeyFixedDelay.rawValue: 0,
+                                                  Setting.sKeyTimeShift.rawValue: 0
+                                                ])
         return true
     }
 
