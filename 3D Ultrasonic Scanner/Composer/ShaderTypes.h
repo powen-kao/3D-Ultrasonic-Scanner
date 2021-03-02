@@ -18,7 +18,8 @@ enum BufferIndices {
     kVoxelInfo,
     kTexture,
     kPreviewFrameInfo,
-    kPreviewTexture
+    kPreviewTexture,
+    kTask
 };
 
 typedef enum State{
@@ -79,6 +80,14 @@ struct VoxelInfo{
     float stepSize; // meter per voxel step
     
     
+};
+
+typedef enum TaskType{
+    kT_Clear
+} TaskType;
+
+struct Task{
+    TaskType type;
 };
 
 struct DebugInfo{

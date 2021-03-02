@@ -35,6 +35,8 @@ class Renderer {
     private lazy var unprojectionPipelineState = makeComputePipelineState(name: "unproject")
     private lazy var fillingPipelineState = makeFillingPipelineState()!
     private lazy var previewPipelineState = makePreviewPiplineState()!
+    private lazy var taskExecutionPipelineState = makeTaskExecutionPiplineState()!
+
     private lazy var textureCache: CVMetalTextureCache = makeTextureCache()
     
     // Rendering objects
@@ -57,6 +59,7 @@ class Renderer {
     private var previewVoxelBuffer: MetalBuffer<Voxel>?
     private let frameInfoBuffer: MetalBuffer<FrameInfo>
     private var voxelInfoBuffer: MetalBuffer<VoxelInfo> // can be modified internally
+    private var taskBuffer: MetalBuffer<Task>?
     
     // Textures
     private var imageTexture: CVMetalTexture?
@@ -273,6 +276,31 @@ class Renderer {
         _commandBuffer.commit()
     }
     
+    func execute(task: Task) {
+        guard let _commandBuffer = commandQueue.makeCommandBuffer(),
+              let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
+            return
+        }
+        
+        let threadGroupSize = MTLSize(width: 8, height: 8, depth: 8)
+        let threadGroupCount = getThreadGroupCount(threadGroupSize: threadGroupSize, gridSize: MTLSize(width: Int(voxelInfo.size.x),
+                                                                                                       height: Int(voxelInfo.size.y),
+                                                                                                       depth: Int(voxelInfo.size.z)))
+        taskBuffer = .init(device: device, count: 1, index: kTask.rawValue)
+        taskBuffer?.assign(task)
+        
+        
+        _commandEncoder.setComputePipelineState(taskExecutionPipelineState)
+        _commandEncoder.setBuffer(voxelBuffer!)
+        _commandEncoder.setBuffer(taskBuffer!)
+        _commandEncoder.setBuffer(frameInfoBuffer)
+        _commandEncoder.setBuffer(voxelInfoBuffer)
+        _commandEncoder.dispatchThreadgroups(threadGroupCount, threadsPerThreadgroup: threadGroupSize)
+        _commandEncoder.endEncoding()
+        
+        _commandBuffer.commit()
+    }
+    
     func drawRectResized(size: CGSize) {
         viewportSize = size
     }
@@ -316,6 +344,15 @@ private extension Renderer {
         }
         return try? device.makeComputePipelineState(function: vertexFunction)
     }
+    
+    func makeTaskExecutionPiplineState() -> MTLComputePipelineState? {
+        guard let vertexFunction = library.makeFunction(name: "executeTask")
+        else {
+                return nil
+        }
+        return try? device.makeComputePipelineState(function: vertexFunction)
+    }
+    
     
     func makeVoxelSCNGeometry(buffer: MetalBuffer<Voxel>) -> SCNGeometry {
         let vertexSource = SCNGeometrySource(buffer: buffer.buffer,

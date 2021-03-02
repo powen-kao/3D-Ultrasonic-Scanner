@@ -118,6 +118,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
             composer?.stopCompose()
         }
     }
+    @IBAction func clearVoxel(_ sender: Any) {
+        composer?.clearVoxel()
+    }
     
     @IBAction func record(_ sender: Any) {
         switch composer?.recorderState {

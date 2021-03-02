@@ -51,9 +51,6 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate {
         updateSlider(slider: _slider, label: fixedDelayValueLabel, value: _slider.value)
         setting.fixedDelay = _slider.value
     }
-    @IBAction func clearVoxel(_ sender: Any) {
-        delegate?.clearVoxelClicked()
-    }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         setting.sourceFolder = urls[0]

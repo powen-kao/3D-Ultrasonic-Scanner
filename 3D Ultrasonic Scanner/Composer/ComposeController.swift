@@ -516,7 +516,7 @@ extension ComposeController{
     
     
     func clearVoxel() {
-        renderer?.clearVoxelGrid()
+        renderer?.execute(task: Task(type: kT_Clear))
     }
     
     private func checkReady(){

@@ -26,15 +26,20 @@
                                             <constraint firstAttribute="height" constant="40" id="Mur-1g-nIa"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
-                                            <barButtonItem title="Preview" image="play.fill" catalog="system" id="mgB-iB-cG2">
-                                                <connections>
-                                                    <action selector="compose:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
-                                                </connections>
-                                            </barButtonItem>
                                             <barButtonItem title="Item" image="record.circle" catalog="system" id="ee1-a6-zVJ">
                                                 <connections>
                                                     <action selector="record:" destination="BV1-FR-VrT" id="Uor-5n-zqX"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
+                                            <barButtonItem title="Item" image="clear" catalog="system" id="4B6-e8-THN">
+                                                <connections>
+                                                    <action selector="clearVoxel:" destination="BV1-FR-VrT" id="Mrj-eM-bEV"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem title="Preview" image="play.fill" catalog="system" id="mgB-iB-cG2">
+                                                <connections>
+                                                    <action selector="compose:" destination="BV1-FR-VrT" id="fbn-Xq-3Wo"/>
                                                 </connections>
                                             </barButtonItem>
                                         </items>
@@ -444,40 +449,6 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Actions" id="SDd-Y3-1oW">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="60" id="htw-MK-cbx">
-                                        <rect key="frame" x="20" y="467.33333206176758" width="388" height="60"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="htw-MK-cbx" id="SrW-nZ-meP">
-                                            <rect key="frame" x="0.0" y="0.0" width="388" height="60"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="DmO-9T-JUp">
-                                                    <rect key="frame" x="20" y="11" width="348" height="38"/>
-                                                    <subviews>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUi-sy-Q2s">
-                                                            <rect key="frame" x="0.0" y="0.0" width="348" height="38"/>
-                                                            <state key="normal" title="CLEAR Voxel">
-                                                                <color key="titleColor" systemColor="systemPinkColor"/>
-                                                            </state>
-                                                            <connections>
-                                                                <action selector="clearVoxel:" destination="bov-0D-poQ" eventType="touchUpInside" id="rXE-mE-Q8D"/>
-                                                            </connections>
-                                                        </button>
-                                                    </subviews>
-                                                </stackView>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="DmO-9T-JUp" secondAttribute="trailing" id="5Fn-F0-Bt2"/>
-                                                <constraint firstItem="DmO-9T-JUp" firstAttribute="top" secondItem="SrW-nZ-meP" secondAttribute="topMargin" id="QnO-OU-A67"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="DmO-9T-JUp" secondAttribute="bottom" id="fOz-rI-UF1"/>
-                                                <constraint firstItem="DmO-9T-JUp" firstAttribute="leading" secondItem="SrW-nZ-meP" secondAttribute="leadingMargin" id="ksQ-Fw-c1s"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="bov-0D-poQ" id="w3o-4Y-C53"/>
@@ -553,6 +524,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="clear" catalog="system" width="128" height="114"/>
         <image name="folder" catalog="system" width="128" height="97"/>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="play.fill" catalog="system" width="116" height="128"/>
@@ -565,9 +537,6 @@
         </systemColor>
         <systemColor name="systemGray2Color">
             <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemPinkColor">
-            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

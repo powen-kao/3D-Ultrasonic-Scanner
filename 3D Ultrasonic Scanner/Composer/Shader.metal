@@ -278,3 +278,22 @@ kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
     }
     // ----- ALGORITHM END-----
 }
+
+kernel void executeTask(device Voxel *voxel [[buffer(kVoxel)]],
+                        constant FrameInfo &fInfo [[buffer(kFrameInfo)]],
+                        device VoxelInfo &vInfo [[buffer(kVoxelInfo)]],
+                        device Task &task [[buffer(kTask)]],
+                        uint3 grid_pos [[thread_position_in_grid]]
+                        ){
+    switch (task.type){
+        case kT_Clear: {
+            const auto id = vPositionToId_3d(int3(grid_pos), &vInfo);
+            if (id < 0)
+                return;
+            voxel[id].color = float4(0, 0, 0, 0);
+            voxel[id].weight = 0;
+            break;
+        }
+    }
+    
+}
