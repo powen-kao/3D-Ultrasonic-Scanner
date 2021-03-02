@@ -267,6 +267,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
     
     private func compose() {
         // TODO: cleanup print
+        // State check
         guard composeState == .Ready,
               arFrameBuffer.count > 0,
               probeFrameBuffer.count > 0 else {
@@ -279,13 +280,12 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
         var itemTime: TimeInterval?
         while probeFrameBuffer.count > 0 {
             uFrame = probeFrameBuffer.first
-            itemTime = uFrame?.itemTime ?? (Date().timeIntervalSince1970 - baseTimestamp!)
+            itemTime = uFrame?.itemTime!
             
             guard let imageTs = probeTimestamp(itemTime: itemTime!),
                   let arTs = arFrameBuffer.first?.timestamp else {
                 break
             }
-//            print("\(imageTs) - \(arTs)" )
 
             if imageTs < arTs {
                 // not possible to match, so drop frame
@@ -294,9 +294,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
                 break // continue to matching stage
             }
         }
-        
-//        print("\(probeFrameBuffer.count) - \(arFrameBuffer.count)" )
-        
+                
         // Stage: Match frame
         guard let _uFrame = uFrame,
               let index = findARFrameIndex(with: _uFrame, itemTime: itemTime!) else {
@@ -304,7 +302,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             // no match frame found
             return
         }
-        
+                
         // Stage: Send to unprojection
         let frame = arFrameBuffer[offset: index]
         
@@ -342,7 +340,7 @@ class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDel
             }
         }
         
-        if index != nil && minDistance < (1.0 / Double(framerate)){
+        if index != nil {
             // distance is larger than a frame interval
             // then match not found
             return index

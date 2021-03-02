@@ -13,6 +13,8 @@ class StreamingProbe: Probe {
     
     var image: CVPixelBuffer?
     
+    private var startTimestamp:TimeInterval?
+
     override func open() -> Bool{
         guard let _image = UIImage(named: "ar_placeholder")?.toCVPixelBuffer() else {
             return false
@@ -26,6 +28,7 @@ class StreamingProbe: Probe {
     }
     
     override func start(){
+        startTimestamp = Date().timeIntervalSince1970
 
         makeDisplayLink(block: nil)
     }
@@ -46,6 +49,6 @@ class StreamingProbe: Probe {
     
     @objc func displayLinkStep(displaylink: CADisplayLink) {
         // provide static placeholder
-        delegate?.probe(self, new: UFrameModel(buffer: image!))
+        delegate?.probe(self, new: UFrameModel(buffer: image!, itemTime: Date().timeIntervalSince1970 - startTimestamp!))
     }
 }

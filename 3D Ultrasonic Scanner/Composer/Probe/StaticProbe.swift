@@ -16,6 +16,8 @@ class StaticProbe: Probe {
     private var image: UIImage?
     private var pixelBuffer: CVPixelBuffer?
     
+    private var startTimestamp:TimeInterval?
+    
     init?(file: URL) {
         self.file = file
 
@@ -38,6 +40,7 @@ class StaticProbe: Probe {
         
     }
     override func start() {
+        startTimestamp = Date().timeIntervalSince1970
         makeDisplayLink(block: nil)
     }
     override func stop() {
@@ -57,7 +60,7 @@ class StaticProbe: Probe {
         guard let _image = pixelBuffer else {
             return
         }
-        delegate?.probe(self, new: UFrameModel(buffer: _image))
+        delegate?.probe(self, new: UFrameModel(buffer: _image, itemTime: Date().timeIntervalSince1970 - startTimestamp!))
     }
     
 }

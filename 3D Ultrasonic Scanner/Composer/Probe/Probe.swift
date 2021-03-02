@@ -103,7 +103,7 @@ class UFrameModel: UFrameProvider{
         }
     }
     
-    init(buffer: CVPixelBuffer, itemTime: TimeInterval? = nil) {
+    init(buffer: CVPixelBuffer, itemTime: TimeInterval) {
         self.pixelBuffer = buffer
         self.itemTime = itemTime
     }
