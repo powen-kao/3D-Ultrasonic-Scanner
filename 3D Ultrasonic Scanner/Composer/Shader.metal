@@ -22,12 +22,38 @@ struct VoxelVertexOut {
     float pointSize [[point_size]];
     float4 color;
 };
+
+/*
+ check whether the point is withing voxel range
+ */
+static bool positionIsValid(float3 position, const device VoxelInfo *info){
+    auto _position = clamp(position, float3(0), float3(info->size - 1) * info->stepSize);
+    
+    if (_position.x != position.x ||
+        _position.y != position.y ||
+        _position.z != position.z){
+        return false;
+    }
+    return true;
+}
+
+static bool vPositionIsValid(int3 vPosition, const device VoxelInfo &info){
+    auto _vPosition = clamp(vPosition, int3(0), int3(info.size - 1));
+
+    if (_vPosition.x != vPosition.x ||
+        _vPosition.y != vPosition.y ||
+        _vPosition.z != vPosition.z){
+        return false;
+    }
+    return true;
+}
+
 /*
  convert image coordinate to world coordinate
  */
 static simd_float4 imageToWorld(simd_float2 cameraPoint, const device VoxelInfo *vInfo, constant FrameInfo *fInfo) {
     auto localPoint = fInfo->uIntrinsicsInversed * simd_float3(cameraPoint, 1);
-    const auto worldPoint = fInfo->cameraTransform * vInfo->rotateToARCamera * fInfo->flipY * simd_float4(simd_float3(localPoint.xy, 0), 1);
+    const auto worldPoint = fInfo->transform * vInfo->rotateToARCamera * fInfo->flipY * simd_float4(simd_float3(localPoint.xy, 0), 1);
     // TODO: add transform from iPhone to ultrasound image
     return worldPoint; // without normalization
 }
@@ -69,19 +95,21 @@ static int vPositionToId_2d(int2 vPosition, constant FrameInfo *fInfo){
     
     return _vPosition.y * fInfo->imageWidth + _vPosition.x;
 }
-/*
- check whether the point is withing voxel range
- */
-static bool positionIsValid(float3 position, const device VoxelInfo *info){
-    auto _position = clamp(position, float3(0), float3(info->size - 1) * info->stepSize);
-    
-    if (_position.x != position.x ||
-        _position.y != position.y ||
-        _position.z != position.z){
-        return false;
+
+///// Convert the local coordinate position to voxel position
+static int3 positionTovPosition_voxel(float3 position, const device VoxelInfo &vInfo, thread bool &isValid){
+    // transform to another coordinate for easier position conversion
+    auto offset = (float4(0, 0, 0, 1) * vInfo.centerizeTransform * vInfo.stepSize).xyz;
+    auto _vPosition = int3((position - offset) / vInfo.stepSize);
+
+    if (!vPositionIsValid(_vPosition, vInfo)) {
+        isValid = false;
+        return int3(-1, -1, -1);
     }
-    return true;
+    isValid = true;
+    return _vPosition;
 }
+
 
 /*
  find voxel nearby
@@ -91,27 +119,53 @@ struct NearByResult{
 };
 
 
+/// Find the neighbor voxels with local position
 static bool findNearby(simd_float3 position, device VoxelInfo &vInfo, thread NearByResult &result){
     result = {{-1}}; // set default value
-    if (!positionIsValid(position, &vInfo)){
-        // WARNING: ignore the points that locate outside the voxel box edge.
+    
+    bool isValid;
+    auto vPosition = positionTovPosition_voxel(position, vInfo, isValid);
+    if (!isValid){
         return false;
     }
     
-    auto vPosition = simd_int3(position / vInfo.stepSize);
     for (uint8_t z = 0; z < 2 ; z ++){
         for (uint8_t y = 0; y < 2 ; y ++){
             for (uint8_t x = 0; x < 2 ; x ++){
                 uint16_t id = x + y * 2 + z * 4;
                 // TODO: check whether ID is valid
                 
-                auto _vPosistion = vPosition + int3(x, y, z);
-                result.ids[id] = vPositionToId_3d(_vPosistion, &vInfo);
+                vPosition = vPosition + (int3(x, y, z) - 1);
+                result.ids[id] = vPositionToId_3d(vPosition, &vInfo);
             }
         }
     }
     
     return true;
+}
+
+static void updateMinMax(float3 position ,device VoxelInfo &vInfo){
+    // update min max value of xyz
+    if (vInfo.axisMax.x < position.x){
+        vInfo.axisMax.x = position.x;
+    }
+    if (vInfo.axisMin.x > position.x){
+        vInfo.axisMin.x = position.x;
+    }
+    
+    if (vInfo.axisMax.y < position.y){
+        vInfo.axisMax.y = position.y;
+    }
+    if (vInfo.axisMin.y > position.y){
+        vInfo.axisMin.y = position.y;
+    }
+    
+    if (vInfo.axisMax.z < position.z){
+        vInfo.axisMax.z = position.z;
+    }
+    if (vInfo.axisMin.z > position.z){
+        vInfo.axisMin.z = position.z;
+    }
 }
 
 /// Sample texture and render the preview
@@ -167,7 +221,9 @@ kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
     // transform points with inverse transform of the first frame (which serves as reference)
     // (this provide local coordinate and scale)
     auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
-    // TODO: check the position of "vInfo.size/2"
+    
+    // TODO: remove if not used
+//    updateMinMax(worldPosition.xyz ,vInfo);
     
     // Prepate data
     float4 color = uImageTexture.sample(colorSampler, float2(float(gridX)/fInfo.imageWidth, float(gridY)/fInfo.imageHeight));
@@ -187,8 +243,6 @@ kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
             break;
         
         device Voxel *v = &voxel[id];
-        int3 vPosition = idTovPosition_3d(id, &vInfo);
-        v->position = float3(vPosition) * vInfo.stepSize + (vInfo.stepSize / 2);
 
         // TODO: Synchronous multithreading
 
@@ -206,28 +260,6 @@ kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
         v->touched = true;
     }
     // ----- ALGORITHM END-----
-        
-    // update min max value of xyz
-    if (vInfo.axisMax.x < worldPosition.x){
-        vInfo.axisMax.x = worldPosition.x;
-    }
-    if (vInfo.axisMin.x > worldPosition.x){
-        vInfo.axisMin.x = worldPosition.x;
-    }
-    
-    if (vInfo.axisMax.y < worldPosition.y){
-        vInfo.axisMax.y = worldPosition.y;
-    }
-    if (vInfo.axisMin.y > worldPosition.y){
-        vInfo.axisMin.y = worldPosition.y;
-    }
-    
-    if (vInfo.axisMax.z < worldPosition.z){
-        vInfo.axisMax.z = worldPosition.z;
-    }
-    if (vInfo.axisMin.z > worldPosition.z){
-        vInfo.axisMin.z = worldPosition.z;
-    }
 
 }
 
@@ -260,7 +292,7 @@ kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
                 // check if the neighbor has value
                 int _id = vPositionToId_3d(int3(grid_pos) + int3(x, y, z), &vInfo);
                 if (_id < 0)
-                    continue; // skip of neighbor is outside
+                    continue; // skip of neighbor is outside
 
                 constant Voxel &vc = voxelCopy[_id];
                 float _color = dot(vc.color.xyz, float3(0.333, 0.333, 0.333));
@@ -286,12 +318,13 @@ kernel void executeTask(device Voxel *voxel [[buffer(kVoxel)]],
                         uint3 grid_pos [[thread_position_in_grid]]
                         ){
     switch (task.type){
-        case kT_Clear: {
+        case kT_ResetVoxels: {
             const auto id = vPositionToId_3d(int3(grid_pos), &vInfo);
             if (id < 0)
                 return;
             voxel[id].color = float4(0, 0, 0, 0);
             voxel[id].weight = 0;
+            voxel[id].position = (float4(float3(grid_pos), 1) * vInfo.centerizeTransform * vInfo.stepSize).xyz;
             break;
         }
     }

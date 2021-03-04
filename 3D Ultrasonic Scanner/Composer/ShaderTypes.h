@@ -35,7 +35,7 @@ typedef enum Mode{
 struct FrameInfo {
     // 'u' represent 'ultrasound'
     matrix_float4x4 viewProjectionMatrix;
-    matrix_float4x4 cameraTransform;
+    matrix_float4x4 transform;
     matrix_float4x4 uImageToCamera;
     matrix_float3x3 cameraIntrinsicsInversed;
     matrix_float3x3 uIntrinsicsInversed;
@@ -66,6 +66,9 @@ struct VoxelInfo{
     simd_float4x4 inversedTransform;
     simd_float4x4 rotateToARCamera;
     simd_float4x4 inversedRotateToARCamera;
+    simd_float4x4 centerizeTransform;
+    simd_float4x4 inversedCenterizeTransform;
+
     simd_uint3 size;
     uint count;
 
@@ -76,14 +79,13 @@ struct VoxelInfo{
     simd_float3 axisMin;
     simd_float3 axisMax;
     
-//    int xy_area = size.x * size.y;
     float stepSize; // meter per voxel step
     
     
 };
 
 typedef enum TaskType{
-    kT_Clear
+    kT_ResetVoxels
 } TaskType;
 
 struct Task{

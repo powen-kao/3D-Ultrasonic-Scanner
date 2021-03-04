@@ -516,7 +516,7 @@ extension ComposeController{
     
     
     func clearVoxel() {
-        renderer?.execute(task: Task(type: kT_Clear))
+        renderer?.execute(task: Task(type: kT_ResetVoxels))
     }
     
     private func checkReady(){

@@ -111,8 +111,7 @@ class Renderer {
         checkVoxelBuffer()
         
         // Post-operations
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.makeVoxelGrid()
+        execute(task: Task(type: kT_ResetVoxels)) {
             self.state = .Ready
         }
     }
@@ -276,10 +275,14 @@ class Renderer {
         _commandBuffer.commit()
     }
     
-    func execute(task: Task) {
+    func execute(task: Task, finish: RenderCompleteCallback? = nil) {
         guard let _commandBuffer = commandQueue.makeCommandBuffer(),
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
             return
+        }
+        
+        _commandBuffer.addCompletedHandler { _ in
+            finish?()
         }
         
         let threadGroupSize = MTLSize(width: 8, height: 8, depth: 8)
@@ -305,11 +308,6 @@ class Renderer {
         viewportSize = size
     }
     
-    func clearVoxelGrid() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.makeVoxelGrid()
-        }
-    }
 }
 
 private extension Renderer {
@@ -387,24 +385,6 @@ private extension Renderer {
         return cache
     }
     
-    func makeVoxelGrid(){
-        for z in 0...voxelSize.z-1{
-            for y in 0...voxelSize.y-1 {
-                for x in 0...voxelSize.x-1 {
-                    let xyArea = voxelSize.x * voxelSize.y
-                    let index = Int(xyArea * z + y * voxelSize.x + x)
-                    let localPosition = simd_float4(Float(x) * Float(voxelStpeSize),
-                                                    Float(y) * Float(voxelStpeSize),
-                                                    Float(z) * Float(voxelStpeSize), 1)
-                    let globePosition = localPosition * voxelInfo.transform
-                    self.voxelBuffer![index].position = simd_float3(globePosition.x, globePosition.y, globePosition.z)
-                    self.voxelBuffer![index].color = simd_float4(repeating: 0)
-//                    self.voxelBuffer![index].color = simd_float4(Float(x)/100.0, Float(y)/100.0, Float(z)/100.0, 1.0)
-                }
-            }
-        }
-    }
-    
     func makeTexture(fromPixelBuffer pixelBuffer: CVPixelBuffer, pixelFormat: MTLPixelFormat, planeIndex: Int) -> CVMetalTexture? {
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
@@ -424,7 +404,7 @@ private extension Renderer {
         // Insert frame info
         var frameInfo = FrameInfo()
         let camera = frame.camera
-        frameInfo.cameraTransform = camera.transform
+        frameInfo.transform = camera.transform
         frameInfo.imageWidth = Int32(image.width())
         frameInfo.imageHeight = Int32(image.height())
         frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
@@ -457,6 +437,11 @@ private extension Renderer {
         voxelInfo.transform = matrix_identity_float4x4
         voxelInfo.rotateToARCamera = rotateToARCamera
         voxelInfo.inversedRotateToARCamera = rotateToARCamera.inverse
+        voxelInfo.centerizeTransform = simd_float4x4([1, 0, 0, -Float(voxelSize.x)/2],
+                                                     [0, 1, 0, -Float(voxelSize.y)/2],
+                                                     [0, 0, 1, 0],
+                                                     [0, 0, 0, 1])
+        voxelInfo.inversedCenterizeTransform = voxelInfo.centerizeTransform.inverse
         return voxelInfo
     }
     
