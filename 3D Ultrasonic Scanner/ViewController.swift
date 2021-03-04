@@ -20,6 +20,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     // Controllers
     private var alertController: UIAlertController?
+    private var actionController: UIAlertController?
     private var composer: ComposeController?
     
     // Scene Objects
@@ -94,7 +95,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 
     @IBAction func action(_ sender: Any) {
         let alertSheet = UIAlertController(title: "Actions", message: "Choose action to perform", preferredStyle: .actionSheet)
-        makeAlertActions(alertController: alertSheet)
+        makeActions(alertController: alertSheet)
         present(alertSheet, animated: true, completion: nil)
     }
     @IBAction func selectAsset(_ sender: Any) {
@@ -119,7 +120,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
     }
     @IBAction func clearVoxel(_ sender: Any) {
-        composer?.clearVoxel()
+        makeAlert(title: "Clear Voxels", message: "Are you sure to clear voxels? This action is DESTRCTIVE") { [self] in
+            composer?.clearVoxel()
+        } decline: {
+            return
+        }
+        present(alertController!, animated: true, completion: nil)
     }
     
     @IBAction func record(_ sender: Any) {
@@ -170,18 +176,18 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
         switch arFrame.camera.trackingState {
         case .normal:
-            alertController?.dismiss(animated: true, completion: nil)
-            alertController = nil
+            actionController?.dismiss(animated: true, completion: nil)
+            actionController = nil
             
             // Update probe transform
             self.probeNode?.transform =  SCNMatrix4(arFrame.camera.transform * (self.composer?.renderer?.voxelInfo.rotateToARCamera ?? matrix_identity_float4x4))
         default:
-            if alertController == nil{
-                alertController = UIAlertController()
-                alertController?.title = "Warning AR tracking state"
-                present(alertController!, animated: true, completion: nil)
+            if actionController == nil{
+                actionController = UIAlertController()
+                actionController?.title = "Warning AR tracking state"
+                present(actionController!, animated: true, completion: nil)
             }
-            alertController?.message = "\(arFrame.camera.trackingState)"
+            actionController?.message = "\(arFrame.camera.trackingState)"
             
         }
     }
@@ -212,7 +218,20 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 }
 
 extension ViewController{
-    func makeAlertActions(alertController: UIAlertController) {
+    @discardableResult
+    func makeAlert(title: String, message: String, accept: AlertAction? = nil, decline: AlertAction? = nil) -> UIAlertController{
+        alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController?.addAction(.init(title: "Clear", style: .destructive, handler: { _ in
+            accept?()
+        }))
+        alertController?.addAction(.init(title: "Cancel", style: .default, handler: { _ in
+            decline?()
+        }))
+        
+        return alertController!
+    }
+    
+    func makeActions(alertController: UIAlertController) {
         alertController.addAction(
             UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
                 self.composer?.restOrigin()
@@ -269,4 +288,6 @@ extension ViewController{
         
         observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver]
     }
+    
+    typealias AlertAction = () -> ()
 }
