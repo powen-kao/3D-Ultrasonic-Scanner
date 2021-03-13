@@ -28,7 +28,7 @@
 		FA19B3AF25A3031100272051 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA19B3AD25A3031100272051 /* LaunchScreen.storyboard */; };
 		FA19B3BA25A3031100272051 /* _D_Ultrasonic_ScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3B925A3031100272051 /* _D_Ultrasonic_ScannerTests.swift */; };
 		FA19B3C525A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */; };
-		FA19B3D925A3104200272051 /* ComposeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3D825A3104200272051 /* ComposeController.swift */; };
+		FA19B3D925A3104200272051 /* Composer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3D825A3104200272051 /* Composer.swift */; };
 		FA19B3E525A35A5700272051 /* Shader.metal in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3E425A35A5700272051 /* Shader.metal */; };
 		FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19B3ED25A35A9A00272051 /* Renderer.swift */; };
 		FA47F1CD25A3642200CAB94E /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA47F1CC25A3642200CAB94E /* File.swift */; };
@@ -86,7 +86,7 @@
 		FA19B3C025A3031100272051 /* 3D Ultrasonic ScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "3D Ultrasonic ScannerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA19B3C425A3031100272051 /* _D_Ultrasonic_ScannerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _D_Ultrasonic_ScannerUITests.swift; sourceTree = "<group>"; };
 		FA19B3C625A3031100272051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FA19B3D825A3104200272051 /* ComposeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeController.swift; sourceTree = "<group>"; };
+		FA19B3D825A3104200272051 /* Composer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Composer.swift; sourceTree = "<group>"; };
 		FA19B3E425A35A5700272051 /* Shader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shader.metal; sourceTree = "<group>"; };
 		FA19B3EC25A35A7500272051 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		FA19B3ED25A35A9A00272051 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
@@ -231,7 +231,7 @@
 				E3301E4D25D3E1A0001EE43F /* Probe */,
 				FAC19CD025A87EC80080E709 /* Helpers.swift */,
 				FAA5F81825A800D200916611 /* MetalBuffer.swift */,
-				FA19B3D825A3104200272051 /* ComposeController.swift */,
+				FA19B3D825A3104200272051 /* Composer.swift */,
 				FA47F1CC25A3642200CAB94E /* File.swift */,
 				FA19B3E425A35A5700272051 /* Shader.metal */,
 				FA19B3EC25A35A7500272051 /* ShaderTypes.h */,
@@ -431,7 +431,7 @@
 				E328868025DE5F96000E0404 /* RecordedARPlayer.swift in Sources */,
 				E3E7F2D025D52BCE00DEA676 /* SettingViewController.swift in Sources */,
 				FABE577B25C8257B00F87982 /* ARFrameModel.swift in Sources */,
-				FA19B3D925A3104200272051 /* ComposeController.swift in Sources */,
+				FA19B3D925A3104200272051 /* Composer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

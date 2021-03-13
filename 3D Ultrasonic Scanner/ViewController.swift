@@ -21,7 +21,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     // Controllers
     private var alertController: UIAlertController?
     private var actionController: UIAlertController?
-    private var composer: ComposeController?
+    private var composer: Composer?
     
     // Scene Objects
     private var probeNode: SCNNode?
@@ -52,7 +52,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         self.probeNode = pointCloudScene.rootNode.childNode(withName: "probe", recursively: true)
 
         // Create composer
-        self.composer = ComposeController(arSession: sceneView.session, scnView: scnView)
+        self.composer = Composer(arSession: sceneView.session, scnView: scnView)
         self.composer?.delegate = self
 
         // Set the scene to the view
@@ -173,7 +173,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
     
     
     // MARK: - Composer Delegate
-    func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame) {
+    func composer(_ composer: Composer, didUpdate arFrame: ARFrame) {
         switch arFrame.camera.trackingState {
         case .normal:
             actionController?.dismiss(animated: true, completion: nil)
@@ -192,7 +192,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
     }
     
-    func composer(_ composer: ComposeController, stateChanged: ComposeState) {
+    func composer(_ composer: Composer, stateChanged: ComposeState) {
         switch stateChanged {
             case .Ready:
                 composeButton.image = UIImage(systemName: "stop.fill")
@@ -204,7 +204,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
     }
     
-    func recordingState(_ composer: ComposeController, changeTo state: ARRecorderState) {
+    func recordingState(_ composer: Composer, changeTo state: ARRecorderState) {
         switch state {
         case .Ready:
             recordButton.image = UIImage(systemName: "record.circle")

@@ -20,7 +20,7 @@ import os
  The frame composition is ultrasound-image-driven rather than ARFrame.
  */
 
-class ComposeController: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate, ARPlayerDelegate{
+class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, ARRecorderDelegate, ARPlayerDelegate{
     
     // Public properties
     var delegate: ComposerDelegate?
@@ -371,7 +371,7 @@ extension ARFrame: Comparable{
     }
 }
 
-extension ComposeController: DisplayLinkable{
+extension Composer: DisplayLinkable{
     func makeDisplayLink(block: DisplayLinkCallback?) {
         if probe != nil {
             framerate = probe!.framerate
@@ -392,7 +392,7 @@ extension ComposeController: DisplayLinkable{
 }
 
 
-extension ComposeController{
+extension Composer{
     
     private func recorderURLChangedHandler() {
         guard let _url = recordingURL else {
@@ -575,9 +575,9 @@ extension ComposeController{
 
 
 @objc protocol ComposerDelegate {
-    @objc optional func composer(_ composer: ComposeController, didUpdate arFrame: ARFrame)
-    @objc optional func composer(_ composer: ComposeController, stateChanged: ComposeState)
-    @objc optional func recordingState(_ composer: ComposeController, changeTo state: ARRecorderState)
+    @objc optional func composer(_ composer: Composer, didUpdate arFrame: ARFrame)
+    @objc optional func composer(_ composer: Composer, stateChanged: ComposeState)
+    @objc optional func recordingState(_ composer: Composer, changeTo state: ARRecorderState)
 }
 
 protocol ComposerObserver{
@@ -589,7 +589,7 @@ protocol ComposerInfoProvider {
     var recorderState: ARRecorderState {get}
 }
 
-extension ComposeController: ComposerInfoProvider{
+extension Composer: ComposerInfoProvider{
     
 }
 
