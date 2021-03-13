@@ -14,9 +14,15 @@ public enum Setting: String {
     case sKeyProbeSorce
     case sKeyARSource
     case sKeySourceFolder
+    case sKeyImageDepth
     
+    // AR to probe
     case sKeyTimeShift
     case sKeyFixedDelay
+    
+    // Voxel
+    case sKeyDimension
+    case sKeyStepSize
 }
 
 extension UserDefaults{
@@ -66,6 +72,16 @@ extension UserDefaults{
     }
     
     @objc dynamic
+    var imageDepth: Float{
+        get{
+            value(forKey: Setting.sKeyImageDepth.rawValue) as! Float
+        }
+        set{
+            set(newValue, forKey: Setting.sKeyImageDepth.rawValue)
+        }
+    }
+    
+    @objc dynamic
     var timeShift: Float{
         get{
             value(forKey: Setting.sKeyTimeShift.rawValue) as! Float
@@ -82,6 +98,26 @@ extension UserDefaults{
         }
         set{
             set(newValue, forKey: Setting.sKeyFixedDelay.rawValue)
+        }
+    }
+    
+    @objc dynamic
+    var dimension: simd_int3{
+        get{
+            (value(forKey: Setting.sKeyDimension.rawValue) as! Data).int3()!
+        }
+        set{
+            set(newValue.data(), forKey: Setting.sKeyDimension.rawValue)
+        }
+    }
+    
+    @objc dynamic
+    var stepSize: Float{
+        get{
+            value(forKey: Setting.sKeyStepSize.rawValue) as! Float
+        }
+        set{
+            set(newValue, forKey: Setting.sKeyStepSize.rawValue)
         }
     }
     

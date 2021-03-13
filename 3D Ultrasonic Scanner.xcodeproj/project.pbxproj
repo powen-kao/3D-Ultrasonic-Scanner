@@ -15,6 +15,7 @@
 		E336893625D3647900BF27B3 /* ARReplayTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E336893525D3647900BF27B3 /* ARReplayTest.swift */; };
 		E33689B725D385D600BF27B3 /* ARMetaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689B625D385D600BF27B3 /* ARMetaModel.swift */; };
 		E33689C525D388E100BF27B3 /* RecorderConst.swift in Sources */ = {isa = PBXBuildFile; fileRef = E33689C425D388E100BF27B3 /* RecorderConst.swift */; };
+		E36C080C25F9A604000AC42E /* KeyboardResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E36C080B25F9A604000AC42E /* KeyboardResponder.swift */; };
 		E378E5A825DD383C00D2FFCD /* StaticProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E378E5A725DD383C00D2FFCD /* StaticProbe.swift */; };
 		E3E7F2D025D52BCE00DEA676 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */; };
 		E3E7F2D525D6624400DEA676 /* SettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3E7F2D425D6624400DEA676 /* SettingModel.swift */; };
@@ -66,6 +67,7 @@
 		E336893525D3647900BF27B3 /* ARReplayTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARReplayTest.swift; sourceTree = "<group>"; };
 		E33689B625D385D600BF27B3 /* ARMetaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMetaModel.swift; sourceTree = "<group>"; };
 		E33689C425D388E100BF27B3 /* RecorderConst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderConst.swift; sourceTree = "<group>"; };
+		E36C080B25F9A604000AC42E /* KeyboardResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponder.swift; sourceTree = "<group>"; };
 		E378E5A725DD383C00D2FFCD /* StaticProbe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StaticProbe.swift; sourceTree = "<group>"; };
 		E3E7F2CF25D52BCE00DEA676 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		E3E7F2D425D6624400DEA676 /* SettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingModel.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				FA4BB09825B99650008ABBC1 /* Capturer.swift */,
+				E36C080B25F9A604000AC42E /* KeyboardResponder.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -422,6 +425,7 @@
 				FA65614325A61244009AD005 /* RecorderProbe.swift in Sources */,
 				FA19B3A325A3030C00272051 /* AppDelegate.swift in Sources */,
 				E33689C525D388E100BF27B3 /* RecorderConst.swift in Sources */,
+				E36C080C25F9A604000AC42E /* KeyboardResponder.swift in Sources */,
 				FA4BB09925B99650008ABBC1 /* Capturer.swift in Sources */,
 				FA19B3EE25A35A9A00272051 /* Renderer.swift in Sources */,
 				E328868025DE5F96000E0404 /* RecordedARPlayer.swift in Sources */,

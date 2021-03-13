@@ -18,8 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UserDefaults.standard.register(defaults: [Setting.sKeyProbeSorce.rawValue: ProbeSource.Streaming.rawValue,
                                                   Setting.sKeyARSource.rawValue: ARSource.RealtimeAR.rawValue,
                                                   Setting.sKeySourceFolder.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings"), // default file path
+                                                  Setting.sKeyImageDepth.rawValue: 5,
+                                                  
+                                                  // Probe to AR
                                                   Setting.sKeyFixedDelay.rawValue: 0,
-                                                  Setting.sKeyTimeShift.rawValue: 0
+                                                  Setting.sKeyTimeShift.rawValue: 0,
+                                                  
+                                                  // Voxel
+                                                  Setting.sKeyDimension.rawValue: simd_int3(100, 100, 100).data(),
+                                                  Setting.sKeyStepSize.rawValue: 1.0
                                                 ])
         return true
     }

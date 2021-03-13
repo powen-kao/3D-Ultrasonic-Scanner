@@ -47,6 +47,27 @@ extension CVPixelBuffer{
     }
 }
 
+extension UIScrollView{
+    func blankSpace() -> CGFloat {
+        let blanckSpace = self.frame.height - self.contentSize.height
+            - self.safeAreaInsets.top
+            - self.safeAreaInsets.bottom
+        return blanckSpace > 0 ? blanckSpace : 0
+    }
+}
+
+extension simd_int3 {
+    func data() -> Data? {
+        try? PropertyListEncoder().encode(self)
+    }
+}
+
+extension Data{
+    func int3() -> simd_int3? {
+        try? PropertyListDecoder().decode(simd_int3.self, from: self)
+    }
+}
+
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {
 
