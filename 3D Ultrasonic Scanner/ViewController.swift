@@ -120,7 +120,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
     }
     @IBAction func clearVoxel(_ sender: Any) {
-        makeAlert(title: "Clear Voxels", message: "Are you sure to clear voxels? This action is DESTRCTIVE") { [self] in
+        makeAlert(title: "Clear Voxels", message: "Are you sure to clear voxels? This action is DESTRUCTIVE") { [self] in
             composer?.clearVoxel()
         } decline: {
             return
