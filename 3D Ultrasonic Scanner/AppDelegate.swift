@@ -26,7 +26,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                   
                                                   // Voxel
                                                   Setting.sKeyDimension.rawValue: simd_uint3(100, 100, 100).data(),
-                                                  Setting.sKeyStepScale.rawValue: 1.0
+                                                  Setting.sKeyStepScale.rawValue: 1.0,
+                                                  
+                                                  // Displacement
+                                                  Setting.sKeyVerticalDisp.rawValue: 0.0,
+                                                  Setting.sKeyHorizontalDisp.rawValue: 0.0,
+
                                                 ])
         return true
     }

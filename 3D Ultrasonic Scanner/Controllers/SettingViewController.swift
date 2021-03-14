@@ -43,6 +43,11 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     @IBOutlet weak var stepScaleSlider: UISlider!
     @IBOutlet weak var stepScaleValueLabel: UILabel!
     
+    // Displacement
+    @IBOutlet weak var verticalDisplacementLabel: UILabel!
+    @IBOutlet weak var verticalDisplacementSlider: UISlider!
+    @IBOutlet weak var horizontalDisplacementLabel: UILabel!
+    @IBOutlet weak var horizontalDisplacmentSlider: UISlider!
     
     override func viewDidLoad() {
         // add touch gesture recognizer
@@ -111,6 +116,18 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
         setting.stepScale = stepScaleSlider.value
     }
     
+    // MARK: Displacement
+    @IBAction func verticalDisplacementChanged(_ sender: UISlider) {
+        update(label: verticalDisplacementLabel, value: sender.value)
+        setting.verticalDisplacement = sender.value
+    }
+    
+    @IBAction func horizontalDisplacementChanged(_ sender: UISlider) {
+        update(label: horizontalDisplacementLabel, value: sender.value)
+        setting.horizontalDisplacement = sender.value
+    }
+    
+    
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         setting.sourceFolder = urls[0]
         updateUI()
@@ -133,6 +150,9 @@ private extension SettingViewController{
         update(slider: fixedDelaySlider, label: fixedDelayValueLabel, value: setting.fixedDelay)
         update(slider: imageDepthSlider, label: imageDepthValueLabel, value: setting.imageDepth)
         update(slider: stepScaleSlider, label: stepScaleValueLabel, value: setting.stepScale)
+        update(slider: verticalDisplacementSlider, label: verticalDisplacementLabel, value: setting.verticalDisplacement)
+        update(slider: horizontalDisplacmentSlider, label: horizontalDisplacementLabel, value: setting.horizontalDisplacement)
+
     }
     
     func update(textField: UITextField, value: Int, format: String? = "%d") {

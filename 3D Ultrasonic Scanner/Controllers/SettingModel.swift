@@ -23,6 +23,11 @@ public enum Setting: String {
     // Voxel
     case sKeyDimension
     case sKeyStepScale
+    
+    // Displacement
+    case sKeyVerticalDisp
+    case sKeyHorizontalDisp
+
 }
 
 extension UserDefaults{
@@ -118,6 +123,27 @@ extension UserDefaults{
         }
         set{
             set(newValue, forKey: Setting.sKeyStepScale.rawValue)
+        }
+    }
+    
+    
+    @objc dynamic
+    var verticalDisplacement: Float{
+        get{
+            value(forKey: Setting.sKeyVerticalDisp.rawValue) as! Float
+        }
+        set{
+            setValue(newValue, forKey: Setting.sKeyVerticalDisp.rawValue)
+        }
+    }
+    
+    @objc dynamic
+    var horizontalDisplacement: Float{
+        get{
+            value(forKey: Setting.sKeyHorizontalDisp.rawValue) as! Float
+        }
+        set{
+            setValue(newValue, forKey: Setting.sKeyHorizontalDisp.rawValue)
         }
     }
     
