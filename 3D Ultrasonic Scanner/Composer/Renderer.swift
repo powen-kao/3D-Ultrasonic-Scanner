@@ -119,10 +119,6 @@ class Renderer {
     // Constant
     private var probeWidth = 0.047 // meter
     
-    // debug use
-    private let capturer: Capturer
-    
-    
     enum RendererState {
         case Initing
         case Ready
@@ -137,7 +133,6 @@ class Renderer {
         self.voxelInfoBuffer = .init(device: device, count: 1, index: kVoxelInfo.rawValue)
         self.voxelSize = voxelSize
         inFlightSemaphore = DispatchSemaphore(value: maxInFlightBuffers)
-        capturer = Capturer.create(with: device)
         
         // rbg does not need to read/write depth
         let relaxedStateDescriptor = MTLDepthStencilDescriptor()
@@ -189,7 +184,6 @@ class Renderer {
             return
         }
         
-        
         // wait for Semaphore
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
         
@@ -201,15 +195,6 @@ class Renderer {
         
         // Insert frame info
         frameInfoBuffer.assign(makeDefaultFrameInfo(frame: frame, image: image))
-        
-        // MARK: debug info printing for unprojection
-        var kvPairs = [String: Any]()
-        kvPairs["Position"] = self.voxelBuffer![Int(self.voxelCounts)/2].position
-        kvPairs["color"] = self.voxelBuffer![0].color
-        kvPairs["max"] = self.voxelInfoBuffer[0].axisMax
-        kvPairs["min"] = self.voxelInfoBuffer[0].axisMin
-        InfoViewController.shared?.frameInfoText = "\(Tools.pairsToString(items: kvPairs))"
-        
         
         imageTexture = makeTexture(fromPixelBuffer: image, pixelFormat: .bgra8Unorm, planeIndex: 0)!
         var retainingTextures = [imageTexture]
@@ -223,14 +208,8 @@ class Renderer {
             inFlightSemaphore.signal()
             
             finish?()
-            // TODO: clean up
-//            DispatchQueue.main.sync { [self] in
-////                InfoViewController.shared?.frameInfoText = "GPU processing time: \((commandBuffer.gpuEndTime-commandBuffer.gpuStartTime)*1000) ms";
-//                // # WARNING: the message is not sychronous
-//            }
         }
         
-        // TODO: replace frameInfo, ARFrame, gridBuffer with matching result
         // compute thread size
         let width = Int(frameInfo.imageWidth)
         let height = Int(frameInfo.imageHeight)
@@ -303,12 +282,6 @@ class Renderer {
         // make a copy of voxel metal buffer
         voxelCopyBuffer = .init(device: device, from: voxelBuffer!, index: kCopyVoxel.rawValue)
         
-        // MARK: uncomment trigger() to enable frame capture on called
-//        capturer.trigger()
-        
-        capturer.begin()
-        
-        
         guard let _commandBuffer = commandQueue.makeCommandBuffer(),
               let _commandEncoder = _commandBuffer.makeComputeCommandEncoder() else {
             return
@@ -318,7 +291,6 @@ class Renderer {
         
         _commandBuffer.addCompletedHandler({ [self]_ in
             state = .Ready
-            capturer.end()
             print("Filling Finished [\((_commandBuffer.gpuEndTime - _commandBuffer.gpuStartTime)*1000) ms]")
         })
 

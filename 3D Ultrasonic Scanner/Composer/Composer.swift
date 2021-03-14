@@ -282,14 +282,12 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
     }
     
     private func compose() {
-        // TODO: cleanup print
         // State check
         guard composeState == .Ready,
               arFrameBuffer.count > 0,
               probeFrameBuffer.count > 0 else {
             return
         }
-//        os_log("------")
         
         // Stage: Drop image frames that is not possible to match
         var uFrame: UFrameModel?
@@ -538,7 +536,6 @@ extension Composer{
     
     func clearVoxel() {
         renderer?.clearVoxel()
-//        renderer?.execute(task: Task(type: kT_ResetVoxels))
     }
     
     private func checkReady(){

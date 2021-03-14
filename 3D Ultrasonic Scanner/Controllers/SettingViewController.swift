@@ -161,5 +161,5 @@ internal extension SettingViewController{
 
 
 protocol SettingViewDelegate {
-    func clearVoxelClicked()
+    
 }

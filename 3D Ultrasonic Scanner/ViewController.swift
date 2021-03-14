@@ -11,7 +11,7 @@ import ARKit
 import MetalKit
 import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate, SettingViewDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
@@ -80,8 +80,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         }
         
         if segue.identifier == "sSetting"{
-            let dst = segue.destination as! SettingViewController
-            dst.delegate = self
+            // assign self as destination delegate
         }
     }
     
@@ -150,13 +149,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         return node
     }
 */
-    // MARK: - SettingViewDelegate
-    func clearVoxelClicked() {
-        // TODO: remove
-        composer?.clearVoxel()
-    }
     
-    
+    // MARK: - ARSessionObserver
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
         
