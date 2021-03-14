@@ -44,10 +44,12 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     @IBOutlet weak var stepScaleValueLabel: UILabel!
     
     // Displacement
-    @IBOutlet weak var verticalDisplacementLabel: UILabel!
-    @IBOutlet weak var verticalDisplacementSlider: UISlider!
-    @IBOutlet weak var horizontalDisplacementLabel: UILabel!
-    @IBOutlet weak var horizontalDisplacmentSlider: UISlider!
+    @IBOutlet weak var displacementXLabel: UILabel!
+    @IBOutlet weak var displacementXSlider: UISlider!
+    @IBOutlet weak var displacementYLabel: UILabel!
+    @IBOutlet weak var displacementYSlider: UISlider!
+    @IBOutlet weak var displacementZLabel: UILabel!
+    @IBOutlet weak var displacementZSlider: UISlider!
     
     override func viewDidLoad() {
         // add touch gesture recognizer
@@ -117,14 +119,17 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     }
     
     // MARK: Displacement
-    @IBAction func verticalDisplacementChanged(_ sender: UISlider) {
-        update(label: verticalDisplacementLabel, value: sender.value)
-        setting.verticalDisplacement = sender.value
+    @IBAction func displacementXChanged(_ sender: UISlider) {
+        update(label: displacementXLabel, value: sender.value)
+        setting.displacementX = sender.value
     }
-    
-    @IBAction func horizontalDisplacementChanged(_ sender: UISlider) {
-        update(label: horizontalDisplacementLabel, value: sender.value)
-        setting.horizontalDisplacement = sender.value
+    @IBAction func displacementYChanged(_ sender: UISlider) {
+        update(label: displacementYLabel, value: sender.value)
+        setting.displacementY = sender.value
+    }
+    @IBAction func displacementZChanged(_ sender: UISlider) {
+        update(label: displacementZLabel, value: sender.value)
+        setting.displacementZ = sender.value
     }
     
     
@@ -150,8 +155,9 @@ private extension SettingViewController{
         update(slider: fixedDelaySlider, label: fixedDelayValueLabel, value: setting.fixedDelay)
         update(slider: imageDepthSlider, label: imageDepthValueLabel, value: setting.imageDepth)
         update(slider: stepScaleSlider, label: stepScaleValueLabel, value: setting.stepScale)
-        update(slider: verticalDisplacementSlider, label: verticalDisplacementLabel, value: setting.verticalDisplacement)
-        update(slider: horizontalDisplacmentSlider, label: horizontalDisplacementLabel, value: setting.horizontalDisplacement)
+        update(slider: displacementXSlider, label: displacementXLabel, value: setting.displacementX)
+        update(slider: displacementYSlider, label: displacementYLabel, value: setting.displacementY)
+        update(slider: displacementZSlider, label: displacementZLabel, value: setting.displacementZ)
 
     }
     
@@ -167,8 +173,14 @@ private extension SettingViewController{
         label.text = text
     }
     
-    func update(slider: UISlider, label: UILabel ,value: Float) {
-        slider.value = round(value / sliderStep) * sliderStep
+    func update(slider: UISlider, label: UILabel ,value: Float, step: Float?=nil) {
+        
+        var _step = step
+        if _step == nil{
+            _step = sliderStep
+        }
+            
+        slider.value = round(value / _step!) * _step!
         label.text = String(format: "%.1f", value)
     }
 }

@@ -29,8 +29,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                   Setting.sKeyStepScale.rawValue: 1.0,
                                                   
                                                   // Displacement
-                                                  Setting.sKeyVerticalDisp.rawValue: 0.0,
-                                                  Setting.sKeyHorizontalDisp.rawValue: 0.0,
+                                                  Setting.sKeyDisplacementX.rawValue: 0.0,
+                                                  Setting.sKeyDisplacementY.rawValue: 0.0,
+                                                  Setting.sKeyDisplacementZ.rawValue: 0.0,
 
                                                 ])
         return true

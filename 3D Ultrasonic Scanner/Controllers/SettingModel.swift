@@ -25,8 +25,9 @@ public enum Setting: String {
     case sKeyStepScale
     
     // Displacement
-    case sKeyVerticalDisp
-    case sKeyHorizontalDisp
+    case sKeyDisplacementX
+    case sKeyDisplacementY
+    case sKeyDisplacementZ
 
 }
 
@@ -128,22 +129,32 @@ extension UserDefaults{
     
     
     @objc dynamic
-    var verticalDisplacement: Float{
+    var displacementX: Float{
         get{
-            value(forKey: Setting.sKeyVerticalDisp.rawValue) as! Float
+            value(forKey: Setting.sKeyDisplacementX.rawValue) as! Float
         }
         set{
-            setValue(newValue, forKey: Setting.sKeyVerticalDisp.rawValue)
+            setValue(newValue, forKey: Setting.sKeyDisplacementX.rawValue)
         }
     }
     
     @objc dynamic
-    var horizontalDisplacement: Float{
+    var displacementY: Float{
         get{
-            value(forKey: Setting.sKeyHorizontalDisp.rawValue) as! Float
+            value(forKey: Setting.sKeyDisplacementY.rawValue) as! Float
         }
         set{
-            setValue(newValue, forKey: Setting.sKeyHorizontalDisp.rawValue)
+            setValue(newValue, forKey: Setting.sKeyDisplacementY.rawValue)
+        }
+    }
+    
+    @objc dynamic
+    var displacementZ: Float{
+        get{
+            value(forKey: Setting.sKeyDisplacementZ.rawValue) as! Float
+        }
+        set{
+            setValue(newValue, forKey: Setting.sKeyDisplacementZ.rawValue)
         }
     }
     
