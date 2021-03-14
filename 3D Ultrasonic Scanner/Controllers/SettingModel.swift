@@ -22,7 +22,7 @@ public enum Setting: String {
     
     // Voxel
     case sKeyDimension
-    case sKeyStepSize
+    case sKeyStepScale
 }
 
 extension UserDefaults{
@@ -102,9 +102,9 @@ extension UserDefaults{
     }
     
     @objc dynamic
-    var dimension: simd_int3{
+    var dimension: simd_uint3{
         get{
-            (value(forKey: Setting.sKeyDimension.rawValue) as! Data).int3()!
+            (value(forKey: Setting.sKeyDimension.rawValue) as! Data).uint3()!
         }
         set{
             set(newValue.data(), forKey: Setting.sKeyDimension.rawValue)
@@ -112,12 +112,12 @@ extension UserDefaults{
     }
     
     @objc dynamic
-    var stepSize: Float{
+    var stepScale: Float{
         get{
-            value(forKey: Setting.sKeyStepSize.rawValue) as! Float
+            value(forKey: Setting.sKeyStepScale.rawValue) as! Float
         }
         set{
-            set(newValue, forKey: Setting.sKeyStepSize.rawValue)
+            set(newValue, forKey: Setting.sKeyStepScale.rawValue)
         }
     }
     

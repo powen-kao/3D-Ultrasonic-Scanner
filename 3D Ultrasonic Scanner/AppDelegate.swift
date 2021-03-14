@@ -25,8 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                   Setting.sKeyTimeShift.rawValue: 0,
                                                   
                                                   // Voxel
-                                                  Setting.sKeyDimension.rawValue: simd_int3(100, 100, 100).data(),
-                                                  Setting.sKeyStepSize.rawValue: 1.0
+                                                  Setting.sKeyDimension.rawValue: simd_uint3(100, 100, 100).data(),
+                                                  Setting.sKeyStepScale.rawValue: 1.0
                                                 ])
         return true
     }

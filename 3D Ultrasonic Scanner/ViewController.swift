@@ -152,6 +152,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
 */
     // MARK: - SettingViewDelegate
     func clearVoxelClicked() {
+        // TODO: remove
         composer?.clearVoxel()
     }
     
@@ -284,9 +285,20 @@ extension ViewController{
             composer?.startCompose()
         })
         
-
+        let imageDepthObserver = _setting.observe(\.imageDepth, options: [.initial, .new], changeHandler: { [self] setting, value in
+            composer?.imageDepth = Double(_setting.imageDepth)
+        })
         
-        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver]
+        let voxelSizeObserver = _setting.observe(\.dimension, options: [.initial, .new], changeHandler: { [self] setting, value in
+            composer?.voxelSize = _setting.dimension
+        })
+        
+        let stepScaleObserver = _setting.observe(\.stepScale, options: [.initial, .new], changeHandler: { [self] setting, value in
+            composer?.voxelStepScale = Double(_setting.stepScale)
+        })
+        
+        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver, imageDepthObserver,
+                     voxelSizeObserver, stepScaleObserver]
     }
     
     typealias AlertAction = () -> ()

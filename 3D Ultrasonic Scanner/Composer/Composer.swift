@@ -72,6 +72,22 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
     // Renderer
     // WARNING: do not modifiy renderer from other controllers
     private(set) var renderer: Renderer?
+    var voxelSize: simd_uint3?{
+        didSet{
+            renderer?.voxelSize = self.voxelSize
+        }
+    }
+    var voxelStepScale = 1.0{
+        didSet{
+            renderer?.voxelScale = self.voxelStepScale
+        }
+    }
+    var imageDepth: Double? {
+        didSet{
+            renderer?.depth = self.imageDepth
+        }
+    }
+
     
     // output
     private var outputAssest: MDLAsset?
@@ -120,7 +136,7 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
         self.device = _device
         
         // Create renderer with device
-        renderer = Renderer(metalDevice: device!)
+        renderer = Renderer(metalDevice: device!, voxelSize: voxelSize)
         
         // Capturer for GPU tracing
         captureScope = MTLCaptureManager.shared().makeCaptureScope(device: device!)
@@ -502,9 +518,14 @@ extension Composer{
         // State switching
         switch composeState {
             case .WaitForFirstFrame:
+                
                 restOrigin()
                 baseTimestamp = frame.timestamp
-                composeState = .Buffering
+                
+                let success = renderer?.prepare(for: _pixelBuffer, depth: imageDepth!, voxelSize: voxelSize)
+                if success ?? false{
+                    composeState = .Buffering
+                }
             case .Buffering:
                 checkReady()
                 break
@@ -516,7 +537,8 @@ extension Composer{
     
     
     func clearVoxel() {
-        renderer?.execute(task: Task(type: kT_ResetVoxels))
+        renderer?.clearVoxel()
+//        renderer?.execute(task: Task(type: kT_ResetVoxels))
     }
     
     private func checkReady(){
@@ -568,9 +590,9 @@ extension Composer{
 @objc enum ComposeState: Int {
     case Idle
     case WaitForFirstFrame  // waiting for first frame to take as reference frame
-    case Buffering
-    case Ready
-    case HoleFilling
+    case Buffering // collecting some frame to guarentee smooth frame matching
+    case Ready // composer is ready to match frame
+    case HoleFilling // filling holes
 }
 
 

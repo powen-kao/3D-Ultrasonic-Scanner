@@ -9,7 +9,7 @@ import Foundation
 import ARKit
 import Metal
 import MetalKit
-
+import os
 
 class Renderer {    
     // To expose
@@ -28,6 +28,30 @@ class Renderer {
     }
     var delegate: RendererDelegate?
     
+    // Required parameters
+    var depth: Double?{ // cm
+        didSet{
+            updateVoxelInfo()
+        }
+    }
+    var pixelDensityX: Double?{
+        guard let _lastWidth = imageWidth else {
+            return nil
+        }
+        return Double(_lastWidth) / probeWidth // pixel per meter
+    }
+    var pixelDensityY: Double?{
+        guard let _depth = depth,
+              let _lastHeight = imageHeight else {
+            return nil
+        }
+        return Double(_lastHeight) / (_depth / 100.0)  // pixel per meter
+    }
+    
+    // last unprojected dimension
+    private var imageWidth: Int?
+    private var imageHeight: Int?
+    
     // Basic Metal objects
     private let device: MTLDevice
     private let library: MTLLibrary
@@ -44,13 +68,31 @@ class Renderer {
     private let depthStencilState: MTLDepthStencilState
     
     // Voxel parameters
-    let voxelSize = simd_uint3(100, 100, 100)
-    private var voxelCounts: UInt32 {
-        get{
-            voxelSize.x * voxelSize.y * voxelSize.z
+    var voxelSize: simd_uint3?{
+        didSet{
+            checkVoxelBuffer()
         }
     }
-    private var voxelStpeSize = 0.00027195 // meter per voxel step
+    private var voxelCounts: UInt32 {
+        get{
+            guard voxelSize != nil else {
+                return 0
+            }
+            return voxelSize!.x * voxelSize!.y * voxelSize!.z
+        }
+    }
+    var voxelScale: Double = 1.0{
+        didSet{
+            updateVoxelInfo()
+        }
+    }
+    var voxelStpeSize: Double? {
+        // take the width density as voxel density since it's a constant
+        if pixelDensityX != nil{
+            return (1 / pixelDensityX!) * voxelScale // meter per voxel step
+        }
+        return nil
+    }
     private var voxelOrigin: Float3?
     
     // Buffers
@@ -74,6 +116,9 @@ class Renderer {
     private var maxInFlightBuffers = 1
     private let maxPoints = 500000
 
+    // Constant
+    private var probeWidth = 0.047 // meter
+    
     // debug use
     private let capturer: Capturer
     
@@ -84,15 +129,16 @@ class Renderer {
         case Processing
     }
 
-    init(metalDevice: MTLDevice) {
+    init(metalDevice: MTLDevice, voxelSize: simd_uint3?=nil) {
         self.device = metalDevice
         self.library = device.makeDefaultLibrary()!
         self.commandQueue = device.makeCommandQueue()!
         self.frameInfoBuffer = .init(device: device, count: 1, index: kFrameInfo.rawValue)
         self.voxelInfoBuffer = .init(device: device, count: 1, index: kVoxelInfo.rawValue)
+        self.voxelSize = voxelSize
         inFlightSemaphore = DispatchSemaphore(value: maxInFlightBuffers)
         capturer = Capturer.create(with: device)
-
+        
         // rbg does not need to read/write depth
         let relaxedStateDescriptor = MTLDepthStencilDescriptor()
         relaxedStencilState = device.makeDepthStencilState(descriptor: relaxedStateDescriptor)!
@@ -103,17 +149,34 @@ class Renderer {
         depthStateDescriptor.isDepthWriteEnabled = true
         depthStencilState = device.makeDepthStencilState(descriptor: depthStateDescriptor)!
         
-        // init the max and min points with a extream value
-        // TODO: remake
+        // init info
         voxelInfoBuffer.assign(makeDefautVoxelInfo())
+    }
+    
+    
+    /// Prepare buffer and redering info for specific image and configuration
+    func prepare(for image: CVPixelBuffer, depth: Double, voxelSize: simd_uint3?=nil) -> Bool{
         
-        // Init values that require
-        checkVoxelBuffer()
+        // update input info
+        self.depth = depth
+        self.imageWidth = image.width()
+        self.imageHeight = image.height()
         
-        // Post-operations
-        execute(task: Task(type: kT_ResetVoxels)) {
-            self.state = .Ready
+        if voxelSize != nil{
+            self.voxelSize = voxelSize
         }
+        
+        guard self.voxelSize != nil else {
+            os_log("Preparation failed due to uninited voxel size.")
+            return false
+        }
+        
+        updateVoxelInfo()
+    
+        // Post-operations
+        clearVoxel()
+        
+        return true
     }
     
     /**
@@ -126,10 +189,11 @@ class Renderer {
             return
         }
         
-        state = .Processing
         
         // wait for Semaphore
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
+        
+        state = .Processing
         
         // prepare for buffers and information for shader
         checkPreviewBuffer(image: image)
@@ -308,6 +372,12 @@ class Renderer {
         viewportSize = size
     }
     
+    func clearVoxel() {
+        self.state = .Processing
+        execute(task: Task(type: kT_ResetVoxels)){
+            self.state = .Ready
+        }
+    }
 }
 
 private extension Renderer {
@@ -407,8 +477,8 @@ private extension Renderer {
         frameInfo.transform = camera.transform
         frameInfo.imageWidth = Int32(image.width())
         frameInfo.imageHeight = Int32(image.height())
-        frameInfo.uIntrinsics = simd_float3x3.init(columns: ([3677, 0, 0],
-                                                             [0, 3677, 0],
+        frameInfo.uIntrinsics = simd_float3x3.init(columns: ([Float(pixelDensityX ?? 3677), 0, 0],
+                                                             [0, Float(pixelDensityY ?? 3677), 0],
                                                              [Float(image.width())/2.0, Float(image.height())/2.0, 1]))
         // transform that convert color to black and white
         frameInfo.colorSpaceTransform = simd_float4x4.init([0.333, 0.333, 0.333, 1],
@@ -429,26 +499,28 @@ private extension Renderer {
         var voxelInfo = VoxelInfo()
         voxelInfo.axisMax = simd_float3(repeating: Float.leastNormalMagnitude)
         voxelInfo.axisMin = simd_float3(repeating: Float.greatestFiniteMagnitude)
-        voxelInfo.size = voxelSize
-        voxelInfo.stepSize = Float(voxelStpeSize)
-        voxelInfo.count = voxelCounts
         voxelInfo.state = kVInit
         voxelInfo.inversedTransform = matrix_identity_float4x4
         voxelInfo.transform = matrix_identity_float4x4
         voxelInfo.rotateToARCamera = rotateToARCamera
         voxelInfo.inversedRotateToARCamera = rotateToARCamera.inverse
-        voxelInfo.centerizeTransform = simd_float4x4([1, 0, 0, -Float(voxelSize.x)/2],
-                                                     [0, 1, 0, -Float(voxelSize.y)/2],
-                                                     [0, 0, 1, 0],
-                                                     [0, 0, 0, 1])
-        voxelInfo.inversedCenterizeTransform = voxelInfo.centerizeTransform.inverse
         return voxelInfo
     }
     
     private func updateVoxelInfo() {
-        voxelInfoBuffer[0].size = voxelSize
-        voxelInfoBuffer[0].stepSize = Float(voxelStpeSize)
+        guard voxelSize != nil,
+              voxelStpeSize != nil else {
+            return
+        }
+        
+        voxelInfoBuffer[0].size = voxelSize!
+        voxelInfoBuffer[0].stepSize = Float(voxelStpeSize!)
         voxelInfoBuffer[0].count = voxelCounts
+        voxelInfoBuffer[0].centerizeTransform = simd_float4x4([1, 0, 0, -Float(voxelSize!.x)/2],
+                                                              [0, 1, 0, -Float(voxelSize!.y)/2],
+                                                              [0, 0, 1, 0],
+                                                              [0, 0, 0, 1])
+        voxelInfoBuffer[0].inversedCenterizeTransform = voxelInfo.centerizeTransform.inverse
     }
     
     static func cameraToDisplayRotation(orientation: UIInterfaceOrientation) -> Int {

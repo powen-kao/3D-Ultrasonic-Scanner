@@ -40,8 +40,8 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     @IBOutlet weak var dimensionXTextField: UITextField!
     @IBOutlet weak var dimensionYTextField: UITextField!
     @IBOutlet weak var dimensionZTextField: UITextField!
-    @IBOutlet weak var stepSizeSlider: UISlider!
-    @IBOutlet weak var stepSizeValueLabel: UILabel!
+    @IBOutlet weak var stepScaleSlider: UISlider!
+    @IBOutlet weak var stepScaleValueLabel: UILabel!
     
     
     override func viewDidLoad() {
@@ -92,23 +92,23 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
         guard let value = Int(sender.text!) else {
             return
         }
-        setting.dimension.x = Int32(value)
+        setting.dimension.x = UInt32(value)
     }
     @IBAction func dimensionYEndEditing(_ sender: UITextField) {
         guard let value = Int(sender.text!) else {
             return
         }
-        setting.dimension.y = Int32(value)
+        setting.dimension.y = UInt32(value)
     }
     @IBAction func dimensionZEndEditing(_ sender: UITextField) {
         guard let value = Int(sender.text!) else {
             return
         }
-        setting.dimension.z = Int32(value)
+        setting.dimension.z = UInt32(value)
     }
-    @IBAction func stepSizeChanged(_ sender: Any) {
-        update(label: stepSizeValueLabel, value: stepSizeSlider.value)
-        setting.stepSize = stepSizeSlider.value
+    @IBAction func stepScaleChanged(_ sender: Any) {
+        update(label: stepScaleValueLabel, value: stepScaleSlider.value)
+        setting.stepScale = stepScaleSlider.value
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -132,7 +132,7 @@ private extension SettingViewController{
         update(slider: timeShiftSlider, label: timeShiftValueLabel, value: setting.timeShift)
         update(slider: fixedDelaySlider, label: fixedDelayValueLabel, value: setting.fixedDelay)
         update(slider: imageDepthSlider, label: imageDepthValueLabel, value: setting.imageDepth)
-        update(slider: stepSizeSlider, label: stepSizeValueLabel, value: setting.stepSize)
+        update(slider: stepScaleSlider, label: stepScaleValueLabel, value: setting.stepScale)
     }
     
     func update(textField: UITextField, value: Int, format: String? = "%d") {

@@ -56,15 +56,15 @@ extension UIScrollView{
     }
 }
 
-extension simd_int3 {
+extension simd_uint3 {
     func data() -> Data? {
         try? PropertyListEncoder().encode(self)
     }
 }
 
 extension Data{
-    func int3() -> simd_int3? {
-        try? PropertyListDecoder().decode(simd_int3.self, from: self)
+    func uint3() -> simd_uint3? {
+        try? PropertyListDecoder().decode(simd_uint3.self, from: self)
     }
 }
 
