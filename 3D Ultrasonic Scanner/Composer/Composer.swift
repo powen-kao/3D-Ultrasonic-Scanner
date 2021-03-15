@@ -87,6 +87,11 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
             renderer?.depth = self.imageDepth
         }
     }
+    var displacement: simd_float3 = simd_float3(0, 0, 0){
+        didSet{
+            renderer?.displacement = self.displacement
+        }
+    }
 
     
     // output

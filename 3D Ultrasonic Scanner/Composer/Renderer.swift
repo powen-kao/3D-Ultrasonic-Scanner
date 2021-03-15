@@ -93,6 +93,9 @@ class Renderer {
         }
         return nil
     }
+    
+    var displacement = simd_float3(0, 0, 0)
+
     private var voxelOrigin: Float3?
     
     // Buffers
@@ -463,6 +466,13 @@ private extension Renderer {
                             [0, -1, 0, 0],
                             [0, 0, 1, 0],
                             [0, 0, 0, 1] )
+        
+        frameInfo.displacement = simd_float4x4.init(rows: [[1, 0, 0, displacement.x / 100],
+                                                           [0, 1, 0, displacement.y / 100],
+                                                           [0, 0, 1, displacement.z / 100],
+                                                           [0 ,0 ,0, 1]])
+        
+        frameInfo.inversedDisplacement = frameInfo.displacement.inverse
         
         return frameInfo
     }

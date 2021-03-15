@@ -10,7 +10,7 @@ import UIKit
 
 
 /// Global setting
-public enum Setting: String {
+public enum SettingKey: String {
     case sKeyProbeSorce
     case sKeyARSource
     case sKeySourceFolder
@@ -25,45 +25,43 @@ public enum Setting: String {
     case sKeyStepScale
     
     // Displacement
-    case sKeyDisplacementX
-    case sKeyDisplacementY
-    case sKeyDisplacementZ
+    case sKeyDisplacement
 
 }
 
 extension UserDefaults{
     
-    func value<T: RawRepresentable>(for key: Setting) -> T {
+    func value<T: RawRepresentable>(for key: SettingKey) -> T {
         T.init(rawValue: UserDefaults.standard.value(forKey: key.rawValue) as! T.RawValue)!
     }
-    func set(_ value: Any, for key: Setting) {
+    func set(_ value: Any, for key: SettingKey) {
         UserDefaults.standard.setValue(value, forKey: key.rawValue)
     }
     
     @objc dynamic
     var probeSource: ProbeSource{
         get{
-            value(for: Setting.sKeyProbeSorce)
+            value(for: SettingKey.sKeyProbeSorce)
         }
         set{
-            set(newValue.rawValue, for: Setting.sKeyProbeSorce)
+            set(newValue.rawValue, for: SettingKey.sKeyProbeSorce)
         }
     }
     
     @objc dynamic
     var arSource: ARSource{
         get{
-            value(for: Setting.sKeyARSource)
+            value(for: SettingKey.sKeyARSource)
         }
         set{
-            set(newValue.rawValue, for: Setting.sKeyARSource)
+            set(newValue.rawValue, for: SettingKey.sKeyARSource)
         }
     }
     
     @objc dynamic
     var sourceFolder: URL?{
         get {
-            guard let data = data(forKey: Setting.sKeySourceFolder.rawValue) else {
+            guard let data = data(forKey: SettingKey.sKeySourceFolder.rawValue) else {
                 return nil
             }
             var stale = false
@@ -73,89 +71,85 @@ extension UserDefaults{
             guard newValue != nil else {
                 return
             }
-            set(try? newValue!.bookmarkData(), forKey: Setting.sKeySourceFolder.rawValue)
+            set(try? newValue!.bookmarkData(), forKey: SettingKey.sKeySourceFolder.rawValue)
         }
     }
     
     @objc dynamic
     var imageDepth: Float{
         get{
-            value(forKey: Setting.sKeyImageDepth.rawValue) as! Float
+            value(forKey: SettingKey.sKeyImageDepth.rawValue) as! Float
         }
         set{
-            set(newValue, forKey: Setting.sKeyImageDepth.rawValue)
+            set(newValue, forKey: SettingKey.sKeyImageDepth.rawValue)
         }
     }
     
     @objc dynamic
     var timeShift: Float{
         get{
-            value(forKey: Setting.sKeyTimeShift.rawValue) as! Float
+            value(forKey: SettingKey.sKeyTimeShift.rawValue) as! Float
         }
         set{
-            set(newValue, forKey: Setting.sKeyTimeShift.rawValue)
+            set(newValue, forKey: SettingKey.sKeyTimeShift.rawValue)
         }
     }
     
     @objc dynamic
     var fixedDelay: Float{
         get{
-            value(forKey: Setting.sKeyFixedDelay.rawValue) as! Float
+            value(forKey: SettingKey.sKeyFixedDelay.rawValue) as! Float
         }
         set{
-            set(newValue, forKey: Setting.sKeyFixedDelay.rawValue)
+            set(newValue, forKey: SettingKey.sKeyFixedDelay.rawValue)
         }
     }
     
     @objc dynamic
     var dimension: simd_uint3{
         get{
-            (value(forKey: Setting.sKeyDimension.rawValue) as! Data).uint3()!
+            (value(forKey: SettingKey.sKeyDimension.rawValue) as! Data).uint3()!
         }
         set{
-            set(newValue.data(), forKey: Setting.sKeyDimension.rawValue)
+            set(newValue.data(), forKey: SettingKey.sKeyDimension.rawValue)
         }
     }
     
     @objc dynamic
     var stepScale: Float{
         get{
-            value(forKey: Setting.sKeyStepScale.rawValue) as! Float
+            value(forKey: SettingKey.sKeyStepScale.rawValue) as! Float
         }
         set{
-            set(newValue, forKey: Setting.sKeyStepScale.rawValue)
-        }
-    }
-    
-    
-    @objc dynamic
-    var displacementX: Float{
-        get{
-            value(forKey: Setting.sKeyDisplacementX.rawValue) as! Float
-        }
-        set{
-            setValue(newValue, forKey: Setting.sKeyDisplacementX.rawValue)
+            set(newValue, forKey: SettingKey.sKeyStepScale.rawValue)
         }
     }
     
     @objc dynamic
-    var displacementY: Float{
+    var displacement: simd_float3{
         get{
-            value(forKey: Setting.sKeyDisplacementY.rawValue) as! Float
+            (value(forKey: SettingKey.sKeyDisplacement.rawValue) as! Data).float3()!
         }
         set{
-            setValue(newValue, forKey: Setting.sKeyDisplacementY.rawValue)
+            setValue(newValue.data(), forKey: SettingKey.sKeyDisplacement.rawValue)
         }
     }
-    
-    @objc dynamic
-    var displacementZ: Float{
-        get{
-            value(forKey: Setting.sKeyDisplacementZ.rawValue) as! Float
-        }
-        set{
-            setValue(newValue, forKey: Setting.sKeyDisplacementZ.rawValue)
-        }
+
+}
+
+class Setting: ObservableObject {
+    static let standard = Setting()
+
+    private let userDefault = UserDefaults.standard
+
+    @Published var displacement: simd_float3 = UserDefaults.standard.displacement
+
+    func set(depth: Float) {
+        userDefault.imageDepth = depth
     }
-    
+
+    func set(displacement: simd_float3) {
+        userDefault.displacement = displacement
+        self.displacement = displacement
+    }
 }

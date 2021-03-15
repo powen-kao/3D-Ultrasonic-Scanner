@@ -15,23 +15,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        UserDefaults.standard.register(defaults: [Setting.sKeyProbeSorce.rawValue: ProbeSource.Streaming.rawValue,
-                                                  Setting.sKeyARSource.rawValue: ARSource.RealtimeAR.rawValue,
-                                                  Setting.sKeySourceFolder.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings"), // default file path
-                                                  Setting.sKeyImageDepth.rawValue: 5,
+        UserDefaults.standard.register(defaults: [SettingKey.sKeyProbeSorce.rawValue: ProbeSource.Streaming.rawValue,
+                                                  SettingKey.sKeyARSource.rawValue: ARSource.RealtimeAR.rawValue,
+                                                  SettingKey.sKeySourceFolder.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings"), // default file path
+                                                  SettingKey.sKeyImageDepth.rawValue: 5,
                                                   
                                                   // Probe to AR
-                                                  Setting.sKeyFixedDelay.rawValue: 0,
-                                                  Setting.sKeyTimeShift.rawValue: 0,
+                                                  SettingKey.sKeyFixedDelay.rawValue: 0,
+                                                  SettingKey.sKeyTimeShift.rawValue: 0,
                                                   
                                                   // Voxel
-                                                  Setting.sKeyDimension.rawValue: simd_uint3(100, 100, 100).data(),
-                                                  Setting.sKeyStepScale.rawValue: 1.0,
+                                                  SettingKey.sKeyDimension.rawValue: simd_uint3(100, 100, 100).data(),
+                                                  SettingKey.sKeyStepScale.rawValue: 1.0,
                                                   
                                                   // Displacement
-                                                  Setting.sKeyDisplacementX.rawValue: 0.0,
-                                                  Setting.sKeyDisplacementY.rawValue: 0.0,
-                                                  Setting.sKeyDisplacementZ.rawValue: 0.0,
+                                                  SettingKey.sKeyDisplacement.rawValue: simd_float3(0, 0, 0).data(),
+
 
                                                 ])
         return true

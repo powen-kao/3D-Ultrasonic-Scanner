@@ -34,6 +34,7 @@ typedef enum Mode{
 
 struct FrameInfo {
     // 'u' represent 'ultrasound'
+    // TODO: cleanup unused parameters
     matrix_float4x4 viewProjectionMatrix;
     matrix_float4x4 transform;
     matrix_float4x4 uImageToCamera;
@@ -42,6 +43,9 @@ struct FrameInfo {
     matrix_float3x3 uIntrinsics;
     matrix_float4x4 colorSpaceTransform;
     matrix_float4x4 flipY;
+    matrix_float4x4 displacement;
+    matrix_float4x4 inversedDisplacement;
+
     
     // Draw info
     PreviewDrawMode mode;

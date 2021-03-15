@@ -56,7 +56,15 @@ extension UIScrollView{
     }
 }
 
+
+// MARK: Encodable and Decodable Extensions
 extension simd_uint3 {
+    func data() -> Data? {
+        try? PropertyListEncoder().encode(self)
+    }
+}
+
+extension simd_float3{
     func data() -> Data? {
         try? PropertyListEncoder().encode(self)
     }
@@ -66,7 +74,12 @@ extension Data{
     func uint3() -> simd_uint3? {
         try? PropertyListDecoder().decode(simd_uint3.self, from: self)
     }
+    func float3() -> simd_float3? {
+        try? PropertyListDecoder().decode(simd_float3.self, from: self)
+    }
 }
+
+
 
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {

@@ -291,9 +291,15 @@ extension ViewController{
             composer?.voxelStepScale = Double(_setting.stepScale)
         })
         
+
+        let displacementObserver = Setting.standard.$displacement.sink { [self] (value) in
+            composer?.displacement = value
+        }
+        
         observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver, imageDepthObserver,
-                     voxelSizeObserver, stepScaleObserver]
+                     voxelSizeObserver, stepScaleObserver, displacementObserver]
     }
+    
     
     typealias AlertAction = () -> ()
 }

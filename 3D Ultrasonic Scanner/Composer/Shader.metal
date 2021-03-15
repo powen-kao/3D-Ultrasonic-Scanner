@@ -53,7 +53,7 @@ static bool vPositionIsValid(int3 vPosition, const device VoxelInfo &info){
  */
 static simd_float4 imageToWorld(simd_float2 cameraPoint, const device VoxelInfo *vInfo, constant FrameInfo *fInfo) {
     auto localPoint = fInfo->uIntrinsicsInversed * simd_float3(cameraPoint, 1);
-    const auto worldPoint = fInfo->transform * vInfo->rotateToARCamera * fInfo->flipY * simd_float4(simd_float3(localPoint.xy, 0), 1);
+    const auto worldPoint = fInfo->transform * fInfo->displacement * vInfo->rotateToARCamera * fInfo->flipY * simd_float4(simd_float3(localPoint.xy, 0), 1);
     // TODO: add transform from iPhone to ultrasound image
     return worldPoint; // without normalization
 }
@@ -61,8 +61,8 @@ static simd_float4 imageToWorld(simd_float2 cameraPoint, const device VoxelInfo 
 /*
  convert from world coordinate to camera local coordinate (not image coordinate).
  */
-static simd_float4 worldToLocal(simd_float3 worldPoint, const device VoxelInfo *vInfo) {
-    const auto localPoint = vInfo->inversedRotateToARCamera * vInfo->inversedTransform * simd_float4(worldPoint, 1);
+static simd_float4 worldToLocal(simd_float3 worldPoint, const device VoxelInfo *vInfo, thread matrix_float4x4 offset) {
+    const auto localPoint = vInfo->inversedRotateToARCamera * offset * vInfo->inversedTransform * simd_float4(worldPoint, 1);
     return localPoint; // without normalization
 }
 
@@ -183,7 +183,7 @@ kernel void renderPreview(uint2 grid_pos [[thread_position_in_grid]],
     }
     
     auto worldPosition = imageToWorld(float2(grid_pos), &vInfo, &fInfo);
-    auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
+    auto localPosition = worldToLocal(worldPosition.xyz, &vInfo, fInfo.inversedDisplacement);
     
     float4 color = uImageTexture.sample(colorSampler, float2(float(grid_pos.x)/fInfo.imageWidth, float(grid_pos.y)/fInfo.imageHeight));
     
@@ -220,7 +220,7 @@ kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
 
     // transform points with inverse transform of the first frame (which serves as reference)
     // (this provide local coordinate and scale)
-    auto localPosition = worldToLocal(worldPosition.xyz, &vInfo);
+    auto localPosition = worldToLocal(worldPosition.xyz, &vInfo, fInfo.inversedDisplacement);
     
     // TODO: remove if not used
 //    updateMinMax(worldPosition.xyz ,vInfo);

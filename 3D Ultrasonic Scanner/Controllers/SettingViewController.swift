@@ -35,7 +35,6 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     @IBOutlet weak var fixedDelayValueLabel: UILabel!
     @IBOutlet weak var fixedDelaySlider: UISlider!
     
-    
     // Voxel
     @IBOutlet weak var dimensionXTextField: UITextField!
     @IBOutlet weak var dimensionYTextField: UITextField!
@@ -121,15 +120,20 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     // MARK: Displacement
     @IBAction func displacementXChanged(_ sender: UISlider) {
         update(label: displacementXLabel, value: sender.value)
-        setting.displacementX = sender.value
+        setting.displacement.x = sender.value
+        Setting.standard.displacement.x = sender.value
     }
     @IBAction func displacementYChanged(_ sender: UISlider) {
         update(label: displacementYLabel, value: sender.value)
-        setting.displacementY = sender.value
+        setting.displacement.y = sender.value
+        Setting.standard.displacement.y = sender.value
+
     }
     @IBAction func displacementZChanged(_ sender: UISlider) {
         update(label: displacementZLabel, value: sender.value)
-        setting.displacementZ = sender.value
+        setting.displacement.z  = sender.value
+        Setting.standard.displacement.z = sender.value
+
     }
     
     
@@ -155,9 +159,9 @@ private extension SettingViewController{
         update(slider: fixedDelaySlider, label: fixedDelayValueLabel, value: setting.fixedDelay)
         update(slider: imageDepthSlider, label: imageDepthValueLabel, value: setting.imageDepth)
         update(slider: stepScaleSlider, label: stepScaleValueLabel, value: setting.stepScale)
-        update(slider: displacementXSlider, label: displacementXLabel, value: setting.displacementX)
-        update(slider: displacementYSlider, label: displacementYLabel, value: setting.displacementY)
-        update(slider: displacementZSlider, label: displacementZLabel, value: setting.displacementZ)
+        update(slider: displacementXSlider, label: displacementXLabel, value: setting.displacement.x)
+        update(slider: displacementYSlider, label: displacementYLabel, value: setting.displacement.y)
+        update(slider: displacementZSlider, label: displacementZLabel, value: setting.displacement.z)
 
     }
     
