@@ -260,44 +260,90 @@ extension ViewController{
     // MARK: Observers
     private func addObservers() {
         
-        let _setting = UserDefaults.standard
+        let _setting = Setting.standard
         
-        let sourceFolderObserver = _setting.observe(\.sourceFolder, options: [.initial, .new], changeHandler: { [self] setting, value in
-            guard let _sourceFolder = setting.sourceFolder else {
-                return
-            }
-            composer?.recordingURL = _sourceFolder
-        })
-        
-        let probeSourceObserver = _setting.observe(\.probeSource, options: [.initial, .new]  ,changeHandler: { [self] setting, value in
-            composer?.switchProbeSource(source: setting.probeSource)
-            composer?.startCompose()
-        })
-        
-        let arSourceObserver = _setting.observe(\.arSource, options: [.initial, .new], changeHandler: { [self] setting, value in
-            composer?.switchARSource(source: setting.arSource)
-            composer?.startCompose()
-        })
-        
-        let imageDepthObserver = _setting.observe(\.imageDepth, options: [.initial, .new], changeHandler: { [self] setting, value in
-            composer?.imageDepth = Double(_setting.imageDepth)
-        })
-        
-        let voxelSizeObserver = _setting.observe(\.dimension, options: [.initial, .new], changeHandler: { [self] setting, value in
-            composer?.voxelSize = _setting.dimension
-        })
-        
-        let stepScaleObserver = _setting.observe(\.stepScale, options: [.initial, .new], changeHandler: { [self] setting, value in
-            composer?.voxelStepScale = Double(_setting.stepScale)
-        })
-        
+        observers = [
+            _setting.$probeSource.sink(receiveValue: { [self] (value) in
+                composer?.switchProbeSource(source: value)
+                composer?.startCompose()
+            }),
+            _setting.$arSource.sink(receiveValue: { [self] (value) in
+                composer?.switchARSource(source: value)
+                composer?.startCompose()
+            }),
+            _setting.$sourceFolder.sink(receiveValue: { [self] (value) in
+                guard let _sourceFolder = value else {
+                    return
+                }
+                composer?.recordingURL = _sourceFolder
+            }),
+            _setting.$imageDepth.sink(receiveValue: { (value) in
+                self.composer?.imageDepth = Double(value)
+            }),
+            
+            
+            _setting.$timeShift.sink(receiveValue: { (value) in
+                self.composer?.timeShift = value
+            }),
+            _setting.$fixedDelay.sink(receiveValue: { (value) in
+                self.composer?.fixedDelay = value
+            }),
+            
+            
+            _setting.$dimension.sink(receiveValue: { (value) in
+                self.composer?.voxelSize = value
+            }),
+            _setting.$stepScale.sink(receiveValue: { (value) in
+                self.composer?.voxelStepScale = Double(value)
+            }),
 
-        let displacementObserver = Setting.standard.$displacement.sink { [self] (value) in
-            composer?.displacement = value
-        }
+            
+            _setting.$displacement.sink(receiveValue: { (value) in
+                self.composer?.displacement = value
+            }),
+            
+        ]
         
-        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver, imageDepthObserver,
-                     voxelSizeObserver, stepScaleObserver, displacementObserver]
+//        let _setting = UserDefaults.standard
+//
+//        let sourceFolderObserver = _setting.observe(\.sourceFolder, options: [.initial, .new], changeHandler: { [self] setting, value in
+//            guard let _sourceFolder = setting.sourceFolder else {
+//                return
+//            }
+//            composer?.recordingURL = _sourceFolder
+//        })
+//
+//        let probeSourceObserver = _setting.observe(\.probeSource, options: [.initial, .new]  ,changeHandler: { [self] setting, value in
+//            composer?.switchProbeSource(source: setting.probeSource)
+//            composer?.startCompose()
+//        })
+//
+//        let arSourceObserver = _setting.observe(\.arSource, options: [.initial, .new], changeHandler: { [self] setting, value in
+//            composer?.switchARSource(source: setting.arSource)
+//            composer?.startCompose()
+//        })
+//
+////        let imageDepthObserver = _setting.observe(\.imageDepth, options: [.initial, .new], changeHandler: { [self] setting, value in
+////            composer?.imageDepth = Double(_settings.imageDepth)
+////        })
+//
+//        let voxelSizeObserver = _setting.observe(\.dimension, options: [.initial, .new], changeHandler: { [self] setting, value in
+//            composer?.voxelSize = _setting.dimension
+//        })
+//        let sizeCancellable = _setting.dimension
+//
+//        let stepScaleObserver = _setting.observe(\.stepScale, options: [.initial, .new], changeHandler: { [self] setting, value in
+//            composer?.voxelStepScale = Double(_setting.stepScale)
+//        })
+//
+//
+//        let displacementObserver = Setting.standard.$displacement.sink { [self] (value) in
+//            composer?.displacement = value
+//        }
+//
+        
+//        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver, imageDepthObserver,
+//                     voxelSizeObserver, stepScaleObserver, displacementObserver]
     }
     
     

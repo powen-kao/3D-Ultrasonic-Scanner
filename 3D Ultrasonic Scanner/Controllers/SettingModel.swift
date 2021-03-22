@@ -7,7 +7,8 @@
 
 import Foundation
 import UIKit
-
+import Combine
+import os
 
 /// Global setting
 public enum SettingKey: String {
@@ -29,127 +30,127 @@ public enum SettingKey: String {
 
 }
 
-extension UserDefaults{
-    
-    func value<T: RawRepresentable>(for key: SettingKey) -> T {
-        T.init(rawValue: UserDefaults.standard.value(forKey: key.rawValue) as! T.RawValue)!
-    }
-    func set(_ value: Any, for key: SettingKey) {
-        UserDefaults.standard.setValue(value, forKey: key.rawValue)
-    }
-    
-    @objc dynamic
-    var probeSource: ProbeSource{
-        get{
-            value(for: SettingKey.sKeyProbeSorce)
-        }
-        set{
-            set(newValue.rawValue, for: SettingKey.sKeyProbeSorce)
-        }
-    }
-    
-    @objc dynamic
-    var arSource: ARSource{
-        get{
-            value(for: SettingKey.sKeyARSource)
-        }
-        set{
-            set(newValue.rawValue, for: SettingKey.sKeyARSource)
-        }
-    }
-    
-    @objc dynamic
-    var sourceFolder: URL?{
-        get {
-            guard let data = data(forKey: SettingKey.sKeySourceFolder.rawValue) else {
-                return nil
-            }
-            var stale = false
-            return try? URL.init(resolvingBookmarkData: data, bookmarkDataIsStale: &stale)
-        }
-        set{
-            guard newValue != nil else {
-                return
-            }
-            set(try? newValue!.bookmarkData(), forKey: SettingKey.sKeySourceFolder.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var imageDepth: Float{
-        get{
-            value(forKey: SettingKey.sKeyImageDepth.rawValue) as! Float
-        }
-        set{
-            set(newValue, forKey: SettingKey.sKeyImageDepth.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var timeShift: Float{
-        get{
-            value(forKey: SettingKey.sKeyTimeShift.rawValue) as! Float
-        }
-        set{
-            set(newValue, forKey: SettingKey.sKeyTimeShift.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var fixedDelay: Float{
-        get{
-            value(forKey: SettingKey.sKeyFixedDelay.rawValue) as! Float
-        }
-        set{
-            set(newValue, forKey: SettingKey.sKeyFixedDelay.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var dimension: simd_uint3{
-        get{
-            (value(forKey: SettingKey.sKeyDimension.rawValue) as! Data).uint3()!
-        }
-        set{
-            set(newValue.data(), forKey: SettingKey.sKeyDimension.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var stepScale: Float{
-        get{
-            value(forKey: SettingKey.sKeyStepScale.rawValue) as! Float
-        }
-        set{
-            set(newValue, forKey: SettingKey.sKeyStepScale.rawValue)
-        }
-    }
-    
-    @objc dynamic
-    var displacement: simd_float3{
-        get{
-            (value(forKey: SettingKey.sKeyDisplacement.rawValue) as! Data).float3()!
-        }
-        set{
-            setValue(newValue.data(), forKey: SettingKey.sKeyDisplacement.rawValue)
-        }
-    }
 
+class Store {
+    static let std = Store()
+    var references: [Cancellable] = []
 }
 
 class Setting: ObservableObject {
     static let standard = Setting()
 
-    private let userDefault = UserDefaults.standard
+    private var userDefault = UserDefaults.standard
+    private var sinks: [Any]?
 
-    @Published var displacement: simd_float3 = UserDefaults.standard.displacement
+    // Source
+    @Published(key: SettingKey.sKeyARSource.rawValue, rawRepresentableType: ARSource.self)
+    var arSource: ARSource
+    
+    @Published(key: SettingKey.sKeyProbeSorce.rawValue, rawRepresentableType: ProbeSource.self)
+    var probeSource: ProbeSource
+    
+    @Published(key: SettingKey.sKeySourceFolder.rawValue, urlType: URL.self)
+    var sourceFolder: URL?
+    
+    @Published(key: SettingKey.sKeyImageDepth.rawValue, type: Float.self)
+    var imageDepth: Float
+    
+    
+    // AR to Probe delay
+    @Published(key: SettingKey.sKeyTimeShift.rawValue, type: Float.self)
+    var timeShift: Float
+    
+    @Published(key: SettingKey.sKeyFixedDelay.rawValue, type: Float.self)
+    var fixedDelay: Float
+    
+    
+    // Voxel
+    @Published(key: SettingKey.sKeyDimension.rawValue, type: simd_uint3.self)
+    var dimension: simd_uint3
+    
+    @Published(key: SettingKey.sKeyStepScale.rawValue, type: Float.self)
+    var stepScale: Float
 
-    func set(depth: Float) {
-        userDefault.imageDepth = depth
+    
+    // Displacement
+    @Published(key: SettingKey.sKeyDisplacement.rawValue, type: simd_float3.self)
+    var displacement: simd_float3
+    
+    // Reset settings
+    func reset() {
+        // Override point for customization after application launch.
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+    }
+}
+
+extension Published{
+    
+    // Constructor for URL
+    init <T>(key: String, urlType: T.Type){
+        let data = UserDefaults.standard.value(forKey: key) as! Data
+        
+        var stale = false
+        let url = try? URL.init(resolvingBookmarkData: data, bookmarkDataIsStale: &stale)
+            
+        self.init(wrappedValue: (url ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]) as! Value)
+        Store.std.references.append(
+            projectedValue.sink(receiveValue: {(value) in
+                let _value = value as! URL
+                UserDefaults.standard.setValue(try? _value.bookmarkData(), forKey: key)
+            })
+        )
     }
 
-    func set(displacement: simd_float3) {
-        userDefault.displacement = displacement
-        self.displacement = displacement
+    // Constructor for Enum (RawRepresentable)
+    init<T: RawRepresentable & Codable>(key: String, rawRepresentableType: T.Type?=nil){
+        let value = UserDefaults.standard.value(forKey: key)
+        let enumValue =  T.init(rawValue: value as! T.RawValue)
+        self.init(wrappedValue: enumValue as! Value)
+        Store.std.references.append(
+            projectedValue.sink(receiveValue: {(value) in
+                let _value = value as! T
+                UserDefaults.standard.setValue(_value.rawValue, forKey: key)
+            })
+        )
+    }
+    
+    
+    // Constructor for PropertyList serializable properties
+    init<T: Codable>(key: String, type: T.Type?=nil){
+        var value = UserDefaults.standard.value(forKey: key)
+        if let data = value as? Data{
+            value = data.decode(as: T.self)
+        }
+        
+        self.init(wrappedValue: value as! Value)
+        addUserDefaultsUpdater(type: T.self, key: key)
+    }
+    
+    mutating func addUserDefaultsUpdater<T: Codable>(type: T.Type, key: String) {
+        Store.std.references.append(
+            projectedValue.sink { (value) in
+                let _value = value as! T
+                var _data: Data?
+                if !PropertyListSerialization.propertyList(value, isValidFor: .xml){
+                    _data = try? PropertyListEncoder().encode(_value)
+                    guard _data != nil else {
+                        os_log(.error, "\(T.Type.self) can neither be serialized to property list nor encooded to Data")
+                        return
+                    }
+                    UserDefaults.standard.setValue(_data , forKey: key)
+                    return
+                }
+                UserDefaults.standard.setValue(_value , forKey: key)
+                return
+            }
+        )
+    }
+}
+
+extension Data{
+    func decode<T: Decodable>(as type: T.Type) -> T? {
+        try? PropertyListDecoder().decode(type, from: self)
     }
 }

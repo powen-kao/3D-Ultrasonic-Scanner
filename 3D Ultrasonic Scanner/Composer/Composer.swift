@@ -70,7 +70,6 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
     var framerate: Int = UIScreen.main.maximumFramesPerSecond  // frames per second
         
     // Renderer
-    // WARNING: do not modifiy renderer from other controllers
     private(set) var renderer: Renderer?
     var voxelSize: simd_uint3?{
         didSet{
@@ -92,7 +91,9 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
             renderer?.displacement = self.displacement
         }
     }
-
+    
+    var timeShift: Float = 0
+    var fixedDelay: Float = 0
     
     // output
     private var outputAssest: MDLAsset?
@@ -124,13 +125,10 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
     private var captureScope: MTLCaptureScope?
     private var shouldCapture = false;
     
-    // Alias
-    let setting = UserDefaults.standard
 
     init(arSession: ARSession, scnView: SCNView) {
         self.arSession = arSession
         self.scnView = scnView
-        self.recordingURL = setting.sourceFolder
         super.init()
         
         // Get default device
@@ -376,7 +374,7 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
         guard baseTimestamp != nil else {
             return nil
         }
-        return baseTimestamp! + TimeInterval(setting.fixedDelay) + TimeInterval(setting.timeShift) + itemTime
+        return baseTimestamp! + TimeInterval(fixedDelay) + TimeInterval(timeShift) + itemTime
         
     }
 }
@@ -421,13 +419,9 @@ extension Composer{
         // Open file for recorder
         recorder.open(folder: _url, size: nil)
         
-        if probe != nil && probe!.isFileBased {
-            switchProbeSource(source: probeSource)
-        }
-
-        if arPlayer != nil && arPlayer!.isFileBased{
-            switchARSource(source: arSource)
-        }
+        // switch source will reopen probe and AR with new URL
+        switchProbeSource(source: probeSource)
+        switchARSource(source: arSource)
     }
     
     // public functions
@@ -571,17 +565,20 @@ extension Composer{
     }
 }
 
-@objc enum ProbeSource: Int {
+
+@objc enum ProbeSource: Int, Codable {
     // keep the same order as in storyboard
     case Streaming
     case Video
     case Image
 }
 
-@objc enum ARSource: Int {
+@objc enum ARSource: Int, Codable {
     case RealtimeAR
     case RecordedAR
 }
+
+
 
 @objc enum ARRecorderState: Int {
     case Ready

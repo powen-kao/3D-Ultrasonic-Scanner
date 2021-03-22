@@ -13,7 +13,7 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     var delegate: SettingViewDelegate?
     
     var selectedFolder: URL?
-    let setting = UserDefaults.standard
+    let setting = Setting.standard
     
     private var keyboardResponder: KeyboardResponder?
     
@@ -121,19 +121,15 @@ class SettingViewController: UITableViewController, UIDocumentPickerDelegate, UI
     @IBAction func displacementXChanged(_ sender: UISlider) {
         update(label: displacementXLabel, value: sender.value)
         setting.displacement.x = sender.value
-        Setting.standard.displacement.x = sender.value
     }
     @IBAction func displacementYChanged(_ sender: UISlider) {
         update(label: displacementYLabel, value: sender.value)
         setting.displacement.y = sender.value
-        Setting.standard.displacement.y = sender.value
 
     }
     @IBAction func displacementZChanged(_ sender: UISlider) {
         update(label: displacementZLabel, value: sender.value)
         setting.displacement.z  = sender.value
-        Setting.standard.displacement.z = sender.value
-
     }
     
     
@@ -150,6 +146,8 @@ private extension SettingViewController{
         probeSourceSegment.selectedSegmentIndex = setting.probeSource.rawValue
         arSourceSegment.selectedSegmentIndex = setting.arSource.rawValue
         folderPathLabel.text = setting.sourceFolder?.lastPathComponent ?? "Select Folder"
+        
+        let _setting = Setting.standard
                 
         update(textField: dimensionXTextField, value: Int(setting.dimension.x))
         update(textField: dimensionYTextField, value: Int(setting.dimension.y))
@@ -157,11 +155,11 @@ private extension SettingViewController{
         
         update(slider: timeShiftSlider, label: timeShiftValueLabel, value: setting.timeShift)
         update(slider: fixedDelaySlider, label: fixedDelayValueLabel, value: setting.fixedDelay)
-        update(slider: imageDepthSlider, label: imageDepthValueLabel, value: setting.imageDepth)
+        update(slider: imageDepthSlider, label: imageDepthValueLabel, value: _setting.imageDepth)
         update(slider: stepScaleSlider, label: stepScaleValueLabel, value: setting.stepScale)
-        update(slider: displacementXSlider, label: displacementXLabel, value: setting.displacement.x)
-        update(slider: displacementYSlider, label: displacementYLabel, value: setting.displacement.y)
-        update(slider: displacementZSlider, label: displacementZLabel, value: setting.displacement.z)
+        update(slider: displacementXSlider, label: displacementXLabel, value: _setting.displacement.x)
+        update(slider: displacementYSlider, label: displacementYLabel, value: _setting.displacement.y)
+        update(slider: displacementZSlider, label: displacementZLabel, value: _setting.displacement.z)
 
     }
     

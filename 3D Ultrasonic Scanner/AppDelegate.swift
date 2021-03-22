@@ -14,10 +14,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
         UserDefaults.standard.register(defaults: [SettingKey.sKeyProbeSorce.rawValue: ProbeSource.Streaming.rawValue,
                                                   SettingKey.sKeyARSource.rawValue: ARSource.RealtimeAR.rawValue,
-                                                  SettingKey.sKeySourceFolder.rawValue: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Recordings"), // default file path
+                                                  SettingKey.sKeySourceFolder.rawValue: try? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].bookmarkData(), // default file path
                                                   SettingKey.sKeyImageDepth.rawValue: 5,
                                                   
                                                   // Probe to AR
