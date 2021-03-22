@@ -67,18 +67,18 @@
                                             <constraint firstAttribute="height" constant="40" id="Cj2-YY-HzT"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="Mjs-cc-1oI"/>
-                                            <barButtonItem title="Action" id="nKS-FW-5Rp" userLabel="Actions">
-                                                <connections>
-                                                    <action selector="action:" destination="BV1-FR-VrT" id="8pN-Tn-bQO"/>
-                                                </connections>
-                                            </barButtonItem>
                                             <barButtonItem title="Info" id="Hrd-cG-pTW">
                                                 <connections>
                                                     <action selector="showInfo:" destination="BV1-FR-VrT" id="a4c-oo-ECz"/>
                                                     <segue destination="rKP-Xa-xg4" kind="popoverPresentation" identifier="sInfo" popoverAnchorBarButtonItem="Hrd-cG-pTW" id="WZQ-KF-7oc">
                                                         <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                                     </segue>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="Mjs-cc-1oI"/>
+                                            <barButtonItem title="Action" image="ellipsis.circle" catalog="system" id="nKS-FW-5Rp" userLabel="Actions">
+                                                <connections>
+                                                    <action selector="action:" destination="BV1-FR-VrT" id="8pN-Tn-bQO"/>
                                                 </connections>
                                             </barButtonItem>
                                         </items>
@@ -850,6 +850,7 @@
     </scenes>
     <resources>
         <image name="clear" catalog="system" width="128" height="114"/>
+        <image name="ellipsis.circle" catalog="system" width="128" height="121"/>
         <image name="folder" catalog="system" width="128" height="97"/>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="play.fill" catalog="system" width="116" height="128"/>
