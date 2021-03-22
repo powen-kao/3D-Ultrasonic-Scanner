@@ -67,16 +67,6 @@
                                             <constraint firstAttribute="height" constant="40" id="Cj2-YY-HzT"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem title="Import" id="3uI-QA-edN">
-                                                <connections>
-                                                    <action selector="selectAsset:" destination="BV1-FR-VrT" id="VVI-bu-fcx"/>
-                                                </connections>
-                                            </barButtonItem>
-                                            <barButtonItem title="Capture" id="ctI-xT-tU9">
-                                                <connections>
-                                                    <action selector="capture:" destination="BV1-FR-VrT" id="3wj-he-gDg"/>
-                                                </connections>
-                                            </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="Mjs-cc-1oI"/>
                                             <barButtonItem title="Action" id="nKS-FW-5Rp" userLabel="Actions">
                                                 <connections>

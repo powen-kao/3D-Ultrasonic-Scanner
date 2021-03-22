@@ -11,7 +11,7 @@ import ARKit
 import MetalKit
 import AVKit
 
-class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ComposerDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControllerDelegate, ComposerDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
@@ -97,19 +97,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, UIImagePickerControll
         makeActions(alertController: alertSheet)
         present(alertSheet, animated: true, completion: nil)
     }
-    @IBAction func selectAsset(_ sender: Any) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.allowsEditing = false
-        imagePicker.sourceType = .photoLibrary
-        present(imagePicker, animated: true, completion: nil)
-    }
     
     @IBAction func showInfo(_ sender: Any) {
     }
-    @IBAction func capture(_ sender: Any) {
-        Capturer.shared?.trigger()
-    }
+
     @IBAction func compose(_ sender: Any) {
         switch composer?.composeState {
         case .Idle:
@@ -303,47 +294,6 @@ extension ViewController{
             }),
             
         ]
-        
-//        let _setting = UserDefaults.standard
-//
-//        let sourceFolderObserver = _setting.observe(\.sourceFolder, options: [.initial, .new], changeHandler: { [self] setting, value in
-//            guard let _sourceFolder = setting.sourceFolder else {
-//                return
-//            }
-//            composer?.recordingURL = _sourceFolder
-//        })
-//
-//        let probeSourceObserver = _setting.observe(\.probeSource, options: [.initial, .new]  ,changeHandler: { [self] setting, value in
-//            composer?.switchProbeSource(source: setting.probeSource)
-//            composer?.startCompose()
-//        })
-//
-//        let arSourceObserver = _setting.observe(\.arSource, options: [.initial, .new], changeHandler: { [self] setting, value in
-//            composer?.switchARSource(source: setting.arSource)
-//            composer?.startCompose()
-//        })
-//
-////        let imageDepthObserver = _setting.observe(\.imageDepth, options: [.initial, .new], changeHandler: { [self] setting, value in
-////            composer?.imageDepth = Double(_settings.imageDepth)
-////        })
-//
-//        let voxelSizeObserver = _setting.observe(\.dimension, options: [.initial, .new], changeHandler: { [self] setting, value in
-//            composer?.voxelSize = _setting.dimension
-//        })
-//        let sizeCancellable = _setting.dimension
-//
-//        let stepScaleObserver = _setting.observe(\.stepScale, options: [.initial, .new], changeHandler: { [self] setting, value in
-//            composer?.voxelStepScale = Double(_setting.stepScale)
-//        })
-//
-//
-//        let displacementObserver = Setting.standard.$displacement.sink { [self] (value) in
-//            composer?.displacement = value
-//        }
-//
-        
-//        observers = [probeSourceObserver, sourceFolderObserver, arSourceObserver, imageDepthObserver,
-//                     voxelSizeObserver, stepScaleObserver, displacementObserver]
     }
     
     

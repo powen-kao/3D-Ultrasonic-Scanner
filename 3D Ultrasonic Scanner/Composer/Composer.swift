@@ -121,9 +121,6 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
         }
     }
     
-    // capturing
-    private var captureScope: MTLCaptureScope?
-    private var shouldCapture = false;
     
 
     init(arSession: ARSession, scnView: SCNView) {
@@ -140,10 +137,6 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
         
         // Create renderer with device
         renderer = Renderer(metalDevice: device!, voxelSize: voxelSize)
-        
-        // Capturer for GPU tracing
-        captureScope = MTLCaptureManager.shared().makeCaptureScope(device: device!)
-        captureScope?.label = String.init(describing: self)
 
         // Rest of the settings
         
@@ -430,24 +423,6 @@ extension Composer{
             return
         }
         self.renderer?.setARFrameAsReference(frame: _frame)
-    }
-    
-    // debug
-    func captureNextFrame() {
-        self.shouldCapture = true
-    }
-    private func startCapture(){
-        let captureManager = MTLCaptureManager.shared()
-        let captureDescriptor = MTLCaptureDescriptor()
-        captureDescriptor.captureObject = captureScope
-        do {
-            try captureManager.startCapture(with:captureDescriptor)
-            captureManager.stopCapture()
-        }
-        catch
-        {
-            fatalError("error when trying to capture: \(error)")
-        }
     }
     
     // MARK: - MTKViewDelegate
