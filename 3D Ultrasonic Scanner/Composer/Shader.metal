@@ -256,6 +256,13 @@ kernel void unproject(uint3 grid_pos [[thread_position_in_grid]],
         v->weight += invDistance;
         v->color = sum/v->weight;
         
+        auto accumulate = dot(v->color, float4(1, 1, 1, 0));
+        if (accumulate < 0.3){
+            v->color.a = 0.03;
+        }else{
+            v->color.a = 1;
+        }
+        
         // update state
         v->touched = true;
     }
