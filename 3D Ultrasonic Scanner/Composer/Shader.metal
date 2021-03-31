@@ -299,7 +299,7 @@ kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
                 // check if the neighbor has value
                 int _id = vPositionToId_3d(int3(grid_pos) + int3(x, y, z), &vInfo);
                 if (_id < 0)
-                    continue; // skip of neighbor is outside
+                    continue; // skip neighbor that is outside
 
                 constant Voxel &vc = voxelCopy[_id];
                 float _color = dot(vc.color.xyz, float3(0.333, 0.333, 0.333));
@@ -313,7 +313,7 @@ kernel void holeFilling(device Voxel *voxel [[buffer(kVoxel)]],
     }
     if (count > 0){
         // TODO: what about transparency?
-        voxel[vertexID].color = float4(float3(sum / count), 1);
+        voxel[vertexID].color = float4(float3(sum / count), voxel[vertexID].color.a);
     }
     // ----- ALGORITHM END-----
 }
