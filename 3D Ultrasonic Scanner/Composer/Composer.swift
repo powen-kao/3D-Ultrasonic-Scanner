@@ -177,7 +177,7 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
             case .Video:
                 // Setup probe
                 // TODO: use the fake probe now, but replace with real probe streamer in the future
-                self.probe = RecorderProbe(file: _path.appendingPathComponent("video.mov"))
+                self.probe = RecorderProbe(file: _path.appendingPathComponent("video.MOV"))
 
             case .Image:
                 self.probe = StaticProbe(file: _path.appendingPathComponent("image.jpg"))
