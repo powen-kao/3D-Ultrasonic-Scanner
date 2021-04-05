@@ -109,11 +109,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControlle
         }
     }
     @IBAction func clearVoxel(_ sender: Any) {
-        makeAlert(title: "Clear Voxels", message: "Are you sure to clear voxels? This action is DESTRUCTIVE") { [self] in
-            composer?.clearVoxel()
-        } decline: {
-            return
-        }
+        makeAlert(title: "Clear Voxels", message: "Are you sure to clear voxels? This action is DESTRUCTIVE",
+                       acceptContext: AlertActionContext(message: "CLEAR", action: { [self] in
+                                                            composer?.clearVoxel()
+                       }),
+                       declineContext: AlertActionContext(message: "Cancel", action: nil))
+        
         present(alertController!, animated: true, completion: nil)
     }
 
@@ -183,19 +184,29 @@ class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControlle
 }
 
 extension ViewController{
-    @discardableResult
-    func makeAlert(title: String, message: String, accept: AlertAction? = nil, decline: AlertAction? = nil) -> UIAlertController{
-        alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController?.addAction(.init(title: "Clear", style: .destructive, handler: { _ in
-            accept?()
-        }))
-        alertController?.addAction(.init(title: "Cancel", style: .default, handler: { _ in
-            decline?()
-        }))
-        
-        return alertController!
+    struct AlertActionContext {
+        let message: String
+        let action: AlertAction?
     }
     
+    @discardableResult
+    func makeAlert(title: String, message: String, acceptContext: AlertActionContext? = nil, declineContext: AlertActionContext? = nil) -> UIAlertController{
+
+        alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        if acceptContext != nil{
+            alertController?.addAction(.init(title: "Clear", style: .destructive, handler: { _ in
+                acceptContext!.action?()
+            }))
+        }
+        if declineContext != nil{
+            alertController?.addAction(.init(title: "Cancel", style: .default, handler: { _ in
+                declineContext!.action?()
+            }))
+        }
+
+        return alertController!
+    }
+        
     func makeActions(alertController: UIAlertController) {
         alertController.addAction(
             UIAlertAction(title: "Set As Origin", style: .default, handler: {_ in
@@ -217,7 +228,15 @@ extension ViewController{
         } else{
             alertController.addAction(
                 UIAlertAction(title: "Stop Recording", style: .default, handler: {_ in
-                    self.composer?.stopRecording()
+                    self.composer?.stopRecording { [self] (recorder, success) in
+                        if (!success){
+                            let alert = makeAlert(title: "Recording Failed", message: "Unknown Error")
+                            present(alertController: alert, completion: nil, delay: 2)
+                        }else{
+                            let alert = makeAlert(title: "Recording Success", message: "AR tracking file saved to folder: \(String(describing: composer?.recordingURL?.lastPathComponent))")
+                            present(alertController: alert, completion: nil, delay: 2)
+                        }
+                    }
                 })
             )
         }

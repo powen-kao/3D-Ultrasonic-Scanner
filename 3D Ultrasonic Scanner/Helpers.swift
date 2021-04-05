@@ -112,3 +112,16 @@ extension UIImage {
         return nil
     }
 }
+
+extension UIViewController{
+    func present(alertController: UIAlertController, animated: Bool = true, completion: (()->(Void))?, delay: Double?) {
+        self.present(alertController, animated: animated, completion: completion)
+        
+        if delay != nil{
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay!) {
+                alertController.dismiss(animated: true, completion: nil)
+            }
+        }
+
+    }
+}

@@ -251,12 +251,14 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
         recorderState = .Recording
     }
     
-    func stopRecording() {
+    func stopRecording(completeHandler: ARRecorder.SaveCompleteHandler?) {
         recorderState = .Busy
         recorder.save { [self] (recorder, success) in
             print("[Save success: \(success)] \(recorder)")
             recorder.clear()
             recorderState = .Ready
+            
+            completeHandler?(recorder, success)
         }
     }
     
