@@ -16,7 +16,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControlle
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var scnView: SCNView!
     @IBOutlet weak var composeButton: UIBarButtonItem!
-    @IBOutlet weak var recordButton: UIBarButtonItem!
     
     // Controllers
     private var alertController: UIAlertController?
@@ -117,21 +116,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControlle
         }
         present(alertController!, animated: true, completion: nil)
     }
-    
-    @IBAction func record(_ sender: Any) {
-        switch composer?.recorderState {
-        case .Ready:
-            composer?.startRecording()
-            break
-        case .Recording:
-            composer?.stopRecording()
-            break
-        default: break
-        }
-    }
 
     // MARK: - ARSCNViewDelegate
-    
 /*
     // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -191,14 +177,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, UINavigationControlle
     }
     
     func recordingState(_ composer: Composer, changeTo state: ARRecorderState) {
-        switch state {
-        case .Ready:
-            recordButton.image = UIImage(systemName: "record.circle")
-            break
-        default:
-            recordButton.image = UIImage(systemName: "stop.circle")
-            break
-        }
+        // handle recording state chagne
     }
     
 }

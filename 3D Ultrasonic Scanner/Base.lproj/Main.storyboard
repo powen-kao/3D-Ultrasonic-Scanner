@@ -26,11 +26,6 @@
                                             <constraint firstAttribute="height" constant="40" id="Mur-1g-nIa"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem title="Item" image="record.circle" catalog="system" id="ee1-a6-zVJ">
-                                                <connections>
-                                                    <action selector="record:" destination="BV1-FR-VrT" id="Uor-5n-zqX"/>
-                                                </connections>
-                                            </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="bKz-2q-J6F"/>
                                             <barButtonItem title="Item" image="clear" catalog="system" id="4B6-e8-THN">
                                                 <connections>
@@ -111,7 +106,6 @@
                     </navigationItem>
                     <connections>
                         <outlet property="composeButton" destination="mgB-iB-cG2" id="nNA-we-te2"/>
-                        <outlet property="recordButton" destination="ee1-a6-zVJ" id="5F8-cK-1CJ"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                         <outlet property="scnView" destination="86V-wZ-on6" id="DY8-KI-Q0i"/>
                     </connections>
@@ -854,7 +848,6 @@
         <image name="folder" catalog="system" width="128" height="97"/>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="play.fill" catalog="system" width="116" height="128"/>
-        <image name="record.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

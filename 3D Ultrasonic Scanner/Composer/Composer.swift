@@ -108,7 +108,7 @@ class Composer: NSObject, ARSessionDelegate, ProbeDelegate, RendererDelegate, AR
     
     // Recorder
     internal let recorder: ARRecorder = ARRecorder()
-    internal var recorderState: ARRecorderState = .Ready {
+    private(set) var recorderState: ARRecorderState = .Ready {
         willSet(newState){
             if newState != recorderState{
                 delegate?.recordingState?(self, changeTo: newState)
