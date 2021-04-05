@@ -251,15 +251,8 @@ extension ViewController{
         
         let _setting = Setting.standard
         
+        // IMPORTANT: The order of adding observer is important since the properties update accordingly as listed
         observers = [
-            _setting.$probeSource.sink(receiveValue: { [self] (value) in
-                composer?.switchProbeSource(source: value)
-                composer?.startCompose()
-            }),
-            _setting.$arSource.sink(receiveValue: { [self] (value) in
-                composer?.switchARSource(source: value)
-                composer?.startCompose()
-            }),
             _setting.$sourceFolder.sink(receiveValue: { [self] (value) in
                 guard let _sourceFolder = value else {
                     return
@@ -289,6 +282,15 @@ extension ViewController{
             
             _setting.$displacement.sink(receiveValue: { (value) in
                 self.composer?.displacement = value
+            }),
+            
+            _setting.$probeSource.sink(receiveValue: { [self] (value) in
+                composer?.switchProbeSource(source: value)
+                composer?.startCompose()
+            }),
+            _setting.$arSource.sink(receiveValue: { [self] (value) in
+                composer?.switchARSource(source: value)
+                composer?.startCompose()
             }),
             
         ]
