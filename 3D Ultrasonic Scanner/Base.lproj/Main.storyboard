@@ -639,7 +639,7 @@
                                                                 </label>
                                                             </subviews>
                                                         </stackView>
-                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-10" maxValue="10" id="CXl-AJ-n7y">
+                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-30" maxValue="30" id="CXl-AJ-n7y">
                                                             <rect key="frame" x="83.333333333333343" y="0.0" width="266.66666666666663" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <connections>
@@ -696,7 +696,7 @@
                                                                 </label>
                                                             </subviews>
                                                         </stackView>
-                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-10" maxValue="10" id="c80-uv-x76">
+                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-30" maxValue="30" id="c80-uv-x76">
                                                             <rect key="frame" x="83" y="0.0" width="267" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <connections>
@@ -753,7 +753,7 @@
                                                                 </label>
                                                             </subviews>
                                                         </stackView>
-                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-10" maxValue="10" id="EVR-eo-F85">
+                                                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-30" maxValue="30" id="EVR-eo-F85">
                                                             <rect key="frame" x="83" y="0.0" width="267" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <connections>
