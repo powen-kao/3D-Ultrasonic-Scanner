@@ -806,7 +806,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DLr-Ei-eAQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1928.9719626168223" y="-194.38444924406048"/>
+            <point key="canvasLocation" x="1793" y="-189"/>
         </scene>
         <!--Momo Scanner-->
         <scene sceneID="SHu-uO-cdg">
