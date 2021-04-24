@@ -16,7 +16,7 @@ class StreamingProbe: Probe {
     private var startTimestamp:TimeInterval?
 
     override func open() -> Bool{
-        guard let _image = UIImage(named: "ar_placeholder")?.toCVPixelBuffer() else {
+        guard let _image = UIImage(named: "dot")?.toCVPixelBuffer() else {
             return false
         }
         image = _image
